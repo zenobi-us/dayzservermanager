@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+mise run core:tasks
+yarn install

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+#
+# Use this command to run any yarn commands in the manager package
+#
+#  mise run manager install -D lodash
+#
+
+yarn workspace @dayzserver/manager "$@"

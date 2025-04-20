@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#MISE dir="apps/manager"
+
+pwd && ls -al
+
+node dist/server

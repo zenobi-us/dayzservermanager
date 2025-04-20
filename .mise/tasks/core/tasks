@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# find all files in .mise/tasks and chmod +x them
+find .mise/tasks -type f -exec chmod +x {} \;

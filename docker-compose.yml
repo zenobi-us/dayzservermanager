@@ -78,3 +78,6 @@ services:
 #        hard: -1
     env_file:
       - .env
+    environment:
+      - SERVER_NAME=dayzaitest
+      - MANAGER_URL=http://web:8000/

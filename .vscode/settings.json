@@ -1,0 +1,6 @@
+{
+    "debug.javascript.defaultRuntimeExecutable": {
+        "pwa-node": "/home/zenobius/.local/share/mise/shims/node"
+    },
+    "shellcheck.executablePath": "/home/zenobius/.local/share/mise/shims/shellcheck"
+}
