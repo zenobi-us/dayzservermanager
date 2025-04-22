@@ -1,0 +1,26 @@
+tasks:
+  format:
+    command: 'prettier --check .'
+  lint:
+    command: 'eslint --no-error-on-unmatched-pattern .'
+
+  typecheck:
+    command:
+      - 'tsc'
+      # Use incremental builds with project references
+      - '--build'
+      # Always use pretty output
+      - '--pretty'
+      # Use verbose logging to see affected projects
+      - '--verbose'
+    inputs:
+      # Source and test files
+      - 'src/**/*'
+      - 'tests/**/*'
+      # Type declarations
+      - 'types/**/*'
+      # Project configs
+      - 'tsconfig.json'
+      - 'tsconfig.*.json'
+      # Root configs (extended from only)
+      - '/tsconfig.options.json'

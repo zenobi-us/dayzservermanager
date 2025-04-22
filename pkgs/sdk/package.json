@@ -1,0 +1,9 @@
+{
+    "name": "@dayzserver/sdk",
+    "type": "module",
+    "types": "./src/index.ts",
+    "dependencies": {
+        "@types/nconf": "^0.10.7",
+        "nconf": "^0.13.0"
+    }
+}

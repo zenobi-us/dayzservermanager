@@ -1,14 +1,13 @@
 #!/bin/bash
 
-#MISE depends=[ "docker:base:build"]
-
-#USAGE arg "v version" "version to tag the image with" {
-#USAGE   default "local"
-#USAGE }
+#MISE depends=["docker:base:build"]
+#USAGE flag "-v --version <version>" "version to tag the image with" default="local"
 
 docker build \
-    -t dayzserver:manager-${usage_version:-local} \
-    --file ./manager/Dockerfile \
+    --progress=plain \
+    --file ./apps/server/Dockerfile \
+    --build-arg USER_ID=${UID:-1000} \
     --build-arg BASE_IMAGE=dayzserver:base-${usage_version:-local} \
     --build-arg BUILD_DATE="$(date +%Y-%m-%dT%H:%M:%S)" \
+    -t dayzserver:server-${usage_version:-local} \
     ./

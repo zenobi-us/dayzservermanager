@@ -1,0 +1,9 @@
+#!/usr/bin/env -S tsx
+import fs from "fs/promises";
+import { Config } from '@dayzserver/sdk';
+import { createLogger } from '@dayzserver/cli';
+
+const logger = createLogger('DayZ/Server/Start');
+
+logger.log(`Starting`)
+

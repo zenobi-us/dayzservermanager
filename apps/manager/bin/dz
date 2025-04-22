@@ -136,6 +136,7 @@ remove(){
 	else
 		echo "Directory ${DIR} doesn't exist?"
 	fi
+
 	if [ -L "${SERVER_FILES}/@${MODNAME}" ]
 	then
 		echo "Removing symlink ${SERVER_FILES}/@${MODNAME}"
@@ -143,6 +144,7 @@ remove(){
 	else
 		echo "Symlink ${SERVER_FILES}/@${MODNAME} doesn't exist?"
 	fi
+	
 	echo -e "Mod id ${1} - ${red}${MODNAME}${default} - removed"
 }
 

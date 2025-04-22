@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.options.json",
+  "exclude": [],
+  "references": [
+    {
+      "path": "apps/manager"
+    },
+    {
+      "path": "apps/server"
+    },
+    {
+      "path": "pkgs/sdk"
+    },
+    {
+      "path": "pkgs/cli"
+    }
+  ]
+}

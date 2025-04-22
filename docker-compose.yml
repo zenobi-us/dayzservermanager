@@ -1,3 +1,8 @@
+
+#
+# These are the shared volumes.
+# All server containers will use these volumes.
+
 volumes:
   # For steamcmd files and resource files used by the scripts
   homedir_main:
@@ -16,11 +21,8 @@ volumes:
 
 services:
 
-  web:
-    build:
-      context: web
-      args:
-        - USER_ID
+  manager:
+    image: dayzserver:manager-${version:-local}
     user: ${USER_ID}
     volumes:
       - homedir_main:/home/user
@@ -29,19 +31,18 @@ services:
       - mods:/serverfiles/steamapps/workshop/content
       - mods:/mods
       - ./files:/files
-      - ./web:/web
+      - ./:/opt/repo/
     ports:
-      - "8001:8001/tcp"
+      - "5173:5173/tcp"
       - "8000:8000/tcp"
     restart: always
+    environment:
+      - MANAGER_PORT=8000
     env_file:
       - .env
 
-  server:
-    build:
-      context: server
-      args:
-        - USER_ID
+  server_one:
+    image: dayzserver:server-${version:-local}
     user: ${USER_ID}
     volumes:
       - homedir_server:/home/user
@@ -51,7 +52,7 @@ services:
       - mpmissions:/serverfiles/mpmissions
       - profiles:/profiles
       - ./files:/files
-      - ./server:/server
+      - ./:/opt/repo/
     # To have the server show up in the LAN tab of the DayZ launcher,
     # it must run under host mode.
     network_mode: host
@@ -79,5 +80,4 @@ services:
     env_file:
       - .env
     environment:
-      - SERVER_NAME=dayzaitest
-      - MANAGER_URL=http://web:8000/
+      - SERVER_NAME=server_one

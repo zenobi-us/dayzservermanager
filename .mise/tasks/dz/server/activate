@@ -1,0 +1,10 @@
+#!/usr/bin/env -S tsx
+import fs from "fs/promises";
+import tmpl from 'chalk-template';
+
+import { Config } from '@dayzserver/sdk'
+import { createLogger } from '@dayzserver/cli'
+
+const logger = createLogger('DayZ/Server/Activate')
+
+logger.log('Activating')

@@ -17,9 +17,8 @@ ARG USER_ID
 
 RUN groupadd -g ${USER_ID} user && \
     useradd -l -u ${USER_ID} -m -g user user && \
-    mkdir -p /home/user /serverfiles/mpmissions /serverfiles/steamapps/workshop/content /opt/repo && \
+    mkdir -p /home/user /serverfiles/steamapps/workshop/content /opt/repo && \
     chown -R user:user /home/user /serverfiles /opt/repo
-
 
 COPY ./apps/manager/s6/services/* /etc/s6-overlay/s6-rc.d/
 COPY ./apps/manager/s6/contents.d/* /etc/s6-overlay/s6-rc.d/user/contents.d/
@@ -35,16 +34,18 @@ COPY ./.mise/tasks/setup ./.mise/tasks/
 COPY .yarn/ ./.yarn/
 COPY ./.yarnrc.yml ./yarn.lock ./package.json ./
 COPY ./apps/manager/package.json ./apps/manager/
+COPY ./apps/sdk/package.json ./apps/sdk/
 
 RUN mise trust --yes --silent
 RUN mise install
 RUN mise run setup
 
-COPY ./apps/manager/ ./manager/
+COPY ./apps/manager/ ./apps/manager/
+COPY ./apps/sdk/ ./apps/sdk/
 COPY .mise/ ./.mise/
 
 RUN mise run core:tasks
-RUN mise run manager build
+RUN mise run manager:build
 
 # Use our non-privileged user
 USER user
@@ -52,7 +53,5 @@ USER user
 # The dayzserver script expects a home directory to itself.
 WORKDIR /home/user
 
-# Run the web server
-ENTRYPOINT ["/opt/manager/entrypoint.sh"]
-# s6 handles the rest of the lifecycle. We don't need to do anything here.
-CMD [""]
+# s6 handles the rest of the lifecycle.
+ENTRYPOINT ["/init"]

@@ -1,2 +1,0 @@
-#!/bin/bash
-mise run web:api:dev

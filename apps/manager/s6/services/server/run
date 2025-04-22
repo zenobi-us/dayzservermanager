@@ -1,2 +1,2 @@
 #!/bin/bash
-mise run manager dev
+mise run manager:start

@@ -1,0 +1,16 @@
+$schema: './cache/schemas/toolchain.json'
+
+typescript:
+  projectConfigFileName: 'tsconfig.json'
+  rootConfigFileName: 'tsconfig.json'
+  routeOutDirToCache: true
+  syncProjectReferences: true
+  syncProjectReferencesToPaths: true
+  includeProjectReferenceSources: true
+
+node:
+  packageManager: 'yarn'
+  dependencyVersionFormat: 'workspace'
+  dedupeOnLockfileChange: true
+  addEnginesConstraint: true
+  syncProjectWorkspaceDependencies: true

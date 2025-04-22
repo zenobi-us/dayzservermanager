@@ -555,16 +555,6 @@ get_map_name(){
   echo ${MAP}
 }
 
-enroll() {
-	local manager_url
-	
-	manager_url="${MANAGER_URL:-http://localhost:8000}"
-
-	# send a POST request to the manager URL to enrol this server
-	curl -X POST \
-		"${manager_url}/enroll" \
-		-d "server_id=${SERVER_ID}&map_name=${MAP_NAME}"
-}
 
 # Display the status of everything
 status(){

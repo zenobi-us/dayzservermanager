@@ -1,12 +1,38 @@
 {
-	"compilerOptions": {
-		"target": "es2020",
-		"module": "ESNext",
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"strict": true,
-		"skipLibCheck": true,
-		"moduleResolution": "Bundler",
-		"customConditions": ["import"]
-	}
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "target": "ES2022",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "composite": true,
+    "types": [
+      "vinxi"
+    ],
+    "paths": {
+      "@/*": [
+        "./app/*"
+      ],
+      "@dayzserver/sdk": [
+        "../../pkgs/sdk/src/index.ts"
+      ],
+      "@dayzserver/sdk/*": [
+        "../../pkgs/sdk/src/*"
+      ]
+    },
+    "outDir": "../../.moon/cache/types/apps/manager"
+  },
+  "include": [
+    "../../pkgs/sdk/**/*",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "references": [
+    {
+      "path": "../../pkgs/sdk"
+    }
+  ]
 }

@@ -1,12 +1,10 @@
 #!/bin/bash
 
-#MISE sources=["docker/Dockerfile.base"]
-#USAGE arg "v version" "version to tag the image with" {
-#USAGE   default "local"
-#USAGE }
+#MISE sources=["apps/docker/Dockerfile.base"]
+#USAGE flag "-v --version <version>" "version to tag the image with" default="local"
 
 docker build \
     -t dayzserver:base-${usage_version:-local} \
-    --file ./docker/Dockerfile.base \
+    --file ./apps/docker/Dockerfile.base \
     --build-arg BUILD_DATE="$(date +%Y-%m-%dT%H:%M:%S)" \
     ./
