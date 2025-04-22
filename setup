@@ -9,20 +9,14 @@ build_images() {
 create_server() {
     local serverid
 
-    serverid="${1}"
+    export serverid="${1}"
+    service="$(yq '.services.server | to_json(0) ' ./docker-compose.server.yml)"
+    service="$(yq '.environment.0 = ("SERVER_ID=${serverid}" | envsubst)' <<<"${service}")"
 
-    # create a jq empty object
-    context=$(jq --null-input '{}')
-    # add serverid key to the object
-    context=$(echo "$context" | jq --arg serverid "${serverid}" '.serverid = $serverid')
-    # write it out to a file
-    context_file=$(mktmp -t dayzserver.json)
+    # write it into services as .services.${serverid}
+    yq -i ".services[strenv(serverid)] = ${service}" docker-compose.yml
 
-    echo "$context" >"$context_file"
-
-    render --engine nunjucks --context "${context_file}" ./docker-compose.server.tmpl |
-        tee "./docker-compose.${serverid}.yml"
-
+    unset serverid
 }
 
 case "$1" in
