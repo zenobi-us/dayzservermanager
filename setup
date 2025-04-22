@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+build_images() {
+    docker build -t "dayzserver:base-local" -f ./pkgs/docker/Dockerfile.base .
+    docker build -t "dayzserver:manager-local" -f ./apps/manager/Dockerfile .
+    docker build -t "dayzserver:server-local" -f ./apps/server/Dockerfile .
+}
+
+create_server() {
+    local serverid
+
+    serverid="${1}"
+
+    # create a jq empty object
+    context=$(jq --null-input '{}')
+    # add serverid key to the object
+    context=$(echo "$context" | jq --arg serverid "${serverid}" '.serverid = $serverid')
+    # write it out to a file
+    context_file=$(mktmp -t dayzserver.json)
+
+    echo "$context" >"$context_file"
+
+    render --engine nunjucks --context "${context_file}" ./docker-compose.server.tmpl |
+        tee "./docker-compose.${serverid}.yml"
+
+}
+
+case "$1" in
+image)
+    build_manager_image
+    ;;
+server)
+    create_server "${2}"
+    ;;
+esac

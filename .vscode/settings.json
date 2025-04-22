@@ -21,5 +21,8 @@
     "debug.javascript.defaultRuntimeExecutable": {
         "pwa-node": "/home/zenobius/.local/share/mise/shims/node"
     },
-    "shellcheck.executablePath": "/home/zenobius/.local/share/mise/shims/shellcheck"
+    "shellcheck.executablePath": "/home/zenobius/.local/share/mise/shims/shellcheck",
+    "[shellscript]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    }
 }

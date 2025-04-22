@@ -2,6 +2,7 @@
 node = "20.12.2"
 usage = "latest"
 yarn = "1.22.19"
+yq = "latest"
 
 # # mise config files are hierarchical. mise will find all of the config files
 # # in all parent directories and merge them together.

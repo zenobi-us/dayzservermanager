@@ -17,6 +17,7 @@
     "jiti": "2.4.2",
     "packemon": "^4.1.0",
     "prettier": "^3.5.3",
+    "render-cli": "^0.3.2",
     "swc-node": "^1.0.0",
     "ts-node": "^10.9.2",
     "tsconfig-moon": "^1.4.0",
