@@ -1,5 +1,5 @@
 services:
-  server:
+  game_server_one:
     image: 'dayzserver:server-${version:-local}'
     user: '${USER_ID}'
 
@@ -7,32 +7,53 @@ services:
       - .env
 
     environment:
-      - SERVER_ID={{SERVER_ID}}
+      - SERVER_ID=game_server_one
 
     volumes:
-      - 'homedir_server:/home/user'
-      - 'serverfiles:/serverfiles'
-      - 'servermpmissions:/mpmissions:ro'
-      - 'mods:/mods'
-      - 'mpmissions:/serverfiles/mpmissions'
-      - 'profiles:/profiles'
+      - type: volume
+        source: homes
+        target: /home/user
+        volume:
+          subpath: game_server_one
+
+      - type: volume
+        source: serverfiles
+        target: /store/serverfiles
+        volume:
+          subpath: game_server_one
+
+      - type: volume
+        source: servermissions
+        target: /store/servermissions
+        read_only: true
+        volume:
+          subpath: game_server_one
+
+      - type: volume
+        source: serverprofiles
+        target: /store/serverprofiles
+        read_only: true
+        volume:
+          subpath: game_server_one
+
+      # these are for development
       - './files:/files'
       - './:/opt/repo/'
 
     # To have the server show up in the LAN tab of the DayZ launcher,
     # it must run under host mode.
-    network_mode: host
+    # network_mode: host
 
     # The above is mutually exclusive with the below. If you don't need
     # the server to show up on the LAN, comment out the network_mode above
     # and uncomment the port mappings below.
-    #    ports:
-    #       # Game port
-    #      - 2302:2302/udp
-    #       # RCON port
-    #      - 2303:2303/udp
-    #       # Steam port
-    #      - 27016:27016/udp
+    ports:
+      # Game port
+      - 2302:2302/udp
+      # RCON port
+      - 2303:2303/udp
+      # Steam port
+      - 27016:27016/udp
 
     restart: unless-stopped
 

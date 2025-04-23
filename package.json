@@ -2,8 +2,6 @@
   "name": "dayzserver",
   "dependencies": {
     "@arethetypeswrong/cli": "^0.17.4",
-    "@dayzserver/cli": "workspace:*",
-    "@dayzserver/sdk": "workspace:*",
     "@devcontainers/cli": "^0.75.0",
     "@eslint/js": "^9.8.0",
     "@moonrepo/cli": "^1.33.1",

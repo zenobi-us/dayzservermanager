@@ -1766,7 +1766,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dayzserver/cli@workspace:*, @dayzserver/cli@workspace:pkgs/cli":
+"@dayzserver/cli@workspace:pkgs/cli":
   version: 0.0.0-use.local
   resolution: "@dayzserver/cli@workspace:pkgs/cli"
   dependencies:
@@ -8011,8 +8011,6 @@ __metadata:
   resolution: "dayzserver@workspace:."
   dependencies:
     "@arethetypeswrong/cli": "npm:^0.17.4"
-    "@dayzserver/cli": "workspace:*"
-    "@dayzserver/sdk": "workspace:*"
     "@devcontainers/cli": "npm:^0.75.0"
     "@eslint/js": "npm:^9.8.0"
     "@moonrepo/cli": "npm:^1.33.1"

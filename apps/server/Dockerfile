@@ -1,4 +1,5 @@
-ARG BASE_IMAGE=dayzserver:base
+ARG VERSION=local
+ARG BASE_IMAGE=dayzserver:base-${VERSION:-local}
 FROM "$BASE_IMAGE" AS base
 
 
@@ -24,14 +25,14 @@ COPY ./.mise/tasks/setup ./.mise/tasks/
 COPY .yarn/ ./.yarn/
 COPY ./.yarnrc.yml ./yarn.lock ./package.json ./
 COPY ./apps/server/package.json ./apps/server/
-COPY ./apps/sdk/package.json ./apps/sdk/
+COPY ./pkgs/sdk/package.json ./pkgs/sdk/
 
 RUN mise trust --yes --silent
 RUN mise install
 RUN mise run setup
 
 COPY ./apps/manager/ ./apps/manager/
-COPY ./apps/sdk/ ./apps/sdk/
+COPY ./pkgs/sdk/ ./pkgs/sdk/
 COPY .mise/ ./.mise/
 
 RUN mise run core:tasks
@@ -44,4 +45,4 @@ USER user
 WORKDIR /home/user
 
 # s6 handles the rest of the lifecycle. 
-ENTRYPOINT ["/opt/repo/apps/server/bin/entrypoint.sh"]
+ENTRYPOINT ["/init"]

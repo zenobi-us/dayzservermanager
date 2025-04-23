@@ -41,8 +41,8 @@ ENV LC_ALL=en_US.UTF-8
 
 RUN apt-get update  \
     && apt-get -y --no-install-recommends install  \
-        # install any other dependencies you might need
-        sudo curl git ca-certificates build-essential \
+    # install any other dependencies you might need
+    sudo curl git ca-certificates build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 FROM base AS withmise
@@ -63,6 +63,6 @@ RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
 ADD https://github.com/just-containers/s6-overlay/releases/download/v3.1.6.2/s6-overlay-x86_64.tar.xz /tmp
 RUN tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz
 
-COPY ./apps/docker/bin/ /opt/repo/docker/bin/
+COPY ./pkgs/docker/bin/ /opt/repo/pkgs/docker/bin/
 
-ENV PATH="/opt/repo/docker/bin:$PATH"
+ENV PATH="/opt/repo/pkgs/docker/bin:$PATH"

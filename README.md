@@ -39,9 +39,22 @@ echo "export USER_ID=${UID}" | tee .env
 There are two images, the manager and the game server.
 
 ```shell
-docker compose build manager
-docker -f ./docker-compose.server.yml compose build server
+./setup images
 ```
+
+Install the server files. This will download about 2.9G of files.
+
+```shell
+./setup install
+```
+
+### Create more servers
+
+Clone the `example.docker-compose.serverone.yml` file to create a new service:
+
+1. rename the file to `docker-compose.<service_name>.yml`.
+2. replace all occurrences of `SERVERNAME` with your `<service_name>`.
+3. increment the ports by one. `2302:2302/udp` -> `2303:2302/udp`, etc...
 
 ### Steam Integration
 
@@ -63,18 +76,6 @@ This will store a session token in the `homedir` docker volume. All subsequent S
 so this process does not need to be repeated unless the session expires or the docker volume is deleted.
 
 To manage the login credentials, simply run the above command again. See [Manage](#manage).
-
-### Create a server
-
-Modify the `docker-compose.yml` to add a new server entry. There is a commented example, follow the trend.
-
-The base server files must be installed before the server can be run:
-
-```shell
-docker compose run --rm web dz install
-```
-
-This will download about 2.9G of files.
 
 ## Run
 

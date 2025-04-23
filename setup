@@ -1,29 +1,42 @@
 #!/usr/bin/env bash
 
 build_images() {
-    docker build -t "dayzserver:base-local" -f ./pkgs/docker/Dockerfile.base .
-    docker build -t "dayzserver:manager-local" -f ./apps/manager/Dockerfile .
-    docker build -t "dayzserver:server-local" -f ./apps/server/Dockerfile .
+    local user_id
+
+    user_id=$(id -u)
+
+    docker build \
+        --build-arg "USER_ID=${user_id}" \
+        --build-arg "VERSION=local" \
+        -t "dayzserver:base-local" \
+        -f ./pkgs/docker/Dockerfile .
+
+    docker build \
+        --build-arg "USER_ID=${user_id}" \
+        --build-arg "VERSION=local" \
+        -t "dayzserver:manager-local" \
+        -f ./apps/manager/Dockerfile .
+
+    docker build \
+        --build-arg "USER_ID=${user_id}" \
+        --build-arg "VERSION=local" \
+        -t "dayzserver:server-local" \
+        -f ./apps/server/Dockerfile .
 }
 
-create_server() {
-    local serverid
-
-    export serverid="${1}"
-    service="$(yq '.services.server | to_json(0) ' ./docker-compose.server.yml)"
-    service="$(yq '.environment.0 = ("SERVER_ID=${serverid}" | envsubst)' <<<"${service}")"
-
-    # write it into services as .services.${serverid}
-    yq -i ".services[strenv(serverid)] = ${service}" docker-compose.yml
-
-    unset serverid
+install() {
+    docker compose run --rm manager mise server:install
 }
 
 case "$1" in
-image)
-    build_manager_image
+images)
+    build_images
     ;;
-server)
-    create_server "${2}"
+install)
+    install
+    ;;
+*)
+    echo "Usage: $0 {images|install}"
+    exit 1
     ;;
 esac

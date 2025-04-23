@@ -1,4 +1,5 @@
-ARG BASE_IMAGE=dayzserver:base
+ARG VERSION=local
+ARG BASE_IMAGE=dayzserver:base-${VERSION:-local}
 FROM "$BASE_IMAGE" AS base
 
 
@@ -30,18 +31,18 @@ FROM base AS build
 WORKDIR /opt/repo
 
 COPY ./mise.toml ./
-COPY ./.mise/tasks/setup ./.mise/tasks/
+COPY ./.mise/tasks ./.mise/tasks
 COPY .yarn/ ./.yarn/
 COPY ./.yarnrc.yml ./yarn.lock ./package.json ./
 COPY ./apps/manager/package.json ./apps/manager/
-COPY ./apps/sdk/package.json ./apps/sdk/
+COPY ./pkgs/sdk/package.json ./pkgs/sdk/
 
 RUN mise trust --yes --silent
 RUN mise install
 RUN mise run setup
 
 COPY ./apps/manager/ ./apps/manager/
-COPY ./apps/sdk/ ./apps/sdk/
+COPY ./pkgs/sdk/ ./pkgs/sdk/
 COPY .mise/ ./.mise/
 
 RUN mise run core:tasks

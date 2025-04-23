@@ -4,37 +4,77 @@
 
 volumes:
   # For steamcmd files and resource files used by the scripts
-  homedir_main:
-  # For Steam, for now
-  homedir_server:
+  # /home/manager
+  # /home/:serverid
+  homes:
+
   # Where the server files will be installed
+  # Steam downloads dayzserver here
+  # /store/steam/DayZServer
+  steamstore:
+
+  # Serverfiles
+  # /serverfiles/:serverid/DayZServer
   serverfiles:
-  # Server profile files
-  profiles:
-  # Upstream mission files
-  servermpmissions:
-  # Server mission files
-  mpmissions:
-  # Mods
-  mods:
+
+  # Activated Server Mod Store
+  # /serverfiles/:serverid/mods/
+  servermods:
+
+  # Server Missions
+  # /serverfiles/:serverid/mpmissions/
+  servermissions:
+
+  # /serverfiles/:serverid/profiles/
+  serverprofiles:
 
 services:
+  volume_setup:
+    image: alpine
+    container_name: 'volume_setup'
+    command: |
+      mkdir -p /home/manager
+
+    volumes:
+      - homes:/home
+
   manager:
     image: dayzserver:manager-${version:-local}
     user: ${USER_ID}
+    depends_on:
+      - 'volume_setup'
     volumes:
-      - homedir_main:/home/user
-      - serverfiles:/serverfiles
-      - servermpmissions:/serverfiles/mpmissions
-      - mods:/serverfiles/steamapps/workshop/content
-      - mods:/mods
-      - ./files:/files
+      # only mount the manager home directory
+      # - type: volume
+      #   source: homes
+      #   target: /home/user
+      #   volume:
+      #     subpath: manager
+
+      - steamstore:/store/steam
+
+      # mount all the server missions
+      - serverfiles:/store/serverfiles
+
+      # mount all the server missions
+      - servermods:/store/servermods
+
+      # mount all the server missions
+      - servermissions:/store/servermissions
+
+      # mount all the server missions
+      - serverprofiles:/store/serverprofiles
+
+      # stores all our customisations
+      - ./files:/store/files
+
+      # these are for development
       - ./:/opt/repo/
+
     ports:
       - '5173:5173/tcp'
-      - '8000:8000/tcp'
     restart: always
-    environment:
-      - MANAGER_PORT=8000
     env_file:
       - .env
+    environment:
+      - MANAGER_PORT=8000
