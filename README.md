@@ -12,7 +12,6 @@ A Linux [DayZ](https://dayz.com) server in a [Docker](https://docs.docker.com/) 
 ## Usage
 
 - Have docker and docker compose installed.
-- [Create an env file](#create-an-env-file).
 - [Build the images](#build-the-images).
 - [Create a server](#create-a-server)
 
@@ -24,14 +23,6 @@ A Linux [DayZ](https://dayz.com) server in a [Docker](https://docs.docker.com/) 
 ```shell
 git clone https://ceregatti.org/git/daniel/dayzdockerserver.git
 cd dayzdockerserver
-```
-
-### Create an Env File
-
-Create a `.env` file that contains your user id. Usually the `${UID}` shell variable has this:
-
-```shell
-echo "export USER_ID=${UID}" | tee .env
 ```
 
 ### Build the Images

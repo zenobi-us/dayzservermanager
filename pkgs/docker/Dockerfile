@@ -68,3 +68,5 @@ RUN curl https://mise.run | sh
 COPY ./pkgs/docker/bin/ /opt/repo/pkgs/docker/bin/
 
 ENV PATH="/opt/repo/pkgs/docker/bin:$PATH"
+
+SHELL ["/bin/bash", "-c"]
