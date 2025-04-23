@@ -1,8 +1,8 @@
 [tools]
-node = "20.12.2"
-usage = "latest"
-yarn = "1.22.19"
-yq = "latest"
+node = "23.10.0"
+usage = "2.0.7"
+yarn = "4.8.1"
+yq = "4.45.1"
 
 # # mise config files are hierarchical. mise will find all of the config files
 # # in all parent directories and merge them together.
