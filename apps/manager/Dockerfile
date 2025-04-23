@@ -31,7 +31,8 @@ FROM base AS build
 WORKDIR /opt/repo
 
 COPY ./mise.toml ./
-COPY ./.mise/tasks ./.mise/tasks
+COPY ./.mise/tasks/setup ./.mise/tasks/setup
+COPY ./.mise/tasks/core ./.mise/tasks/core
 COPY .yarn/ ./.yarn/
 COPY ./.yarnrc.yml ./yarn.lock ./package.json ./
 COPY ./apps/manager/package.json ./apps/manager/
@@ -43,7 +44,7 @@ RUN mise run setup
 
 COPY ./apps/manager/ ./apps/manager/
 COPY ./pkgs/sdk/ ./pkgs/sdk/
-COPY .mise/ ./.mise/
+COPY ./.mise ./.mise
 
 RUN mise run core:tasks
 RUN mise run manager:build

@@ -24,5 +24,8 @@
     "shellcheck.executablePath": "/home/zenobius/.local/share/mise/shims/shellcheck",
     "[shellscript]": {
         "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[ignore]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
     }
 }
