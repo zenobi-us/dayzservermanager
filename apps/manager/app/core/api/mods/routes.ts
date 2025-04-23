@@ -48,6 +48,7 @@ const getModDetails = createServerFn({ method: 'GET' })
 
       const detail: ModeItemDetail = {
         id: modId,
+        path: modDir,
         name,
         size: fs.getDirSize(modDir),
         customXML,

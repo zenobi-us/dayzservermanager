@@ -10,12 +10,11 @@ import assert from 'assert';
 export type ModItem = {
   id: string;
   name: string;
+  path: string;
 };
 
 export type ModItemList = ModItem[];
-export type ModeItemDetail = {
-  id: string;
-  name: string;
+export type ModeItemDetail = ModItem & {
   size: number;
   customXML: CustomXmlItem[];
 };
@@ -24,11 +23,6 @@ export type CustomXmlItem = { name: string };
 
 export const getCustomXML = async (modId: string) => {
   const output: CustomXmlItem[] = [];
-  const exists = await fsExists(Config.get('STEAM_STORE'));
-
-  if (!exists) {
-    return output;
-  }
 
   const configFilePaths = ModConfigFiles.map(async (file) => {
     const exists = await doesWorkshopModFileExist(modId, file);
@@ -96,8 +90,7 @@ export const getModNameById = async (id: string) => {
 };
 
 export const getAllWorkshopMods = async () => {
-  const workshopDir = Config.get('STEAM_STORE');
-  const modDir = join(workshopDir, 'steamapps', 'workshop', 'content');
+  const modDir = Config.get('STEAM_STORE_MODS');
   const mods: ModItem[] = [];
   const modDirExists = await fsExists(modDir);
 
@@ -105,15 +98,17 @@ export const getAllWorkshopMods = async () => {
     return mods;
   }
 
-  const modFiles = await fs.readdir(modDir);
+  const modFiles = await fs.readdir(modDir, {
+    withFileTypes: true,
+  });
 
   for (const file of modFiles) {
-    const name = await getModNameById(file);
+    const name = await getModNameById(file.name);
     if (!name) {
       continue;
     }
 
-    mods.push({ name, id: file });
+    mods.push({ name, id: file.name, path: file.parentPath });
   }
 
   return mods;
@@ -165,7 +160,7 @@ export const getServerModsFromPath = async (path: string) => {
       continue;
     }
 
-    mods.push({ name, id: file.name });
+    mods.push({ name, id: file.name, path: file.parentPath });
   }
 
   return mods;
@@ -284,15 +279,14 @@ export async function assertServerModExists(serverId: string, modId: string) {
   }
 }
 
-export function createWorkshopModPath(modId: string) {
-  return join(Config.get('STEAM_STORE'), modId);
-}
-
 export async function createServerModPath(serverId: string, modId: string) {
   const modName = await getModNameById(modId);
   return join(Config.get('SERVER_FILES'), serverId, `@${modName}`);
 }
 
+export function createWorkshopModPath(modId: string) {
+  return join(Config.get('STEAM_STORE_MODS'), modId);
+}
 export function createWorkshopModFilePath(modId: string, filepath: string) {
-  return join(Config.get('STEAM_STORE'), modId, filepath);
+  return join(Config.get('STEAM_STORE_MODS'), modId, filepath);
 }

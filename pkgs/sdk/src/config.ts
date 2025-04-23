@@ -20,6 +20,7 @@ export const EnvConfigSchema = z.object({
    * Where should steam download the mods
    */
   STEAM_STORE: z.string().default('/store/steam'),
+  STEAM_STORE_MODS: z.string().default('/store/steam/workshop/content'),
 
   /**
    * Where are we writing server specific files?

@@ -9,5 +9,15 @@
 		"../docker-compose.yml",
 		"./docker-compose.yml"
 	],
-	"service": "manager"
+	"service": "manager",
+	"features": {
+		"ghcr.io/devcontainers-extra/features/mise:1": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"hverlin.mise-vscode"
+			]
+		}
+	}
 }

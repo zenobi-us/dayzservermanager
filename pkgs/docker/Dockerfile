@@ -57,22 +57,12 @@ RUN tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz
 
 FROM base AS withmise
 
-# Setup a non-privileged user
-ARG USER_ID
-
-RUN groupadd -g ${USER_ID} user && \
-    useradd -l -u ${USER_ID} -m -g user user && \
-    mkdir -p /opt/repo && \
-    chown -R user:user /home/user /opt/repo
-
-USER user
-
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-ENV MISE_DATA_DIR="/home/user/.mise"
-ENV MISE_CONFIG_DIR="/home/user/.mise"
-ENV MISE_CACHE_DIR="/home/user/.mise/cache"
-ENV MISE_INSTALL_PATH="/home/user/.local/bin/mise"
-ENV PATH="/home/user/.mise/shims:/home/user/.local/bin:$PATH"
+ENV MISE_DATA_DIR="/mise"
+ENV MISE_CONFIG_DIR="/mise"
+ENV MISE_CACHE_DIR="/mise/cache"
+ENV MISE_INSTALL_PATH="/usr/local/bin/mise"
+ENV PATH="/mise/shims:/local/bin:$PATH"
 RUN curl https://mise.run | sh
 
 COPY ./pkgs/docker/bin/ /opt/repo/pkgs/docker/bin/
