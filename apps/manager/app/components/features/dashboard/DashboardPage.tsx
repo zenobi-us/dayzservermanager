@@ -1,10 +1,7 @@
-
 import type { Server } from '@dayzserver/sdk';
 import { ServerGrid } from '../servers/ServerGrid';
 
-export function DashboardPage({ servers = [] }: {
-  servers?: Server[]
-}) {
+export function DashboardPage({ servers = [] }: { servers?: Server[] }) {
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">
@@ -13,5 +10,5 @@ export function DashboardPage({ servers = [] }: {
         </div>
       </div>
     </div>
-  )
+  );
 }

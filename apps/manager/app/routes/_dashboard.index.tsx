@@ -1,6 +1,6 @@
-import { server } from '@/api';
+import { server } from '../core/api';
 import { ErrorScreen } from '@/components/error-screen';
-import { DashboardPage } from '@/components/features/dashboard/Page';
+import { DashboardPage } from '../components/features/dashboard/DashboardPage';
 import { isErrorResponse } from '@/types/response';
 import { createFileRoute } from '@tanstack/react-router';
 

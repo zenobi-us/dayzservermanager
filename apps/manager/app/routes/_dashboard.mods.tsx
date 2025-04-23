@@ -1,25 +1,25 @@
-import { mods } from '@/api'
+import { mods } from '../core/api';
 import { ErrorScreen } from '@/components/error-screen';
 import { ModListDashboardPage } from '@/components/features/mods/ModListPage';
 import { FullScreenLoader } from '@/components/full-screen-loader';
 import { isErrorResponse } from '@/types/response';
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_dashboard/mods')({
   component: RouteComponent,
   staticData: {
-      breadcrumb: 'Mods'
+    breadcrumb: 'Mods',
   },
   loader: async () => mods.getModList(),
-  pendingComponent: FullScreenLoader
-})
+  pendingComponent: FullScreenLoader,
+});
 
 function RouteComponent() {
   const state = Route.useLoaderData();
-  
+
   if (isErrorResponse(state)) {
-    return <ErrorScreen />
+    return <ErrorScreen />;
   }
-    
-  return <ModListDashboardPage mods={state.data?.mods} />
+
+  return <ModListDashboardPage mods={state.data?.mods} />;
 }

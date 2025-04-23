@@ -1,13 +1,10 @@
-import { createServerFn } from "@tanstack/react-start";
-import { setResponseStatus } from "@tanstack/react-start/server";
-import sdk from "@dayzserver/sdk";
+import { createServerFn } from '@tanstack/react-start';
+import { setResponseStatus } from '@tanstack/react-start/server';
+import sdk from '@dayzserver/sdk';
 
-import { ResponseCodes } from "./codes";
-import { z } from "zod";
-import {
-  createErrorResponseBody,
-  createResponseBody,
-} from "../../core/response";
+import { ResponseCodes } from './codes';
+import { z } from 'zod';
+import { createErrorResponseBody, createResponseBody } from '../../response';
 
 /**
  * Create a list of mods
@@ -16,7 +13,7 @@ const SearchSteamWorkhopParameterSchema = z.object({
   searchString: z.string(),
 });
 
-const searchWorkshop = createServerFn({ method: "GET" })
+const searchWorkshop = createServerFn({ method: 'GET' })
   .validator((data: string) => SearchSteamWorkhopParameterSchema.parse(data))
   .handler(async (context) => {
     const searchString = context.data.searchString;
@@ -29,7 +26,7 @@ const searchWorkshop = createServerFn({ method: "GET" })
       });
 
       return body;
-    } catch (err) {
+    } catch {
       const body = createErrorResponseBody<
         string,
         ResponseCodes.SearchQueryError
@@ -48,12 +45,12 @@ const LoginParametersSchema = z.object({
   password: z.string(),
 });
 
-const login = createServerFn({ method: "POST" })
+const login = createServerFn({ method: 'POST' })
   .validator((data: unknown) => LoginParametersSchema.parse(data))
   .handler(async (context) => {
     try {
-      sdk.steam.login(context.data);
-    } catch (error) {
+      await sdk.steam.login(context.data);
+    } catch {
       const body = createResponseBody({
         code: ResponseCodes.LoginFailed,
       });
@@ -62,11 +59,5 @@ const login = createServerFn({ method: "POST" })
 
       return body;
     }
-
-    const body = createResponseBody({
-      code: ResponseCodes.LoginSuccess,
-    });
-
-    return body;
   });
 export { searchWorkshop, login };

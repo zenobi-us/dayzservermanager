@@ -6,7 +6,7 @@ import {
   createErrorResponseBody,
   createResponseBody,
   errorResponseBodyError,
-} from '../../core/response';
+} from '../../response';
 import { ResponseCodes } from './codes';
 import { z } from 'zod';
 

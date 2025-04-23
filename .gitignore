@@ -60,4 +60,6 @@ dist
 # moon
 .moon/cache
 .moon/docker
-lib
+
+.output
+.vinxi

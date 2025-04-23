@@ -1,6 +1,6 @@
 export enum GenericResponseCodes {
-  Success = "Success",
-  Error = "Error",
+  Success = 'Success',
+  Error = 'Error',
 }
 
 export type SuccessResponse<T = void, C = any> = {
@@ -14,9 +14,13 @@ export type ErrorResponse<T = void, C = any> = {
   errorCode: C;
 };
 
-export const isErrorResponse = <T,C>(response: object): response is ErrorResponse<T,C> => {
-  return !!response && "errorCode" in response;
-}
-export const isSuccessResponse = <T,C>(response: object): response is SuccessResponse<T,C> => {
-  return !!response && "successCode" in response;
-}
+export const isErrorResponse = <T, C>(
+  response: object,
+): response is ErrorResponse<T, C> => {
+  return !!response && 'errorCode' in response;
+};
+export const isSuccessResponse = <T, C>(
+  response: object,
+): response is SuccessResponse<T, C> => {
+  return !!response && 'successCode' in response;
+};
