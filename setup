@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
+user_id=$(id -u)
 
-build_images() {
-    local user_id
-
-    user_id=$(id -u)
+build_base_image() {
 
     docker build \
         --build-arg "USER_ID=${user_id}" \
@@ -11,14 +9,17 @@ build_images() {
         -t "dayzserver:base-local" \
         -f ./pkgs/docker/Dockerfile .
 
+}
+
+build_server_image() {
     docker build \
-        --build-arg "USER_ID=${user_id}" \
         --build-arg "VERSION=local" \
         -t "dayzserver:server-local" \
         -f ./apps/server/Dockerfile .
+}
 
+build_manager_image() {
     docker build \
-        --build-arg "USER_ID=${user_id}" \
         --build-arg "VERSION=local" \
         -t "dayzserver:manager-local" \
         -f ./apps/manager/Dockerfile .
@@ -29,9 +30,30 @@ install() {
     docker compose run --rm manager mise server:install
 }
 
+devcontainer() {
+    docker compose \
+        -f ./docker-compose.yml \
+        -f .devcontainer/docker-compose.yml \
+        config
+}
+
 case "$1" in
 images)
-    build_images
+    build_base_image
+    build_manager_image
+    build_server_image
+    ;;
+baseimage)
+    build_base_image
+    ;;
+managerimage)
+    build_manager_image
+    ;;
+serverimage)
+    build_server_image
+    ;;
+devcontainer)
+    devcontainer
     ;;
 install)
     install

@@ -15,6 +15,7 @@ RUN sed -i /etc/apt/sources.list.d/debian.sources -e 's/Components: main/Compone
 # Install _only_ the necessary packages
 RUN apt-get update && apt-get -y upgrade && apt-get -y install --no-install-recommends \
     binutils \
+    bash \
     curl \
     git \
     gwenhywfar-tools \
@@ -30,7 +31,8 @@ RUN apt-get update && apt-get -y upgrade && apt-get -y install --no-install-reco
     strace \
     wget \
     xmlstarlet \
-    gpg gpg-agent
+    gpg gpg-agent \
+    xz-utils
 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
@@ -45,23 +47,33 @@ RUN apt-get update  \
     sudo curl git ca-certificates build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-FROM base AS withmise
-
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-ENV MISE_DATA_DIR="/mise"
-ENV MISE_CONFIG_DIR="/mise"
-ENV MISE_CACHE_DIR="/mise/cache"
-ENV MISE_INSTALL_PATH="/usr/local/bin/mise"
-ENV PATH="/mise/shims:$PATH"
-RUN curl https://mise.run | sh
-
-FROM withmise AS s6
+ARG S6_OVERLAY_VERSION=3.2.0.2
 
 # Install s6-overlay
-ADD https://github.com/just-containers/s6-overlay/releases/download/v3.1.6.2/s6-overlay-noarch.tar.xz /tmp
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
 RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
-ADD https://github.com/just-containers/s6-overlay/releases/download/v3.1.6.2/s6-overlay-x86_64.tar.xz /tmp
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
 RUN tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz
+
+FROM base AS withmise
+
+# Setup a non-privileged user
+ARG USER_ID
+
+RUN groupadd -g ${USER_ID} user && \
+    useradd -l -u ${USER_ID} -m -g user user && \
+    mkdir -p /opt/repo && \
+    chown -R user:user /home/user /opt/repo
+
+USER user
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ENV MISE_DATA_DIR="/home/user/.mise"
+ENV MISE_CONFIG_DIR="/home/user/.mise"
+ENV MISE_CACHE_DIR="/home/user/.mise/cache"
+ENV MISE_INSTALL_PATH="/home/user/.local/bin/mise"
+ENV PATH="/home/user/.mise/shims:/home/user/.local/bin:$PATH"
+RUN curl https://mise.run | sh
 
 COPY ./pkgs/docker/bin/ /opt/repo/pkgs/docker/bin/
 

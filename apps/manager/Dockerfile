@@ -2,33 +2,26 @@ ARG VERSION=local
 ARG BASE_IMAGE=dayzserver:base-${VERSION:-local}
 FROM "$BASE_IMAGE" AS base
 
+USER root
 
 # Add bercon https://github.com/WoozyMasta/bercon
 RUN wget https://github.com/WoozyMasta/bercon/releases/download/1.0.0/bercon \
     && chmod +x bercon \
     && mv bercon /usr/bin
 
-
-# Shut steamcmd up
-RUN cd /usr/lib/i386-linux-gnu && \
-    ln -s /opt/repo/manager/bin/steamservice.so
-
-# Setup a non-privileged user
-ARG USER_ID
-
-RUN groupadd -g ${USER_ID} user && \
-    useradd -l -u ${USER_ID} -m -g user user && \
-    mkdir -p /home/user /serverfiles/steamapps/workshop/content /opt/repo && \
-    chown -R user:user /home/user /serverfiles /opt/repo
+RUN mkdir -p /serverfiles/steamapps/workshop/content && \
+    chown -R user:user /serverfiles
 
 COPY ./apps/manager/s6/services/* /etc/s6-overlay/s6-rc.d/
-COPY ./apps/manager/s6/contents.d/* /etc/s6-overlay/s6-rc.d/user/contents.d/
 
+# Shut steamcmd up
+COPY ./apps/manager/bin/steamservice.so /usr/lib/i386-linux-gnu/
 
 FROM base AS build
 
+USER root
 
-WORKDIR /opt/repo
+WORKDIR /home/user/repo
 
 COPY ./mise.toml ./
 COPY ./.mise/tasks/setup ./.mise/tasks/setup
@@ -49,11 +42,19 @@ COPY ./.mise ./.mise
 RUN mise run core:tasks
 RUN mise run manager:build
 
-# Use our non-privileged user
+RUN chown -R user:user /home/user
+
 USER user
 
 # The dayzserver script expects a home directory to itself.
 WORKDIR /home/user
+
+ENV MODE=manager
+ENV STEAM_STORE=/store/steam
+ENV SERVER_FILES=/store/serverfiles
+ENV SERVER_MODS=/store/servermods
+ENV SERVER_MISSIONS=/store/servermissions
+ENV SERVER_PROFILES=/store/serverprofiles
 
 # s6 handles the rest of the lifecycle.
 ENTRYPOINT ["/init"]
