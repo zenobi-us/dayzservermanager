@@ -4,7 +4,6 @@
 	"name": "DayZServer",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"overrideCommand": true,
-	"postAttachCommand": "echo 'You are now connected to the container!'",
 	"dockerComposeFile": [
 		"../docker-compose.yml",
 		"./docker-compose.yml"

@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import nconf from 'nconf';
+import dotenv from 'dotenv';
 import fs from 'fs/promises';
+
+dotenv.config()
 
 export const EnvConfigSchema = z.object({
   MODE: z

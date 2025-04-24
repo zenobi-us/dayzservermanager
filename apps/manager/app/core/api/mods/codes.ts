@@ -1,4 +1,4 @@
-export enum ModListResponseCodes {
+export enum ResponseCodes {
   ModInstallSuccess = "ModInstallSuccess",
   ModInstallError = "ModInstallError",
   ModFileNotFound = "ModFileNotFound",
@@ -18,5 +18,7 @@ export enum ModListResponseCodes {
   ModActivatedError = "ModActivatedError",
   ModDeactivatedSuccess = "ModDeactivatedSuccess",
   ModDeactivatedError = "ModDeactivatedError",
-  ModFileContentsError = "ModFileContentsError"
+  ModFileContentsError = "ModFileContentsError",
+  SearchQuerySuccess = "SearchQuerySuccess",
+  SearchQueryError = "SearchQueryError",
 }

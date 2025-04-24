@@ -1,23 +1,43 @@
-import { IconCircleX, IconPlus, } from '@tabler/icons-react';
+import { IconPlus, } from '@tabler/icons-react';
+import { SteamWorkshopSearchResults } from '@dayzserver/sdk';
+
 import { Button } from '@/components/ui/button';
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
-import { ModSearchResults } from './ModSearchResults';
-import { cn } from '@/lib/utils';
-import { ModSearchForm } from './ModSearchForm';
-import { ModSearchPagination } from './ModSearchPagination';
-import { modSearchStore, resetSearch, search, useModSearchQuery } from './useModSearch';
-import { useMemo } from 'react';
-import { isErrorResponse } from '@/types/response';
-import { useStore } from '@tanstack/react-store';
-import { ErrorNotice } from '@/components/error-notice';
 import { DrawerCloseButton } from '@/components/drawer-close-button';
+import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
+import { ErrorNotice } from '@/components/error-notice';
+
+import { ModSearchForm } from './ModSearchForm';
+import { ModSearchResults } from './ModSearchResults';
+import { ModSearchPagination } from './ModSearchPagination';
+import { useStore } from '@tanstack/react-store';
+import { modSearchStore, setSearchText, useModSearchQuery } from './useModSearch';
+import { FullScreenLoader } from '@/components/full-screen-loader';
+import { useMemo } from 'react';
 
 
 export function ModSearchDrawerContainer() {
+    const page = useStore(modSearchStore, (state) => state.page)
+    const search_text = useStore(modSearchStore, (state) => state.search_text)
+    const numperpage = useStore(modSearchStore, (state) => state.numperpage)
+    const modSearchQuery = useModSearchQuery({
+        search_text,
+        page,
+        numperpage
+    })
+
+    const pageCount = useMemo(() => {
+        const totalResults = modSearchQuery.data?.response.total;
+        if (!totalResults) {
+            return 0
+        }
+        if (totalResults < numperpage) {
+            return 1
+        }
+        return Math.ceil(totalResults / numperpage)
+    }, [modSearchQuery, numperpage])
+
     return (
-        <Drawer onClose={() => {
-            resetSearch()
-        }}>
+        <Drawer>
             <DrawerTrigger asChild>
                 <Button variant="outline">
                     <IconPlus className='mr-2' /> Add mod
@@ -30,61 +50,66 @@ export function ModSearchDrawerContainer() {
                             <DrawerTitle>Search for mods</DrawerTitle>
                             <DrawerDescription>find and install a mod.</DrawerDescription>
                         </div>
-                        <ModSearchForm />
+                        <ModSearchForm
+                            onSubmit={(query) => {
+                                setSearchText(query.search_text)
+                            }}
+                        />
                         <DrawerCloseButton />
                     </div>
                 </DrawerHeader>
-                <ModSearchDrawerResults />
+                <ModSearchDrawerResults
+                    currentPage={page}
+                    pageCount={pageCount}
+                    pageSize={numperpage}
+                    publishedfiledetails={modSearchQuery.data?.response.publishedfiledetails || []}
+                    error={modSearchQuery.error?.message || ""}
+                    total={modSearchQuery.data?.response.total || 0}
+                    isFetching={modSearchQuery.isFetching}
+                    isPending={modSearchQuery.isPending}
+                    onNextPageClick={() => {
+                        modSearchStore.setState((state) => {
+                            const page = state.page + 1 > pageCount ? 1 : state.page + 1;
+                            return ({ ...state, page })
+                        });
+                    }}
+                    onPreviousPageClick={() => {
+                        modSearchStore.setState((state) => {
+                            const page = state.page - 1 < 1 ? pageCount : state.page - 1;
+                            return ({ ...state, page })
+                        });
+                    }}
+
+                />
             </DrawerContent>
         </Drawer>
     )
 }
 
-function ModSearchDrawerResults() {
-    const search_text = useStore(modSearchStore, (data) => data.search_text);
-    const page = useStore(modSearchStore, (data) => data.page);
-    const numperpage = useStore(modSearchStore, (data) => data.numperpage);
+function ModSearchDrawerResults({
+    error,
+    isFetching,
+    isPending,
+    publishedfiledetails,
+    total,
+    pageSize,
+    pageCount,
+    currentPage,
+    onNextPageClick,
+    onPreviousPageClick
+}: {
+    error: string;
+    isPending?: boolean;
+    isFetching?: boolean;
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    pageCount: number;
+    publishedfiledetails: SteamWorkshopSearchResults['response']['publishedfiledetails'];
+    onNextPageClick: () => void;
+    onPreviousPageClick: () => void;
+}) {
 
-    const query = useModSearchQuery({
-        search_text,
-        page,
-        numperpage
-    });
-
-    const error = useMemo(() => {
-        if (query.isFetching) {
-            return
-        }
-        if (!isErrorResponse(query.data?.data)) {
-            return
-        }
-        if (typeof query.data.data.error === 'string') {
-            return query.data.data.error;
-        }
-
-        return query.data.data.error?.message;
-    }, [query.data?.data])
-
-    const response = useMemo(() => {
-        if (query.isFetching) {
-            return null
-        }
-
-        if (typeof query.data?.data === 'string') {
-            return null
-        }
-        if (isErrorResponse(query.data?.data)) {
-            return null
-        }
-
-        return query.data?.data?.response
-    }, [query.data?.data])
-
-
-    const pageCount = useMemo(() => {
-        if (!response?.total) { return 0 }
-        return Math.ceil(response?.total / numperpage);
-    }, [response, numperpage])
 
     return (
         <>
@@ -92,26 +117,26 @@ function ModSearchDrawerResults() {
                 {error && (
                     <ErrorNotice>{error}</ErrorNotice>
                 )}
-                {!query.isFetching && !!response && (
+                {isFetching && (
+                    <FullScreenLoader />
+                )}
+                {!isPending && (
                     <ModSearchResults
                         className="block overflow-visible"
-                        publishedfiledetails={response.publishedfiledetails}
-                        total={response.total}
+                        publishedfiledetails={publishedfiledetails}
+                        total={total}
                     />
                 )}
             </div>
 
-            {!query.isFetching && pageCount && (
-                <DrawerFooter>
-                    <ModSearchPagination
-                        totalPages={pageCount}
-                        isSearching={query.isFetching}
-                        currentPage={page}
-                        onNextPageClick={() => search({ page: page + 1 })}
-                        onPreviousPageClick={() => search({ page: page - 1 })}
-                    />
-                </DrawerFooter>
-            )}
+            <DrawerFooter>
+                <ModSearchPagination
+                    totalPages={pageCount}
+                    currentPage={currentPage}
+                    onNextPageClick={onNextPageClick}
+                    onPreviousPageClick={onPreviousPageClick}
+                />
+            </DrawerFooter>
         </>
     )
 }

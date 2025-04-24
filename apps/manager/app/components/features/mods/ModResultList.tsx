@@ -1,13 +1,16 @@
+import { useCallback } from "react";
+import type { PropsWithChildren } from "react";
+import type { SteamWorkshopSearchResults } from "@dayzserver/sdk";
+import { IconCancel, IconDownload, IconLanguage, IconStar, IconUsersGroup, IconVersions } from "@tabler/icons-react";
+
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { PageSectionGrid } from "../../page-section-grid";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger, NestedDrawer } from "@/components/ui/drawer";
-import { cn } from "@/lib/utils";
-import { SteamWorkshopSearchResults } from "@dayzserver/sdk";
-import { IconCancel, IconDownload, IconLanguage, IconStar, IconUsersGroup, IconVersions } from "@tabler/icons-react";
-import { PropsWithChildren, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { DrawerCloseButton } from "@/components/drawer-close-button";
+
+import { PageSectionGrid } from "../../page-section-grid";
 import { DownloadModButton } from "./DownloadModButton";
 
 export function ModSearchResultList({ publishedfiledetails, total }: {
@@ -35,7 +38,7 @@ const ModResultItemHeader = ({ children, onDownloadClick }: PropsWithChildren<
             <div className="col-span-4 md:col-span-2">
                 {children}
             </div>
-            <Button variant='outline' size='sm' className="col-span-2 md:col-span-1">
+            <Button variant='outline' size='sm' className="col-span-2 md:col-span-1" onClick={onDownloadClick}>
                 <IconDownload /> Download
             </Button>
         </div>
@@ -85,11 +88,12 @@ function ModResultItem({ item }: { item: SteamWorkshopSearchResults['response'][
                 <DrawerHeader
                     className={cn(
                         'relative min-h-96',
-                        'bg-cover bg-[image:var(--image-url)]',
+                        'bg-cover bg-center bg-no-repeat bg-[image:var(--image-url)]',
                     )}
-                // style={{
-                //     '--image-url': `url(${item.preview_url})`
-                // }}
+                    style={{
+                        //@ts-expect-error 
+                        '--image-url': `url(${item.preview_url})`
+                    }}
                 >
                     <div className={cn("absolute top-0 bottom-0 right-0 left-0 p-4 flex flex-grow jusitfy-end items-end gap-4",
                         'bg-linear-to-t from-black/45 to-transparent'
@@ -97,8 +101,7 @@ function ModResultItem({ item }: { item: SteamWorkshopSearchResults['response'][
                     )}>
                         <div className="flex flex-col gap-2 min-w-1/4">
                             <DrawerTitle className="text-gray-100 text-shadow-2xs">{item.title}</DrawerTitle>
-                            <DrawerDescription className="text-white 
-text-shadow-2xs"> by {item.creator}</DrawerDescription>
+                            <DrawerDescription className="text-white text-shadow-2xs"> by {item.creator}</DrawerDescription>
                         </div>
                         <DrawerCloseButton />
                         <DownloadModButton modId={item.publishedfileid} />

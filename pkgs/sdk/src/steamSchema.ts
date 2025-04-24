@@ -25,7 +25,7 @@ export const EPublishedFileQueryType = {
 
 type EPublishedFileQueryType = typeof EPublishedFileQueryType[keyof typeof EPublishedFileQueryType];
 
-const EPublishedFileQueryTypeSchema = z.enum([
+export const EPublishedFileQueryTypeSchema = z.enum([
     (EPublishedFileQueryType.RankedByVote),
     (EPublishedFileQueryType.RankedByPublicationDate),
     (EPublishedFileQueryType.AcceptedForGameRankedByAcceptanceDate),
@@ -49,7 +49,7 @@ const EPublishedFileQueryTypeSchema = z.enum([
 ])
     .transform((val) => parseInt(val, 10)).pipe(z.number().int().min(0).max(19, 'query_type must be between 0 and 19'))
 
-const IPublishedFileServiceQueryFilesRequestParamsSchema = z.object({
+const PublishedFileServiceQueryFilesRequestParamsSchema = z.object({
     // key: z.string().min(1, 'API key is required'),
     // query_type: EPublishedFileQueryTypeSchema,
     page: z.number().int().min(1).default(1).optional(),
@@ -91,7 +91,7 @@ const IPublishedFileServiceQueryFilesRequestParamsSchema = z.object({
     revision: z.number().int().min(0).max(2, 'revision must be between 0 and 2').optional()
 }).strict();
 
-type IPublishedFileServiceQueryFilesRequestParams = z.infer<typeof IPublishedFileServiceQueryFilesRequestParamsSchema>
+type IPublishedFileServiceQueryFilesRequestParams = z.infer<typeof PublishedFileServiceQueryFilesRequestParamsSchema>
 
 // Schema for individual tag objects
 const SteamWorkshopTagSchema = z.object({
@@ -163,5 +163,5 @@ type SteamWorkshopTag = z.infer<typeof SteamWorkshopTagSchema>;
 type SteamWorkshopSearchResultItem = z.infer<typeof SteamWorkshopSearchResultItemSchema>;
 type SteamWorkshopSearchResults = z.infer<typeof SteamWorkshopSearchResultsSchema>;
 
-export { SteamWorkshopSearchResultItemSchema, SteamWorkshopSearchResultsSchema, SteamWorkshopTagSchema, IPublishedFileServiceQueryFilesRequestParamsSchema };
+export { SteamWorkshopSearchResultItemSchema, SteamWorkshopSearchResultsSchema, SteamWorkshopTagSchema, PublishedFileServiceQueryFilesRequestParamsSchema as IPublishedFileServiceQueryFilesRequestParamsSchema };
 export type { SteamWorkshopTag, SteamWorkshopSearchResultItem, SteamWorkshopSearchResults, IPublishedFileServiceQueryFilesRequestParams };

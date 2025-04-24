@@ -52,7 +52,7 @@ const createSearchUrl = ({ search_text, page = 1, numperpage = 10, ...options }:
   const key = Config.get('STEAM_APIKEY')
 
   if (!key) {
-    throw new Error
+    throw new Error('Missing STEAM_APIKEY')
   }
 
   const url = new URL("https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/");

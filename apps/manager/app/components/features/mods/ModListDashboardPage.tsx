@@ -13,17 +13,18 @@ export function ModListDashboardPage({ mods = [] }: {
 
   return (
     <Page>
-      <PageHeader title="mods"
+      <PageHeader
+        title="mods"
         actions={
-          <ModSearchDrawerContainer />
+          <>
+            <ModSearchDrawerContainer />
+          </>
         }
+
       />
       <PageSection>
-        <ModListDataTable
-          data={mods}
-        />
+        <ModListDataTable data={mods} />
       </PageSection>
-    </Page >
+    </Page>
   )
 }
-
