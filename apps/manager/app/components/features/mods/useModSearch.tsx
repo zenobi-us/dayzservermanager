@@ -6,11 +6,8 @@ import { IPublishedFileServiceQueryFilesRequestParams } from "@dayzserver/sdk/st
 
 import * as api from '../../../core/api'
 import { Key } from "lucide-react";
+import { UrlSearchParamsFromObject } from "@/core/params";
 
-function UrlSearchParamsFromObject(obj: object) {
-    const params = Object.fromEntries(Object.entries(obj).map(([key, value]) => [key.toString(), value.toString()]))
-    return new URLSearchParams(params);
-}
 
 export function useModSearchQuery(data: IPublishedFileServiceQueryFilesRequestParams) {
     const queryKey = ['modsearch', UrlSearchParamsFromObject(data).toString()]
