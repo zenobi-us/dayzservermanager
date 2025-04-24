@@ -4,9 +4,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger, NestedDrawer } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { SteamWorkshopSearchResults } from "@dayzserver/sdk";
-import { IconCancel, IconCircleX, IconDownload, IconLanguage, IconStar, IconUsersGroup, IconVersions } from "@tabler/icons-react";
+import { IconCancel, IconCircleX, IconDownload, IconLanguage, IconStar, IconUsersGroup, IconVersions, IconX } from "@tabler/icons-react";
 import { PropsWithChildren, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import { DrawerCloseButton } from "@/components/drawer-close-button";
 
 export function ModSearchResultList({ publishedfiledetails, total }: {
     publishedfiledetails: SteamWorkshopSearchResults['response']['publishedfiledetails'],
@@ -79,22 +80,25 @@ function ModResultItem({ item }: { item: SteamWorkshopSearchResults['response'][
                     </CardFooter>
                 </Card>
             </DrawerTrigger>
-            <DrawerContent className='flex flex-col mx-4 min-h-3/4 max-h-3/4'>
-                <DrawerHeader className='relative'>
-                    <div className="flex flex-grow jusitfy-start items-end gap-4">
-                        <div className="flex flex-col gap-2 min-w-1/4">
-                            <DrawerTitle>{item.title}</DrawerTitle>
-                            <DrawerDescription> by {item.creator}</DrawerDescription>
-                        </div>
+            <DrawerContent className='flex flex-col mx-4 min-h-3/4 max-h-3/4 '>
+                <DrawerHeader
+                    className={cn(
+                        'relative min-h-96',
+                        'bg-cover bg-[image:var(--image-url)]',
+                    )}
+                    style={{
+                        '--image-url': `url(${item.preview_url})`
+                    }}
+                >
+                    <div className={cn("absolute top-0 bottom-0 right-0 left-0 p-4 flex flex-grow jusitfy-end items-end gap-4",
+                        'bg-linear-to-t from-black/45 to-transparent'
 
-                        <DrawerClose className={cn(
-                            'absolute -top-10 right-5 cursor-pointer border-4 rounded-full border-white bg-white',
-                        )}>
-                            <IconCircleX
-                                size={32}
-                                className='stroke-gray-400 hover:stroke-black'
-                            />
-                        </DrawerClose>
+                    )}>
+                        <div className="flex flex-col gap-2 min-w-1/4">
+                            <DrawerTitle className="text-gray-100 text-shadow-2xs">{item.title}</DrawerTitle>
+                            <DrawerDescription className="text-mute text-shadow-2xs"> by {item.creator}</DrawerDescription>
+                        </div>
+                        <DrawerCloseButton />
                     </div>
                 </DrawerHeader>
                 <div className="overflow-y-scroll rounded-md border m-2 p-2 flex flex-col flex-grow">

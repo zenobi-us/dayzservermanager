@@ -10,6 +10,7 @@ import { useMemo } from 'react';
 import { isErrorResponse } from '@/types/response';
 import { useStore } from '@tanstack/react-store';
 import { ErrorNotice } from '@/components/error-notice';
+import { DrawerCloseButton } from '@/components/drawer-close-button';
 
 
 export function ModSearchDrawerContainer() {
@@ -24,20 +25,13 @@ export function ModSearchDrawerContainer() {
             </DrawerTrigger>
             <DrawerContent className='flex flex-col mx-4 min-h-3/4 max-h-3/4'>
                 <DrawerHeader className='relative'>
-                    <div className="flex flex-grow jusitfy-start items-end gap-4">
+                    <div className="flex flex-grow jusitfy-start items-end gap-4 pt-4">
                         <div className="flex flex-col gap-2 min-w-1/4">
                             <DrawerTitle>Search for mods</DrawerTitle>
                             <DrawerDescription>find and install a mod.</DrawerDescription>
                         </div>
                         <ModSearchForm />
-                        <DrawerClose className={cn(
-                            'absolute -top-10 right-5 cursor-pointer border-4 rounded-full border-white bg-white',
-                        )}>
-                            <IconCircleX
-                                size={32}
-                                className='stroke-gray-400 hover:stroke-black'
-                            />
-                        </DrawerClose>
+                        <DrawerCloseButton />
                     </div>
                 </DrawerHeader>
                 <ModSearchDrawerResults />
