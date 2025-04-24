@@ -15,12 +15,12 @@ export type ErrorResponse<T = void, C = any> = {
 };
 
 export const isErrorResponse = <T, C>(
-  response: object,
+  response: unknown,
 ): response is ErrorResponse<T, C> => {
-  return !!response && 'errorCode' in response;
+  return !!response && typeof response === 'object' && 'errorCode' in response;
 };
 export const isSuccessResponse = <T, C>(
-  response: object,
+  response: unknown,
 ): response is SuccessResponse<T, C> => {
-  return !!response && 'successCode' in response;
+  return !!response && typeof response === 'object' && 'successCode' in response;
 };

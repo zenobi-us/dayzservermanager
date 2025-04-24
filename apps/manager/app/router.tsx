@@ -4,9 +4,9 @@ import { routeTree } from './routeTree.gen';
 import { QueryClient } from '@tanstack/react-query'
 import { ErrorBoundary } from './components/error-boundary';
 import { NotFound } from './components/not-found';
+import { queryClient } from './core/api/client';
 
 export function createRouter() {
-  const queryClient = new QueryClient()
   const router = createTanStackRouter({
     routeTree,
     context: { queryClient },

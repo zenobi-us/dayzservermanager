@@ -8,14 +8,14 @@ import { IconCancel, IconCircleX, IconDownload, IconLanguage, IconStar, IconUser
 import { PropsWithChildren, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 
-export function ModSearchResultList({ results, total }: {
-    results: SteamWorkshopSearchResults['response']['publishedfiledetails'],
+export function ModSearchResultList({ publishedfiledetails, total }: {
+    publishedfiledetails: SteamWorkshopSearchResults['response']['publishedfiledetails'],
     total: SteamWorkshopSearchResults['response']['total'],
 }) {
 
     return (
         <PageSectionGrid>
-            {results.map((item) => (
+            {publishedfiledetails.map((item) => (
                 <ModResultItem item={item} />
             ))}
         </PageSectionGrid>

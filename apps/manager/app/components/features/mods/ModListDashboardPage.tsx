@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/page-header';
 import { PageSection } from '@/components/page-section';
 import { ModListDataTable } from './ModListDataTable';
 import { createOpenState } from '@/hooks/use-open-state';
-import { ModSearchDrawer } from './ModSearchDrawer';
+import { ModSearchDrawerContainer } from './ModSearchDrawer';
 
 
 const openState = createOpenState({
@@ -21,9 +21,7 @@ export function ModListDashboardPage({ mods = [] }: {
     <Page>
       <PageHeader title="mods"
         actions={
-          <>
-            <ModSearchDrawer />
-          </>
+          <ModSearchDrawerContainer />
         }
       />
       <PageSection>

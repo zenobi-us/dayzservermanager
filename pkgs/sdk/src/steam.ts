@@ -47,7 +47,7 @@ export const authenticatedSteamCmd = async (args: string[]) => {
   ])
 }
 
-const createSearchUrl = ({ page = 1, numperpage = 10, ...options }: IPublishedFileServiceQueryFilesRequestParams) => {
+const createSearchUrl = ({ search_text, page = 1, numperpage = 10, ...options }: IPublishedFileServiceQueryFilesRequestParams) => {
   const appid = Config.get('CLIENT_APPID')
   const key = Config.get('STEAM_APIKEY')
 
@@ -59,6 +59,7 @@ const createSearchUrl = ({ page = 1, numperpage = 10, ...options }: IPublishedFi
   const cleaned = Object.fromEntries(Object.entries(options).filter(([_, v]) => v !== undefined).map((key, value) => [key, value.toString()]));
   const params = new URLSearchParams({
     ...cleaned,
+    search_text,
     page,
     numperpage,
     return_metadata: true,

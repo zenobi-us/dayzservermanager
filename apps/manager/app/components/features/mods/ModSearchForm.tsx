@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { IconSearch } from "@tabler/icons-react";
 import { DeleteIcon } from "lucide-react";
 import { IPublishedFileServiceQueryFilesRequestParams, IPublishedFileServiceQueryFilesRequestParamsSchema } from "@dayzserver/sdk/steamSchema";
+import { resetSearch, search } from "./useModSearch";
 
 
 function useModSearchForm() {
@@ -18,18 +19,15 @@ function useModSearchForm() {
     });
 }
 
-export function ModSearchForm({
-    onSubmit,
-    onClearClick
-}: {
-    onSubmit: (data: IPublishedFileServiceQueryFilesRequestParams) => void,
-    onClearClick: () => void
-}) {
+export function ModSearchForm() {
     const form = useModSearchForm();
 
     return (
         <Form  {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
+            <form onSubmit={form.handleSubmit((data) => {
+                resetSearch();
+                search(data)
+            })} className="space-y-8 w-full">
                 <div className="relative flex w-full flex-grow gap-2 items-center">
                     <FormField
                         control={form.control}
@@ -48,7 +46,7 @@ export function ModSearchForm({
                                                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-destructive cursor-pointer"
                                                 onClick={() => {
                                                     form.reset();
-                                                    onClearClick();
+                                                    resetSearch();
                                                 }}
                                             >
                                                 <DeleteIcon />

@@ -1,97 +1,53 @@
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { setPage, useModSearch } from "./useModSearch";
-import { useMemo } from "react";
-import { isErrorResponse } from "@/types/response";
-
-function createPageIdArray(start: number, size: number) {
-    return Array.from({ length: size }, (_, i) => {
-        return start + i - 1;
-    });
-}
+import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 
-export const ModSearchPagination = () => {
-    const search = useModSearch()
-
-    const totalRecords = useMemo(() => {
-        const data = search.query.data?.data
-        if (!data) {
-            return null
-        }
-        if (typeof data === 'string') {
-            return null
-        }
-
-        if (isErrorResponse(data)) {
-            return null
-        }
-
-        return data.response.total;
-    }, [search.query.data?.data])
-
-    const pageCount = useMemo(() => {
-        if (!totalRecords) { return null }
-
-        const size = search.store.numperpage
-        const pages = Math.ceil(totalRecords / size);
-
-        return pages
-    }, [totalRecords, search.store.numperpage])
-
-    const left = useMemo(() => {
-        if (pageCount === null) { return null }
-
-        if (pageCount < 5) {
-            return createPageIdArray(search.store.page, 4)
-        }
-
-        // if 5 or more pages, then show the first three and an ellipsis
-        return createPageIdArray(search.store.page, 3)
-    }, [pageCount])
-
-    const right = useMemo(() => {
-        if (pageCount === null) { return null }
-        // don't bother showing ellipsis if there are only 5 pages or less
-        if (pageCount <= 5) { return null }
-
-        return createPageIdArray(search.store.page + 5, 1)
-    }, [pageCount])
+export const ModSearchPagination = ({
+    currentPage,
+    totalPages,
+    isSearching,
+    onNextPageClick,
+    onPreviousPageClick
+}: {
+    isSearching?: boolean;
+    currentPage: number;
+    totalPages: number;
+    onNextPageClick: () => void;
+    onPreviousPageClick: () => void;
+}) => {
+    const isNextDisabled = isSearching || currentPage >= totalPages
+    const isPreviousDisabled = isSearching || currentPage <= 1
 
     return (
-        <Pagination>
-            <PaginationContent>
-                {search.store.page > 1 && (
+        <div className="flex w-full justify-betwee">
+            <Pagination>
+                <div className="text-muted-foreground flex flex-grow">
+                    Page {currentPage} of {totalPages}
+                </div>
+                <PaginationContent>
                     <PaginationItem>
-                        <PaginationPrevious onClick={() => {
-                            setPage(search.store.page - 1)
-                        }} />
+                        <PaginationPrevious
+                            className={isPreviousDisabled ? "text-muted-foreground" : ""}
+                            onClick={() => {
+                                if (isPreviousDisabled) {
+                                    return
+                                }
+                                onPreviousPageClick()
+                            }}
+                        />
                     </PaginationItem>
-                )}
-                {left && left.map((pageId) => {
-                    return (
-                        <PaginationItem>
-                            <PaginationLink onClick={() => { setPage(pageId) }}>{pageId}</PaginationLink>
-                        </PaginationItem>
-                    )
-                })}
-                <PaginationItem>
-                    <PaginationLink href="#" isActive>
-                        2
-                    </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                    <PaginationLink href="#">3</PaginationLink>
-                </PaginationItem>
-
-                <PaginationItem>
-                    <PaginationEllipsis />
-                </PaginationItem>
-
-                <PaginationItem>
-                    <PaginationNext href="#" />
-                </PaginationItem>
-
-            </PaginationContent>
-        </Pagination>
+                    <PaginationItem>
+                        <PaginationNext
+                            className={isNextDisabled ? "text-muted-foreground" : ""}
+                            onClick={() => {
+                                if (isNextDisabled) {
+                                    return
+                                }
+                                onNextPageClick()
+                            }}
+                        />
+                    </PaginationItem>
+                </PaginationContent>
+            </Pagination >
+        </div>
     )
 }

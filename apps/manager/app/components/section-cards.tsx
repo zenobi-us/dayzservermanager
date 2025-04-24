@@ -33,7 +33,7 @@ function SectionCardsItem({
   ...props
 }: {
   title?: string;
-  description?: string;
+  description?: ReactNode;
   actions?: ReactNode;
   footer?: ReactNode;
   className?: string;
