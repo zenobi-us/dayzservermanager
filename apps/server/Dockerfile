@@ -28,12 +28,23 @@ RUN mise run server:build
 RUN mkdir -p /store/steam /serverfiles/{mpmissions, mods, profiles}
 
 ENV MODE=server
-ENV STEAM_STORE=/store/steam
-ENV STEAM_STORE_MODS=/store/steam/workshop/content
-ENV SERVER_FILES=/serverfiles
-ENV SERVER_MODS=/serverfiles/mods
-ENV SERVER_MISSIONS=/serverfiles/mpmissions
-ENV SERVER_PROFILES=/serverfiles/profiles
+
+#
+# Mounted from subpath volume
+# serverfiles:/<serverid>/
+ENV SERVERFILES=/serverfiles
+#
+# Mounted from subpath volume
+# servermods:/<serverid>/ 
+ENV SERVERFILES_MODS=/serverfiles/mods
+#
+# Mounted from subpath volume
+# servermissions:/<serverid>/
+ENV SERVERFILES_MISSIONS=/serverfiles/mpmissions
+#
+# Mounted from subpath volume
+# serverprofiles:/<serverid>/ 
+ENV SERVERFILES_PROFILES=/serverfiles/profiles
 
 # s6 handles the rest of the lifecycle. 
 ENTRYPOINT ["/init"]

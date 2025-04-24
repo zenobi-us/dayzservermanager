@@ -26,7 +26,7 @@ export type { IConfig, IEnvConfig, IFileConfig } from './config';
 
 export type { AppStatus } from './meta';
 
-export type { SearchResult, SearchResultList } from './steam';
+export type { SteamWorkshopSearchResultItem, SteamWorkshopSearchResults, SteamWorkshopTag } from './steamSchema';
 
 export { meta, server, steam, mods };
 

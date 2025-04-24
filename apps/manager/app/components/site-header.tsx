@@ -9,8 +9,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Fragment } from "react"
-import type { IBreadcrumb  } from "@/hooks/use-breadcrumbs" 
-import { useBreadcrumbs  } from "@/hooks/use-breadcrumbs" 
+import type { IBreadcrumb } from "@/hooks/use-breadcrumbs"
+import { useBreadcrumbs } from "@/hooks/use-breadcrumbs"
 import { Link } from "@tanstack/react-router"
 
 export function SiteHeader() {
@@ -41,7 +41,7 @@ export function SiteHeaderBreadcrumbs({ items = [] }: { items: IBreadcrumb[] }) 
                 <Link to={item.path}>{item.name}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
-            {items.length-1 > index && (
+            {items.length - 1 > index && (
               <BreadcrumbSeparator />
             )}
           </Fragment>

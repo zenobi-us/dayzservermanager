@@ -6,9 +6,6 @@ services:
     env_file:
       - .env
 
-    environment:
-      - SERVER_ID=game_server_one
-
     volumes:
       - type: volume
         source: homes
@@ -16,25 +13,28 @@ services:
         volume:
           subpath: game_server_one
 
+      - steamstore:/store/steam
+
       - type: volume
-        source: serverfiles
-        target: /store/serverfiles
+        source: serverstore
+        target: /store/serverstore
         volume:
           subpath: game_server_one
 
       - type: volume
-        source: servermissions
+        source: serverstoremissions
         target: /store/servermissions
         read_only: true
         volume:
           subpath: game_server_one
 
       - type: volume
-        source: serverprofiles
+        source: serverstoreprofiles
         target: /store/serverprofiles
         read_only: true
         volume:
           subpath: game_server_one
+
 
       # these are for development
       - './files:/files'

@@ -19,21 +19,25 @@ export const EnvConfigSchema = z.object({
   /**
    * Where should steam download the mods
    */
-  STEAM_STORE: z.string().default('/store/steam'),
-  STEAM_STORE_MODS: z.string().default('/store/steam/workshop/content'),
+  STEAMSTORE: z.string().default('/store/steam'),
+  STEAMSTORE_MODS: z.string().default('/store/steam/workshop/content'),
 
   /**
-   * Where are we writing server specific files?
-   *
-   * This entry is used to create other paths:
-   *
-   * - a server root: SERVER_FILES/:serverid/
-   * - a server mod: SERVER_FILES/:serverid/@:mod_name/ (a symlink)
+   * All servers files
    */
-  SERVER_FILES: z.string().default('/store/serverfiles'),
-  SERVER_MODS: z.string().default('/store/servermods'),
-  SERVER_MISSIONS: z.string().default('/store/servermissions'),
-  SERVER_PROFILES: z.string().default('/store/serverprofiles'),
+  SERVERSTORE_FILES: z.string().default('/store/serverfiles'),
+  SERVERSTORE_MODS: z.string().default('/store/servermods'),
+  SERVERSTORE_MISSIONS: z.string().default('/store/servermissions'),
+  SERVERSTORE_PROFILES: z.string().default('/store/serverprofiles'),
+
+  /**
+   * Server specific paths.
+   * Only usable if MODE === 'server'
+   */
+  SERVERFILES: z.string().default('/serverfiles'),
+  SERVERFILES_MODS: z.string().default('/serverfiles/mods'),
+  SERVERFILES_MISSIONS: z.string().default('/serverfiles/mpmissions'),
+  SERVERFILES_PROFILES: z.string().default('/serverfiles/profiles'),
 
   /**
    * The server config file name.
@@ -44,7 +48,7 @@ export const EnvConfigSchema = z.object({
   /**
    * What is the cmd we run to start the game server
    *
-   * - SERVER_FILES/:serverid/SERVER_COMMAND
+   * - SERVERFILES/:serverid/SERVER_COMMAND
    */
   SERVER_COMMAND: z.string().default('DayZServer'),
   /**
@@ -67,14 +71,6 @@ export const EnvConfigSchema = z.object({
    * Searching steam workshop requires an apikey: https://steamcommunity.com/dev/apikey
    */
   STEAM_APIKEY: z.string().optional(),
-  /**
-   * Search url template
-   */
-  STEAM_SEARCH_URL_TEMPLATE: z
-    .string()
-    .default(
-      'https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/?numperpage=1000&appid=221100&return_short_description=true&strip_description_bbcode=true&key={{api_key}}&search_text={{search_text}}',
-    ),
 });
 
 export type IEnvConfig = z.infer<typeof EnvConfigSchema>;

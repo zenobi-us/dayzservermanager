@@ -22,5 +22,5 @@ export function useBreadcrumbs() {
       };
     }, {});
 
-  return Object.values(breadcrumbs);
+  return Object.values(breadcrumbs) as IBreadcrumb[];
 }

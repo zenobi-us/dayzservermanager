@@ -15,18 +15,18 @@ volumes:
 
   # Serverfiles
   # /serverfiles/:serverid/DayZServer
-  serverfiles:
+  serverstore:
 
   # Activated Server Mod Store
   # /serverfiles/:serverid/mods/
-  servermods:
+  serverstoremods:
 
   # Server Missions
   # /serverfiles/:serverid/mpmissions/
-  servermissions:
+  serverstoremissions:
 
   # /serverfiles/:serverid/profiles/
-  serverprofiles:
+  serverstoreprofiles:
 
 services:
   volume_setup:
@@ -54,16 +54,16 @@ services:
       - steamstore:/store/steam
 
       # mount all the server missions
-      - serverfiles:/store/serverfiles
+      - serverstore:/store/serverfiles
 
       # mount all the server missions
-      - servermods:/store/servermods
+      - serverstoremods:/store/servermods
 
       # mount all the server missions
-      - servermissions:/store/servermissions
+      - serverstoremissions:/store/servermissions
 
       # mount all the server missions
-      - serverprofiles:/store/serverprofiles
+      - serverstoreprofiles:/store/serverprofiles
 
       # stores all our customisations
       - ./files:/store/files

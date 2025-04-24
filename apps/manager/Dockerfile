@@ -36,12 +36,12 @@ RUN mise run manager:build
 RUN mkdir -p /store/{serverfiles, steam, servermods, servermissions, serverprofiles}
 
 ENV MODE=manager
-ENV STEAM_STORE=/store/steam
-ENV STEAM_STORE_MODS=/store/steam/workshop/content
-ENV SERVER_FILES=/store/serverfiles
-ENV SERVER_MODS=/store/servermods
-ENV SERVER_MISSIONS=/store/servermissions
-ENV SERVER_PROFILES=/store/serverprofiles
+ENV STEAMSTORE=/store/steam
+ENV STEAMSTORE_MODS=/store/steam/workshop/content
+ENV SERVERSTORE_FILES=/store/serverfiles
+ENV SERVERSTORE_MODS=/store/servermods
+ENV SERVERSTORE_MISSIONS=/store/servermissions
+ENV SERVERSTORE_PROFILES=/store/serverprofiles
 
 # s6 handles the rest of the lifecycle.
 ENTRYPOINT ["/init"]

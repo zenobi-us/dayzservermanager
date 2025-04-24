@@ -13,8 +13,8 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as DashboardImport } from './routes/_dashboard'
 import { Route as DashboardIndexImport } from './routes/_dashboard.index'
-import { Route as DashboardModsImport } from './routes/_dashboard.mods'
 import { Route as DashboardServersIndexImport } from './routes/_dashboard.servers.index'
+import { Route as DashboardModsIndexImport } from './routes/_dashboard.mods.index'
 import { Route as DashboardServersServerIdImport } from './routes/_dashboard.servers.$serverId'
 import { Route as DashboardDemoDashboardImport } from './routes/_dashboard.demo.dashboard'
 
@@ -31,15 +31,15 @@ const DashboardIndexRoute = DashboardIndexImport.update({
   getParentRoute: () => DashboardRoute,
 } as any)
 
-const DashboardModsRoute = DashboardModsImport.update({
-  id: '/mods',
-  path: '/mods',
-  getParentRoute: () => DashboardRoute,
-} as any)
-
 const DashboardServersIndexRoute = DashboardServersIndexImport.update({
   id: '/servers/',
   path: '/servers/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardModsIndexRoute = DashboardModsIndexImport.update({
+  id: '/mods/',
+  path: '/mods/',
   getParentRoute: () => DashboardRoute,
 } as any)
 
@@ -66,13 +66,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardImport
       parentRoute: typeof rootRoute
     }
-    '/_dashboard/mods': {
-      id: '/_dashboard/mods'
-      path: '/mods'
-      fullPath: '/mods'
-      preLoaderRoute: typeof DashboardModsImport
-      parentRoute: typeof DashboardImport
-    }
     '/_dashboard/': {
       id: '/_dashboard/'
       path: '/'
@@ -94,6 +87,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardServersServerIdImport
       parentRoute: typeof DashboardImport
     }
+    '/_dashboard/mods/': {
+      id: '/_dashboard/mods/'
+      path: '/mods'
+      fullPath: '/mods'
+      preLoaderRoute: typeof DashboardModsIndexImport
+      parentRoute: typeof DashboardImport
+    }
     '/_dashboard/servers/': {
       id: '/_dashboard/servers/'
       path: '/servers'
@@ -107,18 +107,18 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface DashboardRouteChildren {
-  DashboardModsRoute: typeof DashboardModsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardDemoDashboardRoute: typeof DashboardDemoDashboardRoute
   DashboardServersServerIdRoute: typeof DashboardServersServerIdRoute
+  DashboardModsIndexRoute: typeof DashboardModsIndexRoute
   DashboardServersIndexRoute: typeof DashboardServersIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardModsRoute: DashboardModsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardDemoDashboardRoute: DashboardDemoDashboardRoute,
   DashboardServersServerIdRoute: DashboardServersServerIdRoute,
+  DashboardModsIndexRoute: DashboardModsIndexRoute,
   DashboardServersIndexRoute: DashboardServersIndexRoute,
 }
 
@@ -128,28 +128,28 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
   '': typeof DashboardRouteWithChildren
-  '/mods': typeof DashboardModsRoute
   '/': typeof DashboardIndexRoute
   '/demo/dashboard': typeof DashboardDemoDashboardRoute
   '/servers/$serverId': typeof DashboardServersServerIdRoute
+  '/mods': typeof DashboardModsIndexRoute
   '/servers': typeof DashboardServersIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/mods': typeof DashboardModsRoute
   '/': typeof DashboardIndexRoute
   '/demo/dashboard': typeof DashboardDemoDashboardRoute
   '/servers/$serverId': typeof DashboardServersServerIdRoute
+  '/mods': typeof DashboardModsIndexRoute
   '/servers': typeof DashboardServersIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_dashboard': typeof DashboardRouteWithChildren
-  '/_dashboard/mods': typeof DashboardModsRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/demo/dashboard': typeof DashboardDemoDashboardRoute
   '/_dashboard/servers/$serverId': typeof DashboardServersServerIdRoute
+  '/_dashboard/mods/': typeof DashboardModsIndexRoute
   '/_dashboard/servers/': typeof DashboardServersIndexRoute
 }
 
@@ -157,20 +157,20 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | ''
-    | '/mods'
     | '/'
     | '/demo/dashboard'
     | '/servers/$serverId'
+    | '/mods'
     | '/servers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/mods' | '/' | '/demo/dashboard' | '/servers/$serverId' | '/servers'
+  to: '/' | '/demo/dashboard' | '/servers/$serverId' | '/mods' | '/servers'
   id:
     | '__root__'
     | '/_dashboard'
-    | '/_dashboard/mods'
     | '/_dashboard/'
     | '/_dashboard/demo/dashboard'
     | '/_dashboard/servers/$serverId'
+    | '/_dashboard/mods/'
     | '/_dashboard/servers/'
   fileRoutesById: FileRoutesById
 }
@@ -199,16 +199,12 @@ export const routeTree = rootRoute
     "/_dashboard": {
       "filePath": "_dashboard.tsx",
       "children": [
-        "/_dashboard/mods",
         "/_dashboard/",
         "/_dashboard/demo/dashboard",
         "/_dashboard/servers/$serverId",
+        "/_dashboard/mods/",
         "/_dashboard/servers/"
       ]
-    },
-    "/_dashboard/mods": {
-      "filePath": "_dashboard.mods.tsx",
-      "parent": "/_dashboard"
     },
     "/_dashboard/": {
       "filePath": "_dashboard.index.tsx",
@@ -220,6 +216,10 @@ export const routeTree = rootRoute
     },
     "/_dashboard/servers/$serverId": {
       "filePath": "_dashboard.servers.$serverId.tsx",
+      "parent": "/_dashboard"
+    },
+    "/_dashboard/mods/": {
+      "filePath": "_dashboard.mods.index.tsx",
       "parent": "/_dashboard"
     },
     "/_dashboard/servers/": {

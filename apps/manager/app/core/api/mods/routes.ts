@@ -1,10 +1,8 @@
 import { createServerFn } from '@tanstack/react-start';
 import { setHeader, setResponseStatus } from '@tanstack/react-start/server';
 import sdk from '@dayzserver/sdk';
-import type { ModeItemDetail } from '@dayzserver/sdk';
 
-import { createErrorResponseBody, createResponseBody } from '../../response';
-import * as fs from '../../fs';
+import { createErrorResponseBody, createResponseBody, errorResponseBodyError } from '../../response';
 import { ModListResponseCodes } from './codes';
 import { z } from 'zod';
 /**
@@ -12,16 +10,17 @@ import { z } from 'zod';
  */
 const getModList = createServerFn({ method: 'GET' }).handler(async () => {
   try {
-    const output = await sdk.mods.getAllWorkshopMods();
+    const output = await sdk.mods.listSteamStoreMods();
     const body = createResponseBody({
       code: ModListResponseCodes.ModListSuccess,
       data: { mods: output },
     });
     return body;
-  } catch {
+  } catch (error) {
     const body = createErrorResponseBody({
       code: ModListResponseCodes.ModListError,
       data: null,
+      error: errorResponseBodyError(error)
     });
     return body;
   }
@@ -37,25 +36,15 @@ const getModDetails = createServerFn({ method: 'GET' })
   .validator((data: unknown) => GetModDetailsParametersSchema.parse(data))
   .handler(async (context) => {
     const modId = context.data.modId;
-    const modDir = sdk.mods.createWorkshopModPath(modId);
     try {
-      const customXML = await sdk.mods.getCustomXML(modId);
-      const name = await sdk.mods.getModNameById(modId);
+      const modDetails = await sdk.mods.getModDetails(modId);
 
-      if (!name) {
+      if (!modDetails) {
         throw ModListResponseCodes.ModNotFoundError;
       }
 
-      const detail: ModeItemDetail = {
-        id: modId,
-        path: modDir,
-        name,
-        size: fs.getDirSize(modDir),
-        customXML,
-      };
-
       const body = createResponseBody({
-        data: detail,
+        data: modDetails,
         code: ModListResponseCodes.ModDetailSuccess,
       });
 
@@ -94,7 +83,7 @@ const getModFileDetails = createServerFn({ method: 'GET' })
   .handler(async (context) => {
     const { modId, file } = context.data;
     try {
-      const contents = await sdk.mods.getWorkshopModFileContents(modId, file);
+      const contents = await sdk.mods.getSteamStoreModFileContents(modId, file);
 
       if (!contents) {
         const body = createErrorResponseBody({

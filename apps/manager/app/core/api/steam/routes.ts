@@ -1,25 +1,29 @@
-import { createServerFn } from '@tanstack/react-start';
 import { setResponseStatus } from '@tanstack/react-start/server';
-import sdk from '@dayzserver/sdk';
+import sdk, { SteamWorkshopSearchResults } from '@dayzserver/sdk';
 
 import { ResponseCodes } from './codes';
 import { z } from 'zod';
-import { createErrorResponseBody, createResponseBody } from '../../response';
+import { createErrorResponseBody, createResponseBody, errorResponseBodyError } from '../../response';
+import { ErrorResponse, SuccessResponse } from '@/types/response';
+import { createServerFn, Fetcher } from '@tanstack/react-start';
+import { IPublishedFileServiceQueryFilesRequestParamsSchema } from '@dayzserver/sdk/steamSchema';
+
 
 /**
- * Create a list of mods
+ * Search for mods
  */
-const SearchSteamWorkhopParameterSchema = z.object({
-  searchString: z.string(),
-});
+type SearchWorkshopFn = Fetcher<
+  undefined,
+  typeof IPublishedFileServiceQueryFilesRequestParamsSchema,
+  SuccessResponse<SteamWorkshopSearchResults, ResponseCodes.SearchQuerySuccess> | ErrorResponse<string, ResponseCodes.SearchQueryError>,
+  "data"
+>;
 
-const searchWorkshop = createServerFn({ method: 'GET' })
-  .validator((data: string) => SearchSteamWorkhopParameterSchema.parse(data))
+export const searchWorkshop: SearchWorkshopFn = createServerFn()
+  .validator(IPublishedFileServiceQueryFilesRequestParamsSchema)
   .handler(async (context) => {
-    const searchString = context.data.searchString;
-
     try {
-      const results = await sdk.steam.apiSearch(searchString);
+      const results = await sdk.steam.apiSearch(context.data);
       const body = createResponseBody({
         code: ResponseCodes.SearchQuerySuccess,
         data: results,
@@ -32,7 +36,7 @@ const searchWorkshop = createServerFn({ method: 'GET' })
         ResponseCodes.SearchQueryError
       >({
         code: ResponseCodes.SearchQueryError,
-        data: `Error searching for ${searchString}`,
+        data: `Error searching for ${context.data.search_text}`,
       });
 
       setResponseStatus(500);
@@ -45,19 +49,27 @@ const LoginParametersSchema = z.object({
   password: z.string(),
 });
 
-const login = createServerFn({ method: 'POST' })
-  .validator((data: unknown) => LoginParametersSchema.parse(data))
+type LoginFn = Fetcher<
+  undefined,
+  typeof LoginParametersSchema,
+  SuccessResponse<{}, ResponseCodes.LoginSuccess> | ErrorResponse<{}, ResponseCodes.LoginFailed>,
+  'data'
+>;
+
+export const login: LoginFn = createServerFn({ method: 'POST' })
+  .validator(LoginParametersSchema)
   .handler(async (context) => {
     try {
       await sdk.steam.login(context.data);
-    } catch {
-      const body = createResponseBody({
+      return createResponseBody({
+        code: ResponseCodes.LoginSuccess
+      })
+    } catch (error) {
+      const body = createErrorResponseBody({
         code: ResponseCodes.LoginFailed,
-      });
+        error: errorResponseBodyError(error)
+      })
 
-      setResponseStatus(401);
-
-      return body;
+      return body
     }
   });
-export { searchWorkshop, login };

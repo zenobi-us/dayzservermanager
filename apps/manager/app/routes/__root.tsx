@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import {
     Outlet,
-    createRootRoute,
+    createRootRouteWithContext,
     HeadContent,
     Scripts,
 } from '@tanstack/react-router'
@@ -10,8 +10,9 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
 import appCss from "@/app.css?url"
 import { FullScreenLoader } from '@/components/full-screen-loader'
+import { QueryClient } from '@tanstack/react-query'
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
     head: () => ({
         meta: [
             {
@@ -36,7 +37,6 @@ export const Route = createRootRoute({
     component: RootComponent,
     context() {
         return {
-            breadcrumb: ""
         }
     }
 })

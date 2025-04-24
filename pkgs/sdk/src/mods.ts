@@ -6,165 +6,14 @@ import * as steam from './steam';
 import * as servers from './server';
 import { Config, ModConfigFiles } from './config';
 import assert from 'assert';
+import { assertIsManagerMode } from './mode';
+import { createCppFileParser } from './cpp';
 
-export type ModItem = {
-  id: string;
-  name: string;
-  path: string;
-};
-
-export type ModItemList = ModItem[];
-export type ModeItemDetail = ModItem & {
-  size: number;
-  customXML: CustomXmlItem[];
-};
-
-export type CustomXmlItem = { name: string };
-
-export const getCustomXML = async (modId: string) => {
-  const output: CustomXmlItem[] = [];
-
-  const configFilePaths = ModConfigFiles.map(async (file) => {
-    const exists = await doesWorkshopModFileExist(modId, file);
-    if (!exists) {
-      return;
-    }
-
-    output.push({ name: file });
-  });
-
-  await Promise.all(configFilePaths);
-
-  return output;
-};
 
 /**
- * Read the meta.cpp file
+ * Main Api
  */
-const MetaCPPNameLinePattern = /^name\s?=(?<name>.*);?/;
-export const getModMeta = async (modId: string) => {
-  const metacpp = await getWorkshopModFileContents(modId, 'meta.cpp');
-  assert(metacpp, `Mod ${modId} does not have a meta.cpp file!`);
 
-  const lines = metacpp.split('\n');
-
-  for (const line of lines) {
-    if (!line.includes('name')) {
-      continue;
-    }
-    const matches = MetaCPPNameLinePattern.exec(line);
-    if (!matches || !matches.groups) {
-      continue;
-    }
-    if ('name' in matches.groups && !matches?.groups.name) {
-      return matches.groups.name;
-    }
-  }
-
-  throw new Error(`Mod ${modId} has a meta.cpp, but there's no name field.`);
-};
-
-export const getModNameById = async (id: string) => {
-  const files = await fs.readdir(Config.get('STEAM_STORE'), {
-    encoding: 'utf8',
-    withFileTypes: true,
-  });
-
-  for (const file of files) {
-    const filepath = join(Config.get('STEAM_STORE'), file.name);
-    const exists = await fsExists(filepath);
-    if (!exists) {
-      continue;
-    }
-
-    const sym = await fs.readlink(filepath);
-
-    if (sym.indexOf(id) < 0) {
-      continue;
-    }
-
-    return file.name;
-  }
-
-  return null;
-};
-
-export const getAllWorkshopMods = async () => {
-  const modDir = Config.get('STEAM_STORE_MODS');
-  const mods: ModItem[] = [];
-  const modDirExists = await fsExists(modDir);
-
-  if (!modDirExists) {
-    return mods;
-  }
-
-  const modFiles = await fs.readdir(modDir, {
-    withFileTypes: true,
-  });
-
-  for (const file of modFiles) {
-    const name = await getModNameById(file.name);
-    if (!name) {
-      continue;
-    }
-
-    mods.push({ name, id: file.name, path: file.parentPath });
-  }
-
-  return mods;
-};
-
-/**
- * Retrieve a list of mods for a particular server.
- * Retrieve a list of mods on this server.
- */
-export const getCurrentServerMods = async () => {
-  assert(Config.get('MODE') !== 'server', 'Only to be used in server mode');
-  const serverFiles = Config.get('SERVER_FILES');
-  return getServerModsFromPath(serverFiles);
-};
-
-/**
- * Return a list of mods installed for a server at a path
- *
- * This can be used by both manager and server since we mount the paths like so:
- *  volumes:
- *    ServerFilesVolume:
- *
- *  manager:
- *    image: dayzserver:manager-local
- *    volumes:
- *      - ServerFilesVolume:/store/serverFiles
- *
- *  serverOne:
- *    image: dayzserver:manager-local
- *    volumes:
- *      - type: volume
- *        source: ServerFilesVolume
- *        target: /store/serverFiles
- *        subpath: serverOne
- *
- */
-export const getServerModsFromPath = async (path: string) => {
-  const modFiles = await fs.readdir(path, {
-    withFileTypes: true,
-  });
-  const mods: ModItem[] = [];
-
-  for (const file of modFiles) {
-    if (!file.isSymbolicLink() || !file.name.startsWith('@')) {
-      continue;
-    }
-    const name = await getModNameById(file.name);
-    if (!name) {
-      continue;
-    }
-
-    mods.push({ name, id: file.name, path: file.parentPath });
-  }
-
-  return mods;
-};
 
 /**
  * Downloads a mod to the workshop store
@@ -180,10 +29,11 @@ export const addMod = async (modId: string) => {
  * Symlinks a downloaded mod to the servers mod store
  */
 export const activateMod = async (serverId: string, modId: string) => {
-  assertWorkshopModExists(modId);
+  assertIsManagerMode()
+  assertSteamStoreModExists(modId);
 
-  const workshopModPath = createWorkshopModPath(modId);
-  const serverModPath = await createServerModPath(serverId, modId);
+  const workshopModPath = getSteamStoreModPath(modId);
+  const serverModPath = await getServerStoreModPath(serverId, modId);
 
   fs.link(workshopModPath, serverModPath);
 };
@@ -192,12 +42,13 @@ export const activateMod = async (serverId: string, modId: string) => {
  * Unlinks a downloaded mod from a servers mod store
  */
 export const deactivateMod = async (serverId: string, modId: string) => {
+  assertIsManagerMode()
   const exists = await doesServerModExist(serverId, modId);
   if (!exists) {
     return;
   }
 
-  const serverModPath = await createServerModPath(serverId, modId);
+  const serverModPath = await getServerStoreModPath(serverId, modId);
 
   await fs.unlink(serverModPath);
 };
@@ -206,6 +57,7 @@ export const deactivateMod = async (serverId: string, modId: string) => {
  * Removes a downloaded mod and unlinks it from all server mod stores
  */
 export const removeMod = async (modId: string) => {
+  assertIsManagerMode()
   const availableServers = await servers.getServerList();
   await Promise.all(
     availableServers.map(async (server) => {
@@ -213,65 +65,155 @@ export const removeMod = async (modId: string) => {
     }),
   );
 
-  if (!(await doesWorkshopModExist(modId))) {
+  if (!(await doesSteamStoreModExist(modId))) {
     return;
   }
 
-  const modPath = createWorkshopModPath(modId);
+  const modPath = getSteamStoreModPath(modId);
   await fs.rmdir(modPath);
 };
 
+export const getModDetails = async (modId: string): Promise<ModeItemDetail> => {
+  assertIsManagerMode()
+  const modDetails = await getSteamStoreModMeta(modId);
+  const modDir = await getSteamStoreModPath(modId);
+  const modSize = await getDirSize(modDir)
+  const customXML = await getCustomXML(modId);
+
+  return {
+    ...modDetails,
+    size: modSize,
+    customXML,
+    path: modDir
+  };
+}
+
 /**
- *
+ * Helpers
  */
-export async function getWorkshopModFileContents(
-  modId: string,
-  filepath: string,
-) {
-  if (!(await doesWorkshopModFileExist(modId, filepath))) {
-    return null;
+
+export type ModItem = {
+  id: string;
+  name: string;
+  path: string;
+};
+
+export type ModItemList = ModItem[];
+export type ModeItemDetail = ModItem & {
+  size: number;
+  customXML: CustomXmlItem[];
+};
+
+export type CustomXmlItem = { name: string };
+
+
+
+export const getCustomXML = async (modId: string) => {
+  assertIsManagerMode()
+  const output: CustomXmlItem[] = [];
+
+  const configFilePaths = ModConfigFiles.map(async (file) => {
+    const exists = await doesSteamStoreModFileExist(modId, file);
+    if (!exists) {
+      return;
+    }
+
+    output.push({ name: file });
+  });
+
+  await Promise.all(configFilePaths);
+
+  return output;
+};
+
+import { z } from 'zod';
+import { getDirSize } from './fs';
+
+/**
+ * Read the meta.cpp file
+ */
+const steamStoreModMetaParser = createCppFileParser(z.object({
+  id: z.coerce.string(),
+  name: z.string()
+}))
+
+export const getSteamStoreModMeta = async (modId: string) => {
+  assertIsManagerMode()
+  const metacpp = await getSteamStoreModFileContents(modId, 'meta.cpp');
+  assert(metacpp, `Mod ${modId} does not have a meta.cpp file!`);
+
+  const meta = await steamStoreModMetaParser(metacpp)
+
+  if (meta.success) {
+    return meta.data
   }
 
-  const modFilePath = createWorkshopModFilePath(modId, filepath);
-  const contents = await fs.readFile(modFilePath, { encoding: 'utf8' });
-  return contents;
-}
+  throw new Error(`Parsing ModMeta ${modId} was not valid. ${meta.error}`);
+};
 
-export async function doesWorkshopModExist(modId: string) {
-  const modPath = createWorkshopModPath(modId);
-  return await fsExists(modPath);
-}
+export const listSteamStoreMods = async () => {
+  const modDir = join(Config.get('STEAMSTORE_MODS'), Config.get('CLIENT_APPID'))
+  const mods: ModItem[] = [];
+  const modFiles = await fs.readdir(modDir, {
+    withFileTypes: true,
+  });
 
-export async function assertWorkshopModExists(modId: string) {
-  const yesno = await doesWorkshopModExist(modId);
-  if (!yesno) {
-    throw new Error(`Mod ${modId} does not exist`);
+  for (const file of modFiles) {
+    const meta = await getSteamStoreModMeta(file.name);
+    if (!meta) {
+      continue;
+    }
+
+    mods.push({ name: meta.name, id: file.name, path: file.parentPath });
   }
-}
 
-export async function doesWorkshopModFileExist(
-  modId: string,
-  filepath: string,
-) {
-  const modFilePath = createWorkshopModFilePath(modId, filepath);
-  return await fsExists(modFilePath);
-}
-export async function assertWorkshopModFileExists(
-  modId: string,
-  filepath: string,
-) {
-  const yesno = await doesWorkshopModFileExist(modId, filepath);
-  if (!yesno) {
-    throw new Error(
-      `Either Mod ${modId} does not exist, or it does not have a file at ${filepath}`,
-    );
+  return mods;
+};
+
+
+export const getServerModMeta = async (modId: string) => { }
+export const listCurrentServerMods = async (serverId: string) => { }
+
+/**
+ * Retrieve a list of mods installed to a server
+ */
+export const listServerMods = async (serverId: string) => {
+  assertIsManagerMode()
+  const serverFiles = Config.get('SERVERSTORE_FILES');
+  const path = join(serverFiles, serverId);
+
+  const modFiles = await fs.readdir(path, {
+    withFileTypes: true,
+  });
+  const mods: ModItem[] = [];
+
+  for (const file of modFiles) {
+    if (!file.isSymbolicLink() || !file.name.startsWith('@')) {
+      continue;
+    }
+    const meta = await getSteamStoreModMeta(file.name);
+
+    if (!meta) {
+      continue;
+    }
+
+    mods.push({ name: meta.name, id: file.name, path: file.parentPath });
   }
-}
+
+  return mods;
+};
+
+/**
+ * Server
+ */
+
+/**
+ * Does the server have a mod?
+ */
 export async function doesServerModExist(serverId: string, modId: string) {
-  const modPath = await createServerModPath(serverId, modId);
+  const modPath = await getServerStoreModPath(serverId, modId);
   return await fsExists(modPath);
 }
-
 export async function assertServerModExists(serverId: string, modId: string) {
   const yesno = await doesServerModExist(serverId, modId);
   if (!yesno) {
@@ -279,14 +221,71 @@ export async function assertServerModExists(serverId: string, modId: string) {
   }
 }
 
-export async function createServerModPath(serverId: string, modId: string) {
-  const modName = await getModNameById(modId);
-  return join(Config.get('SERVER_FILES'), serverId, `@${modName}`);
+export async function getServerStoreModPath(serverId: string, modId: string) {
+  const modMeta = await getSteamStoreModMeta(modId);
+  return join(Config.get('SERVERSTORE_MODS'), serverId, `@${modMeta.name}`);
 }
 
-export function createWorkshopModPath(modId: string) {
-  return join(Config.get('STEAM_STORE_MODS'), modId);
+
+/**
+ * Steam Store
+ */
+/**
+ *
+ */
+export async function getSteamStoreModFileContents(
+  modId: string,
+  filepath: string,
+) {
+  if (!(await doesSteamStoreModFileExist(modId, filepath))) {
+    return null;
+  }
+
+  const modFilePath = getSteamStoreModFilePath(modId, filepath);
+  const contents = await fs.readFile(modFilePath, { encoding: 'utf8' });
+  return contents;
 }
-export function createWorkshopModFilePath(modId: string, filepath: string) {
-  return join(Config.get('STEAM_STORE_MODS'), modId, filepath);
+export function getSteamStoreModPath(modId: string) {
+  assertIsManagerMode()
+  const modDir = join(Config.get('STEAMSTORE_MODS'), Config.get('CLIENT_APPID'), modId)
+  return modDir
+}
+
+export function getSteamStoreModFilePath(modId: string, filepath: string) {
+  assertIsManagerMode()
+  const modDir = getSteamStoreModPath(modId);
+  return join(modDir, filepath);
+}
+
+
+export async function doesSteamStoreModExist(modId: string) {
+  const modPath = getSteamStoreModPath(modId);
+  return await fsExists(modPath);
+}
+
+export async function assertSteamStoreModExists(modId: string) {
+  const yesno = await doesSteamStoreModExist(modId);
+  if (!yesno) {
+    throw new Error(`Mod ${modId} does not exist`);
+  }
+}
+
+export async function doesSteamStoreModFileExist(
+  modId: string,
+  filepath: string,
+) {
+  const modFilePath = getSteamStoreModFilePath(modId, filepath);
+  return await fsExists(modFilePath);
+}
+
+export async function assertSteamStoreModFileExists(
+  modId: string,
+  filepath: string,
+) {
+  const yesno = await doesSteamStoreModFileExist(modId, filepath);
+  if (!yesno) {
+    throw new Error(
+      `Either Mod ${modId} does not exist, or it does not have a file at ${filepath}`,
+    );
+  }
 }

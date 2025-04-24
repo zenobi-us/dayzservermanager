@@ -2,18 +2,43 @@ import fs from "fs/promises";
 import { Config } from "./config";
 import * as mods from "./mods";
 import { join } from "path";
-import { z } from "zod";
+import { ServerConfigInvalidError, ServerConfigParseError, ServerFileNotFound } from "./errors";
+import { ServerConfig, ServerConfigSchema } from "./serverSchema";
+import { assertIsManagerMode, assertIsServerMode } from "./mode";
+import { createCppFileParser } from "./cpp";
+import { ModItem } from "./mods";
 
-export type Server = {
+
+export type ServerBase = {
   id: string;
   path: string;
+}
+
+export type Server = ServerBase & (
+  ServerWithDetails | ServerWithParseError | ServerWithInvalidConfig
+)
+
+export type ServerWithDetails = {
   map: string;
-  mods?: mods.ModItemList
-  config: ServerConfig
+  mods?: mods.ModItemList;
+  config: ServerConfig;
+  error: null;
+};
+
+export type ServerWithParseError = {
+  error: ServerConfigParseError;
+};
+
+export type ServerWithGenericError = {
+  error: Error
+};
+
+export type ServerWithInvalidConfig = {
+  error: ServerConfigInvalidError
 };
 
 export async function getServerList() {
-  const serverFiles = Config.get("SERVER_FILES");
+  const serverFiles = Config.get("SERVERSTORE_FILES");
   const servers = await fs.readdir(serverFiles, {
     withFileTypes: true,
   });
@@ -25,21 +50,49 @@ export async function getServerList() {
     }
     const server = await getServerDetail(entry.name);
 
+    if (!server) {
+      continue;
+    }
+
     output.push(server);
   }
 
   return output;
 }
 
-export async function getServerDetail(serverId: string) {
-  const config = await getServerConfig(serverId);
-  const serverPath = createServerPath(serverId)
-  const output:Server = {
+export async function getServerDetail(serverId: string): Promise<Server> {
+
+  const id = serverId;
+  const path = join(createServerPath(serverId), serverId);
+  let config = {} as ServerConfig;
+
+  try {
+    config = await getServerStoreConfig(serverId);
+
+  } catch (error) {
+    if (error instanceof Error || error instanceof ServerConfigInvalidError || error instanceof ServerConfigParseError) {
+      return {
+        id,
+        path,
+        error
+      }
+    }
+
+    return {
+      id,
+      path,
+      error: new Error
+    }
+  }
+
+
+  const output: Server = {
     id: serverId,
-    path: serverPath,
+    path,
     mods: [],
     map: config.template,
-    config
+    config,
+    error: null
   }
 
   return output
@@ -50,20 +103,23 @@ export async function getServerDetail(serverId: string) {
  * dayz modlist args
  */
 export async function getServerModCommandArgs() {
-  const activeMods = await mods.getCurrentServerMods();
+  const serverFiles = Config.get('SERVERFILES_MODS')
+  const modFiles = await fs.readdir(serverFiles, {
+    withFileTypes: true,
+  });
 
-  return activeMods.reduce((result, mod) => {
-    return (result += `${mod.id};`);
-  }, "-mod=");
-}
+  const mods: ModItem[] = [];
 
+  for (const file of modFiles) {
+    if (!file.isSymbolicLink() || !file.name.startsWith('@')) {
+      continue;
+    }
 
+    mods.push({ name: 'todo: get name', id: file.name, path: file.parentPath });
+  }
 
-export async function getServerFile(serverId: string, filename: string) {
-  const serverFiles = Config.get("SERVER_FILES");
-  const filepath = join(serverFiles, serverId, filename);
+  return mods;
 
-  return await fs.readFile(filepath, { encoding: "utf8" });
 }
 
 
@@ -79,79 +135,44 @@ export async function getServerFile(serverId: string, filename: string) {
 /gm: g for all matches, m for multiline.
 
  */
-const ServerConfigParameterPattern =
-  /^(?!\/\/)\s+(?<key>\w+)\s*=\s*(?<value>[^;]*);/gm;
+const serverConfigParser = createCppFileParser(ServerConfigSchema)
 
-export async function getServerConfig(serverId: string) {
+export async function getServerStoreConfig(serverId: string) {
+  assertIsManagerMode()
+
   const configFileName = Config.get("SERVER_CONFIG_FILENAME");
-  const content = await getServerFile(serverId, configFileName);
-  const data: Record<string, string | number> = {};
-  let match;
-  while ((match = ServerConfigParameterPattern.exec(content)) !== null) {
-    if (!match.groups) {
-      continue;
-    }
-    const key = match.groups.key;
-    const value = JSON.parse(match.groups.value.trim());
-    data[key] = value;
+  const serverStoreFiles = Config.get('SERVERSTORE_FILES')
+  const filename = join(serverStoreFiles, serverId, configFileName)
+  const content = await fs.readFile(filename, { encoding: 'utf-8' });
+  const output = await serverConfigParser(content);
+
+  if (!output.success) {
+    const error = output.error
+    throw new ServerConfigInvalidError(error)
   }
 
-  const output =  ServerConfigSchema.parse(data);
-
-  return output
+  return output.data;
 }
 
-const ServerConfigBooleanEnum = z.union([z.literal(0), z.literal(1), z.literal(2)])
-
-const ServerConfigSchema = z.object({
-  maxPlayers: z.number().default(60),
-  verifySignatures: ServerConfigBooleanEnum.default(1),
-  forceSameBuild: ServerConfigBooleanEnum.default(0),
-  disableVoN: ServerConfigBooleanEnum.default(1),
-  disable3rdPerson: ServerConfigBooleanEnum.default(1),
-  serverTime: z.string(),
-  serverTimePersistent: ServerConfigBooleanEnum.default(1),
-  guaranteedUpdates: ServerConfigBooleanEnum.default(1),
-  loginQueueConcurrentPlayers: z.number().default(5),
-  instanceId: z.number(),
-  respawnTime: z.number().default(0),
-  timeStampFormat: z.union([z.literal('Short'), z.literal('Long')]),
-  adminLogPlayerHitsOnly: ServerConfigBooleanEnum.default(0),
-  enableDebugMonitor: ServerConfigBooleanEnum.default(0),
-  steamQueryPort: z.number().default(27016),
-  allowFilePatching: ServerConfigBooleanEnum.default(1),
-  simulatedPlayersBatch: z.number().default(20),
-  multithreadedReplication: ServerConfigBooleanEnum.default(0),
-  speedhackDetection: ServerConfigBooleanEnum.default(1),
-  networkRangeClose: z.number().default(20),
-  defaultVisibility: z.number().default(1375),
-  lightingConfig: ServerConfigBooleanEnum.default(1),
-  disableBaseDamage: ServerConfigBooleanEnum.default(0),
-  lootHistory: ServerConfigBooleanEnum.default(1),
-  enableCfgGameplayFile: ServerConfigBooleanEnum.default(1),
-  vppDisablePassword: ServerConfigBooleanEnum.default(0),
-  template: z.string(),
-});
-export type ServerConfig = z.infer<typeof ServerConfigSchema>
 
 /**
  * Write the provided server config to <serverId>/serverDZ.cfg.save
  */
-export function saveServerConfig(serverId: string, config: string) {}
+export function saveServerConfig(serverId: string, config: string) { }
 
 /**
  * Parse the <serverId>/serverDZ.cfg for template=(.*)
  */
 export async function getServerMapName(serverId: string) {
-  const config = await getServerConfig(serverId);
-  if (config.template) {
-    return config.template
+  const config = await getServerStoreConfig(serverId);
+  if (!config) {
+    return null
   }
 
-  throw new Error(`Server ${serverId} has no configured map`);
+  return config.template
 }
 
 export function createServerPath(serverId: string) {
-  const serverFiles = Config.get("SERVER_FILES");
+  const serverFiles = Config.get("SERVERFILES");
   return join(serverFiles, serverId);
 }
