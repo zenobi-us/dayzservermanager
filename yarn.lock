@@ -6202,6 +6202,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/underscore@npm:^1":
+  version: 1.13.0
+  resolution: "@types/underscore@npm:1.13.0"
+  checksum: 10c0/240d3f36f694e177b1896c464b1254249e64b51a2afc703a1dda61f0c544d6e3b081ac4d955fb057e873982a62a7ba78e3a0aaa252c9d766f6cbe5e85283bc04
+  languageName: node
+  linkType: hard
+
 "@types/yauzl@npm:^2.9.1":
   version: 2.10.3
   resolution: "@types/yauzl@npm:2.10.3"
@@ -8189,6 +8196,7 @@ __metadata:
     "@moonrepo/cli": "npm:^1.33.1"
     "@swc/core": "npm:^1.11.21"
     "@types/node": "npm:^22.14.1"
+    "@types/underscore": "npm:^1"
     babel-preset-moon: "npm:^3.0.2"
     chalk-template: "npm:^1.1.0"
     eslint: "npm:^9.18.0"
@@ -8206,6 +8214,7 @@ __metadata:
     tsup: "npm:^8.4.0"
     tsx: "npm:^4.19.3"
     typescript-eslint: "npm:^8.19.0"
+    underscore: "npm:^1.13.7"
     vite: "npm:^6.0.0"
     vite-plugin-dts: "npm:^4.5.3"
     vitest: "npm:^3.0.0"
@@ -15067,21 +15076,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"underscore@npm:1.6.x":
-  version: 1.6.0
-  resolution: "underscore@npm:1.6.0"
-  checksum: 10c0/23db03890dc042984b5a6082f2784969aa1af0110b11486347b84e3e1c5ebc3a83531cfc031097900ccfc88cf2ded43970220d94e388e5b10e56519813d7d029
-  languageName: node
-  linkType: hard
-
-"underscore@npm:1.8.x":
-  version: 1.8.3
-  resolution: "underscore@npm:1.8.3"
-  checksum: 10c0/b9f8c5756252e01c057859c4b0932dc0bea73122121bbe465f1e1fa975ca6c3b6a3c8b967b7918d374686f9f1beb96c0d5c5d52788fc1328992bff02dba3599c
-  languageName: node
-  linkType: hard
-
-"underscore@npm:^1.8.0":
+"underscore@npm:^1.13.7":
   version: 1.13.7
   resolution: "underscore@npm:1.13.7"
   checksum: 10c0/fad2b4aac48847674aaf3c30558f383399d4fdafad6dd02dd60e4e1b8103b52c5a9e5937e0cc05dacfd26d6a0132ed0410ab4258241240757e4a4424507471cd
