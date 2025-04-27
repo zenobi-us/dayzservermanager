@@ -192,6 +192,7 @@ export type CustomXmlItem = z.infer<typeof CustomXmlItemSchema>;
 export const ModItemSchema = z.object({
   id: z.string(),
   name: z.string(),
+  identifier: z.string(),
   path: z.string(),
 });
 export type ModItem = z.infer<typeof ModItemSchema>;
@@ -207,3 +208,56 @@ export const ModItemDetailSchema = z
   .merge(ModItemSchema);
 
 export type ModItemDetail = z.infer<typeof ModItemDetailSchema>;
+
+export const DownloadModParametersSchema = z.object({
+  modId: z.string(),
+});
+
+export type DownloadModParameters = z.infer<typeof DownloadModParametersSchema>;
+
+export const GetServerModsParametersSchema = z.object({
+  serverId: z.string(),
+});
+
+export type GetServerModsParameters = z.infer<
+  typeof GetServerModsParametersSchema
+>;
+export const GetModParametersSchema = z.object({
+  modId: z.string(),
+});
+
+export type GetModParameters = z.infer<typeof GetModParametersSchema>;
+export const GetModFileParametersSchema = z.object({
+  modId: z.string(),
+  file: z.string(),
+});
+
+export type GetModFileParameters = z.infer<typeof GetModFileParametersSchema>;
+
+export const UpdateModParametersSchema = z.object({
+  modId: z.string(),
+});
+
+export type UpdateModParameters = z.infer<typeof UpdateModParametersSchema>;
+
+export const RemoveModParamtersSchema = z.object({
+  modId: z.string(),
+});
+
+export type RemoveModParameters = z.infer<typeof RemoveModParamtersSchema>;
+
+export const UninstallModParamtersSchema = z.object({
+  modId: z.string(),
+  serverId: z.string(),
+});
+
+export type UninstallModParameters = z.infer<
+  typeof UninstallModParamtersSchema
+>;
+
+export const InstallModParametersSchema = z.object({
+  modId: z.string(),
+  serverId: z.string(),
+});
+
+export type InstallModParameters = z.infer<typeof InstallModParametersSchema>;

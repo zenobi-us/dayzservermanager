@@ -20,7 +20,6 @@ import {
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
-  IconDotsVertical,
 } from '@tabler/icons-react';
 import {
   flexRender,
@@ -34,18 +33,7 @@ import {
 } from '@tanstack/react-table';
 import { useId, useMemo, useState } from 'react';
 
-import { DragHandle } from '@/components/data-table-drag-handle';
-import { DraggableRow } from '@/components/draggable-table-row';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -63,7 +51,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-import type { ModItem, ModItemList } from '@dayzserver/sdk/schema';
+import { DataTableRow, DraggableDataTableRow } from './data-table-row';
+
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -71,88 +60,15 @@ import type {
   VisibilityState,
 } from '@tanstack/react-table';
 
-const columns: ColumnDef<ModItem>[] = [
-  {
-    id: 'drag',
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-  },
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: 'modId',
-    header: 'Mod Id',
-    cell: ({ row }) => (
-      <div className="w-32">
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
-          {row.original.id}
-        </Badge>
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'name',
-    header: 'Name',
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-start justify-start">
-          {row.original.name}
-        </div>
-      );
-    },
-    enableHiding: false,
-  },
-  {
-    id: 'actions',
-    cell: () => (
-      <div className="w-8">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem>View</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    ),
-  },
-];
-
-export function ModListDataTable({ data: initialData }: { data: ModItemList }) {
+export function PaginatedDataTable<T extends { id: string }>({
+  data: initialData,
+  isDraggable,
+  columns,
+}: {
+  data: T[];
+  isDraggable?: boolean;
+  columns: ColumnDef<T>[];
+}) {
   const [data, setData] = useState(() => initialData);
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -211,6 +127,7 @@ export function ModListDataTable({ data: initialData }: { data: ModItemList }) {
   }
 
   const hasRows = table.getRowModel().rows?.length > 0;
+  const RowElement = isDraggable ? DraggableDataTableRow : DataTableRow;
 
   return (
     <div className="w-full flex-col justify-start gap-6">
@@ -248,7 +165,7 @@ export function ModListDataTable({ data: initialData }: { data: ModItemList }) {
                   strategy={verticalListSortingStrategy}
                 >
                   {table.getRowModel().rows.map((row) => (
-                    <DraggableRow
+                    <RowElement
                       key={row.id}
                       row={row}
                       getRowId={(data) => data.id}

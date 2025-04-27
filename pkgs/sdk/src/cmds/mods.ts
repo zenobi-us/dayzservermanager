@@ -4,8 +4,10 @@ import https from 'https';
 import { join } from 'path';
 
 import fsExists from 'fs.promises.exists';
+import { startCase } from 'lodash-es';
 import { z } from 'zod';
 
+import * as errors from '../errors';
 import { createCppFileParser } from '../lib/cpp';
 import { getDirSize } from '../lib/fs';
 import { ModConfigFiles } from '../schema/configSchema';
@@ -115,7 +117,7 @@ export const getModFile = async ({
 /**
  * Downloads a mod to the workshop store
  */
-export const addMod = async ({ modId }: { modId: string }) => {
+export const downloadMod = async ({ modId }: { modId: string }) => {
   assertIsManagerMode();
   return await steamcmds.authenticatedSteamCmd([
     `+workshop_download_item "${Config.get('CLIENT_APPID')}" "${modId}"`,
@@ -126,7 +128,7 @@ export const addMod = async ({ modId }: { modId: string }) => {
 /**
  * Symlinks a downloaded mod to the servers mod store
  */
-export const activateMod = async ({
+export const installModToServer = async ({
   serverId,
   modId,
 }: {
@@ -138,13 +140,20 @@ export const activateMod = async ({
   const modMeta = await getModMeta({ path: workshopModPath });
   const targetPath = getServerStoreModPath(serverId, modMeta.name);
 
-  await fs.link(workshopModPath, targetPath);
+  if (!(await fsExists(workshopModPath))) {
+    throw new errors.ModNoExistsError();
+  }
+  if (await fsExists(targetPath)) {
+    throw new errors.InstallModAlreadyExistsError();
+  }
+
+  await fs.symlink(workshopModPath, targetPath);
 };
 
 /**
  * Unlinks a downloaded mod from a servers mod store
  */
-export const deactivateMod = async ({
+export const uninstallModFromServer = async ({
   serverId,
   modId,
 }: {
@@ -155,6 +164,10 @@ export const deactivateMod = async ({
   const workshopModPath = getSteamStoreModPath({ modId });
   const modMeta = await getModMeta({ path: workshopModPath });
   const serverModPath = getServerStoreModPath(serverId, modMeta.name);
+
+  if (!(await fsExists(serverModPath))) {
+    throw new errors.InstallModNoExistsError();
+  }
 
   await fs.unlink(serverModPath);
 };
@@ -167,7 +180,7 @@ export const removeMod = async ({ modId }: { modId: string }) => {
   const availableServers = await servers.getServerList();
   await Promise.all(
     availableServers.map(async (server) => {
-      await deactivateMod({ serverId: server.id, modId });
+      await uninstallModFromServer({ serverId: server.id, modId });
     }),
   );
 
@@ -231,9 +244,12 @@ export const getModDetails = async ({
   const modDetails = await getModMeta({ path });
   const modSize = getDirSize(path);
   const customXML = await getCustomXML(path);
+  const identifier = getServerModIdentifier(modDetails.name);
 
   return {
     ...modDetails,
+    name: startCase(modDetails.name),
+    identifier,
     size: modSize,
     customXML,
     path,
@@ -273,9 +289,6 @@ async function _listModsAtServerStorePath(serverModPath: string) {
   const mods: ModItemDetail[] = [];
 
   for (const file of modFiles) {
-    if (!file.isSymbolicLink() || !file.name.startsWith('@')) {
-      continue;
-    }
     const modPath = join(serverModPath, file.name);
     const meta = await getModDetails({ path: modPath });
 
@@ -319,9 +332,16 @@ export async function assertServerModExists({
   }
 }
 export function getServerStoreModPath(serverId: string, modName: string) {
-  return join(Config.get('SERVERSTORE_MODS'), serverId, `@${modName}`);
+  return join(
+    Config.get('SERVERSTORE_MODS'),
+    serverId,
+    getServerModIdentifier(modName),
+  );
 }
 
+export function getServerModIdentifier(modName: string) {
+  return `@${startCase(modName).replace(/\s/gim, '')}`;
+}
 /**
  * Steam Store
  */

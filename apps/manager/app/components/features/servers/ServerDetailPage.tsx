@@ -1,18 +1,33 @@
-import { IconPackages, IconPlus } from '@tabler/icons-react';
-import { useQuery } from '@tanstack/react-query';
+import {
+  IconDownload,
+  IconDownloadOff,
+  IconFidgetSpinner,
+  IconPackages,
+  IconPlus,
+} from '@tabler/icons-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { useMemo } from 'react';
 
 import * as api from '../../../core/api';
+import { PaginatedDataTable } from '../../PaginatedDataTable';
 
+import {
+  DrawerController,
+  DrawerControllerContent,
+} from '@/components/controlled-drawer';
 import { FullScreenLoader } from '@/components/full-screen-loader';
 import { PageHeader } from '@/components/page-header';
 import { SectionCards } from '@/components/section-cards';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
-import { isErrorResponse } from '@/types/response';
+import { DrawerTrigger } from '@/components/ui/drawer';
 
-import type { Server } from '@dayzserver/sdk/schema';
+import { useGetDownloadedModsQuery } from './useGetDownloadedModsQuery';
+import { useGetServerModsQuery } from './useGetServerModsQuery';
+
+import type { ModItem, Server } from '@dayzserver/sdk/schema';
+import type { ColumnDef } from '@tanstack/react-table';
 import type { PropsWithChildren } from 'react';
 
 export function ServerDetailPage({ server }: { server: Server }) {
@@ -37,7 +52,7 @@ function ServerDetailHeader({ server }: { server: Server }) {
       title={server.id}
       actions={
         <>
-          <AddServerModDrawer>
+          <AddServerModDrawer serverId={server.id}>
             <Button variant="outline">
               <IconPlus className="mr-2" /> Add mod
             </Button>
@@ -75,33 +90,162 @@ function ServerModCard({ server }: { server: Server }) {
   );
 }
 
-function useGetDownloadedModsQuery() {
-  const getModsListServerFn = useServerFn(api.mods.getModList);
-  return useQuery({
-    queryFn: () => getModsListServerFn(),
-    queryKey: ['get-downloaded-mods'],
-    select: (data) => {
-      if (isErrorResponse(data)) {
-        return [];
-      }
-      return data.data.mods || [];
-    },
-    staleTime: Infinity,
-    refetchOnWindowFocus: false,
-  });
+function AddServerModDrawer({
+  serverId,
+  isOpen,
+  children,
+}: PropsWithChildren<{ serverId: string; isOpen?: boolean }>) {
+  return (
+    <DrawerController isOpen={isOpen}>
+      <DrawerTrigger asChild>{children}</DrawerTrigger>
+      <DrawerControllerContent className="flex flex-col mx-4 min-h-3/4 max-h-3/4">
+        <AddServerModListContainer serverId={serverId} />
+      </DrawerControllerContent>
+    </DrawerController>
+  );
 }
 
-function AddServerModDrawer({ children }: PropsWithChildren) {
+function AddServerModListContainer({ serverId }: { serverId: string }) {
+  const queryClient = useQueryClient();
+  const installedModsQuery = useGetServerModsQuery({ serverId });
   const downloadedModsQuery = useGetDownloadedModsQuery();
-  return (
-    <Drawer>
-      <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent className="flex flex-col mx-4 min-h-3/4 max-h-3/4">
-        {downloadedModsQuery.isPending && <FullScreenLoader />}
-        {!downloadedModsQuery.isPending && (
-          <pre>{JSON.stringify(downloadedModsQuery.data, null, 2)}</pre>
-        )}
-      </DrawerContent>
-    </Drawer>
+
+  const installModFn = useServerFn(api.mods.installModToServer);
+  const installModMutation = useMutation({
+    mutationFn: installModFn,
+    async onSuccess() {
+      await queryClient.invalidateQueries({
+        queryKey: useGetServerModsQuery.createKey({ serverId }),
+      });
+    },
+  });
+  const uninstallModFn = useServerFn(api.mods.uninstallModFromServer);
+  const uninstallModMutation = useMutation({
+    mutationFn: uninstallModFn,
+    async onSuccess() {
+      await queryClient.invalidateQueries({
+        queryKey: useGetServerModsQuery.createKey({ serverId }),
+      });
+    },
+  });
+
+  const installingModId = useMemo(() => {
+    if (installModMutation.isPending) {
+      return installModMutation.variables?.data?.modId;
+    }
+
+    return;
+  }, []);
+
+  const uninstallingModId = useMemo(() => {
+    if (uninstallModMutation.isPending) {
+      return uninstallModMutation.variables?.data?.modId;
+    }
+
+    return;
+  }, []);
+
+  const columns = useMemo(
+    () =>
+      createServerInstallableModColumns({
+        installedModIds: installedModsQuery.data?.map((m) => m.id) || [],
+        uninstallingModId,
+        installingModId,
+        onInstallClick: (modId: string) => {
+          installModMutation.mutate({
+            data: {
+              modId,
+              serverId,
+            },
+          });
+        },
+        onUninstallClick: (modId: string) => {
+          uninstallModMutation.mutate({
+            data: {
+              modId,
+              serverId,
+            },
+          });
+        },
+      }),
+    [installModMutation, installingModId],
   );
+
+  if (downloadedModsQuery.isPending) return <FullScreenLoader />;
+
+  return (
+    <PaginatedDataTable
+      data={downloadedModsQuery.data || []}
+      columns={columns}
+    />
+  );
+}
+
+function createServerInstallableModColumns({
+  installedModIds,
+  installingModId,
+  uninstallingModId,
+  onInstallClick,
+  onUninstallClick,
+}: {
+  installedModIds: string[];
+  installingModId?: string;
+  uninstallingModId?: string;
+  onInstallClick: (modId: string) => void;
+  onUninstallClick: (modId: string) => void;
+}) {
+  const columns: ColumnDef<ModItem>[] = [
+    {
+      id: 'name',
+      header: 'Name',
+      cell: ({ row }) => (
+        <div className="flex items-center space-x-2 min-w-96">
+          <span>
+            {row.original.name}{' '}
+            <Badge variant="secondary">{row.original.identifier}</Badge>
+          </span>
+        </div>
+      ),
+    },
+    {
+      id: 'actions',
+      cell: ({ row }) => (
+        <div className="flex justify-end">
+          {installedModIds.includes(row.original.id) && (
+            <Button
+              disabled={installingModId === row.original.id}
+              variant="secondary"
+              onClick={() => {
+                onUninstallClick(row.original.id);
+              }}
+            >
+              {uninstallingModId === row.original.id ? (
+                <IconFidgetSpinner className="animation-spin" />
+              ) : (
+                <IconDownloadOff />
+              )}
+              Uninstall
+            </Button>
+          )}
+          {!installedModIds.includes(row.original.id) && (
+            <Button
+              disabled={installingModId === row.original.id}
+              variant="secondary"
+              onClick={() => {
+                onInstallClick(row.original.id);
+              }}
+            >
+              {installingModId === row.original.id ? (
+                <IconFidgetSpinner className="animation-spin" />
+              ) : (
+                <IconDownload />
+              )}
+              Install
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
+  return columns;
 }

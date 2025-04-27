@@ -47,3 +47,12 @@ export class NotManagerModeError extends Error {
 export class NoModeError extends Error {
   code = 'NoModeError';
 }
+export class InstallModAlreadyExistsError extends Error {
+  code = 'InstallModAlreadyExistsError';
+}
+export class InstallModNoExistsError extends Error {
+  code = 'InstallModNoExistsError';
+}
+export class ModNoExistsError extends Error {
+  code = 'ModNoExistsError';
+}
