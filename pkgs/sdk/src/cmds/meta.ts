@@ -1,11 +1,8 @@
 import fsExists from 'fs.promises.exists';
+
 import { Config } from './config';
 
-export type AppStatus = {
-  appid: string;
-  installed: boolean;
-  version: string;
-};
+import type { AppStatus } from '../schema/metaSchema';
 
 type Pkg = { name: string; version: string };
 export const getFormattedVersion = (pkg?: Pkg) => {

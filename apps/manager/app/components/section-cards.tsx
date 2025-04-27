@@ -1,3 +1,5 @@
+import { cn } from '../lib/utils/cn';
+
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
@@ -7,13 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ElementType, PropsWithChildren, ReactNode } from 'react';
-import { cn } from '../lib/utils/cn';
+
 import { PageSectionGrid } from './page-section-grid';
+
+import type { ElementType, PropsWithChildren, ReactNode } from 'react';
 
 export function SectionCards({ children }: PropsWithChildren) {
   return (
-    <PageSectionGrid className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs">
+    <PageSectionGrid className="*:data-[slot=card]:border-2 *:data-[slot=card]:shadow-none">
       {children}
     </PageSectionGrid>
   );

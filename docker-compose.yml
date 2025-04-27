@@ -71,6 +71,8 @@ services:
       # these are for development
       - ./:/opt/repo/
 
+      - /var/run/docker.sock:/var/run/docker.sock
+
     ports:
       - '5173:5173/tcp'
     restart: always

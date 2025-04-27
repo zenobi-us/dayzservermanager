@@ -1,7 +1,8 @@
+import { createFileRoute, Outlet } from '@tanstack/react-router';
+
 import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { createFileRoute, Outlet } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_dashboard')({
   component: RouteComponent,
@@ -12,8 +13,14 @@ export const Route = createFileRoute('/_dashboard')({
 
 function RouteComponent() {
   return (
-    <SidebarProvider>
-      <AppSidebar variant="inset" />
+    <SidebarProvider
+      style={
+        {
+          '--sidebar-width': '19rem',
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar />
       <SidebarInset>
         <SiteHeader />
         <Outlet />

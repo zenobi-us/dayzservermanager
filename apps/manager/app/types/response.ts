@@ -22,5 +22,7 @@ export const isErrorResponse = <T, C>(
 export const isSuccessResponse = <T, C>(
   response: unknown,
 ): response is SuccessResponse<T, C> => {
-  return !!response && typeof response === 'object' && 'successCode' in response;
+  return (
+    !!response && typeof response === 'object' && 'successCode' in response
+  );
 };

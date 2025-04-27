@@ -1,14 +1,21 @@
-import { createServerFn } from '@tanstack/react-start';
 import sdk from '@dayzserver/sdk';
+import { CreateServerPayloadSchema } from '@dayzserver/sdk/schema';
+import { createServerFn } from '@tanstack/react-start';
 import { setResponseStatus } from '@tanstack/react-start/server';
+import { z } from 'zod';
 
 import {
   createErrorResponseBody,
   createResponseBody,
   errorResponseBodyError,
 } from '../../response';
+
+import type { ErrorResponse, SuccessResponse } from '@/types/response';
+
 import { ResponseCodes } from './codes';
-import { z } from 'zod';
+
+import type { Server } from '@dayzserver/sdk/schema';
+import type { Fetcher } from '@tanstack/react-start';
 
 /**
  * Create a list of mods
@@ -16,7 +23,7 @@ import { z } from 'zod';
 const updateServerBaseFiles = createServerFn({ method: 'POST' }).handler(
   async () => {
     try {
-      await sdk.steam.useCachedLogin();
+      await sdk.auth.useCachedLogin();
     } catch (error) {
       const body = createErrorResponseBody({
         code: ResponseCodes.LoginFailed,
@@ -60,11 +67,18 @@ const getAllServers = createServerFn({ method: 'GET' }).handler(async () => {
 /**
  * Provide a list of all the servers
  */
-const GetServerDetailParams = z.object({
+type GetServerDetailFn = Fetcher<
+  undefined,
+  typeof GetServerDetailParamsSchema,
+  | SuccessResponse<{ server: Server }, ResponseCodes.ServerListSuccess>
+  | ErrorResponse<{}, ResponseCodes.ServerListError>,
+  'data'
+>;
+const GetServerDetailParamsSchema = z.object({
   serverId: z.string(),
 });
-const getServerDetail = createServerFn({ method: 'GET' })
-  .validator((data: { serverId: string }) => GetServerDetailParams.parse(data))
+const getServerDetail: GetServerDetailFn = createServerFn({ method: 'GET' })
+  .validator(GetServerDetailParamsSchema)
   .handler(async ({ data }) => {
     try {
       const server = await sdk.server.getServerDetail(data.serverId);
@@ -83,4 +97,37 @@ const getServerDetail = createServerFn({ method: 'GET' })
     }
   });
 
-export { updateServerBaseFiles, getAllServers, getServerDetail };
+/**
+ * Create a server
+ */
+type CreateServerFn = Fetcher<
+  undefined,
+  typeof CreateServerPayloadSchema,
+  | SuccessResponse<{ server: Server }, ResponseCodes.CreateServerSuccess>
+  | ErrorResponse<Error, ResponseCodes.CreateServerError>,
+  'data'
+>;
+
+const postCreateServer: CreateServerFn = createServerFn({ method: 'POST' })
+  .validator(CreateServerPayloadSchema)
+  .handler(async ({ data }) => {
+    try {
+      const server = await sdk.server.createServer(data);
+      return createResponseBody({
+        data: { server },
+        code: ResponseCodes.CreateServerSuccess,
+      });
+    } catch (error) {
+      return createErrorResponseBody({
+        code: ResponseCodes.CreateServerError,
+        error: errorResponseBodyError(error),
+      });
+    }
+  });
+
+export {
+  updateServerBaseFiles,
+  getAllServers,
+  getServerDetail,
+  postCreateServer,
+};

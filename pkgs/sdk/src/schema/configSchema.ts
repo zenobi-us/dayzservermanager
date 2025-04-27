@@ -1,22 +1,17 @@
 import { z } from 'zod';
-import nconf from 'nconf';
-import dotenv from 'dotenv';
-import fs from 'fs/promises';
-
-dotenv.config()
 
 export const EnvConfigSchema = z.object({
   MODE: z
     .union([z.literal('server'), z.literal('manager'), z.null()])
     .default(null),
   /*
-   Without a release binary, we must use the experimental server app ID.
-   */
+     Without a release binary, we must use the experimental server app ID.
+     */
   SERVER_APPID: z.string().default('1042420'),
 
   /*
-  DayZ release client Steam app ID. This is for mods, as only the release client has them.
-  */
+    DayZ release client Steam app ID. This is for mods, as only the release client has them.
+    */
   CLIENT_APPID: z.string().default('221100'),
 
   /**
@@ -28,6 +23,7 @@ export const EnvConfigSchema = z.object({
   /**
    * All servers files
    */
+  FILES: z.string().default('/store/files'),
   SERVERSTORE_FILES: z.string().default('/store/serverfiles'),
   SERVERSTORE_MODS: z.string().default('/store/servermods'),
   SERVERSTORE_MISSIONS: z.string().default('/store/servermissions'),
@@ -97,8 +93,8 @@ export const ServerVersionTypes = {
 };
 
 /*
-   XML config files the system can handle. These are retrieved from values in templates located in /files/mods/:modId
-   */
+     XML config files the system can handle. These are retrieved from values in templates located in /files/mods/:modId
+     */
 export const ModConfigFiles = [
   'cfgeventspawns.xml',
   'cfgspawnabletypes.xml',
@@ -155,27 +151,4 @@ export const ConfigFiles = {
   db: DbConfigFiles,
   env: EnvironmentConfigFiles,
   root: RootConfigFiles,
-};
-
-const store = nconf.env().file({ file: 'dayzserver.config.json' });
-
-export const Config = {
-  get<T extends keyof IConfig>(key: T) {
-    if (!Object.hasOwn(ConfigSchema.shape, key)) {
-      throw new Error(`Missing ${key} from config.`);
-    }
-
-    const field = ConfigSchema.shape[key];
-    return field.parse(store.get(key)) as IConfig[T];
-  },
-  save() {
-    store.save(async function () {
-      const data = await fs.readFile('dayzserver.config.json');
-      console.dir(JSON.parse(data.toString()));
-    });
-  },
-  set<T extends keyof IFileConfig>(key: T, value: IFileConfig[T]) {
-    store.set(key, value);
-    this.save();
-  },
 };

@@ -1,51 +1,38 @@
-FROM debian:bookworm-slim AS base
+FROM steamcmd/steamcmd:debian-bookworm AS base
 
 # Replace shell with bash so we can source files
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
-# Set debconf to run non-interactively and agree to the SteamCMD EULA
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
-    && echo steam steam/question select "I AGREE" | debconf-set-selections \
-    && echo steam steam/license note '' | debconf-set-selections \
-    && dpkg --add-architecture i386
-
-# Add backports and contrib
-RUN sed -i /etc/apt/sources.list.d/debian.sources -e 's/Components: main/Components: main contrib non-free/g'
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Install _only_ the necessary packages
-RUN apt-get update && apt-get -y upgrade && apt-get -y install --no-install-recommends \
-    binutils \
-    bash \
-    curl \
-    git \
-    gwenhywfar-tools \
-    jq \
-    libxml2-utils \
-    locales \
-    ltrace \
-    nano \
-    patch \
-    procps \
-    rename \
-    steamcmd \
-    strace \
-    wget \
-    xmlstarlet \
-    gpg gpg-agent \
-    xz-utils
-
-# Set the locale
-RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
-ENV LANG=en_US.UTF-8
-ENV LANGUAGE=en_US:en
-ENV LC_ALL=en_US.UTF-8
-
+RUN apt-get update && \
+    apt-get -y upgrade && \
+    apt-get -y install --no-install-recommends \
+        binutils \
+        bash \
+        curl \
+        git \
+        gwenhywfar-tools \
+        jq \
+        libxml2-utils \
+        ltrace \
+        nano \
+        patch \
+        procps \
+        rename \
+        strace \
+        wget \
+        xmlstarlet \
+        gpg gpg-agent gnupg2 \
+        xz-utils
 
 RUN apt-get update  \
     && apt-get -y --no-install-recommends install  \
     # install any other dependencies you might need
     sudo curl git ca-certificates build-essential \
     && rm -rf /var/lib/apt/lists/*
+
 
 ARG S6_OVERLAY_VERSION=3.2.0.2
 
@@ -55,9 +42,6 @@ RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
 ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
 RUN tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz
 
-FROM base AS withmise
-
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV MISE_DATA_DIR="/mise"
 ENV MISE_CONFIG_DIR="/mise"
 ENV MISE_CACHE_DIR="/mise/cache"

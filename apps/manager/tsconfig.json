@@ -19,8 +19,8 @@
       "@dayzserver/sdk": [
         "../../pkgs/sdk/src/index.ts"
       ],
-      "@dayzserver/sdk/*": [
-        "../../pkgs/sdk/src/*"
+      "@dayzserver/sdk/schema": [
+        "../../pkgs/sdk/src/schema/index.ts"
       ]
     },
     "outDir": "../../.moon/cache/types/apps/manager"

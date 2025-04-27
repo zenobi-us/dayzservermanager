@@ -15,7 +15,13 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"hverlin.mise-vscode"
+				"hverlin.mise-vscode",
+				"bourhaouta.tailwindshades",
+				"bradlc.vscode-tailwindcss",
+				"KalimahApps.tailwind-config-viewer",
+				"esbenp.prettier-vscode",
+				"dbaeumer.vscode-eslint",
+				"maattdd.gitless"
 			]
 		}
 	}

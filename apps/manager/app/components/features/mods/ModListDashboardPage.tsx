@@ -1,16 +1,15 @@
-import type { ModItemList } from '@dayzserver/sdk';
-
 import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { PageSection } from '@/components/page-section';
+
 import { ModListDataTable } from './ModListDataTable';
 import { ModSearchDrawerContainer } from './ModSearchDrawer';
 
+import type { ComponentProps } from 'react';
 
-export function ModListDashboardPage({ mods = [] }: {
-  mods: ModItemList
-}) {
-
+export function ModListDashboardPage({
+  data = [],
+}: ComponentProps<typeof ModListDataTable>) {
   return (
     <Page>
       <PageHeader
@@ -20,11 +19,10 @@ export function ModListDashboardPage({ mods = [] }: {
             <ModSearchDrawerContainer />
           </>
         }
-
       />
       <PageSection>
-        <ModListDataTable data={mods} />
+        <ModListDataTable data={data} />
       </PageSection>
     </Page>
-  )
+  );
 }

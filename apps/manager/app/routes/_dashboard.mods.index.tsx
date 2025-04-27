@@ -1,10 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 
+import { ModListDashboardPage } from '../components/features/mods/ModListDashboardPage';
 import { mods } from '../core/api';
+
 import { ErrorScreen } from '@/components/error-screen';
 import { FullScreenLoader } from '@/components/full-screen-loader';
 import { isErrorResponse } from '@/types/response';
-import { ModListDashboardPage } from '../components/features/mods/ModListDashboardPage';
 
 export const Route = createFileRoute('/_dashboard/mods/')({
   component: RouteComponent,
@@ -22,5 +23,5 @@ function RouteComponent() {
     return <ErrorScreen />;
   }
 
-  return <ModListDashboardPage mods={state.data?.mods} />;
+  return <ModListDashboardPage data={state.data?.mods} />;
 }

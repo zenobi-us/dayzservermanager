@@ -1,11 +1,18 @@
-import sdk from '@dayzserver/sdk';
+import sdk, { Config } from '@dayzserver/sdk';
+import { createServerFn } from '@tanstack/react-start';
+import { z } from 'zod';
+
+import {
+  createErrorResponseBody,
+  createResponseBody,
+  errorResponseBodyError,
+} from '../../response';
+
+import type { ErrorResponse, SuccessResponse } from '@/types/response';
 
 import { ResponseCodes } from './codes';
-import { z } from 'zod';
-import { createErrorResponseBody, createResponseBody, errorResponseBodyError } from '../../response';
-import { ErrorResponse, SuccessResponse } from '@/types/response';
-import { createServerFn, Fetcher } from '@tanstack/react-start';
 
+import type { Fetcher } from '@tanstack/react-start';
 
 const LoginParametersSchema = z.object({
   username: z.string(),
@@ -15,7 +22,8 @@ const LoginParametersSchema = z.object({
 type LoginFn = Fetcher<
   undefined,
   typeof LoginParametersSchema,
-  SuccessResponse<{}, ResponseCodes.LoginSuccess> | ErrorResponse<{}, ResponseCodes.LoginFailed>,
+  | SuccessResponse<{ username: string }, ResponseCodes.LoginSuccess>
+  | ErrorResponse<{}, ResponseCodes.LoginFailed>,
   'data'
 >;
 
@@ -23,16 +31,47 @@ export const login: LoginFn = createServerFn({ method: 'POST' })
   .validator(LoginParametersSchema)
   .handler(async (context) => {
     try {
-      await sdk.steam.login(context.data);
+      const username = await sdk.auth.login(context.data);
       return createResponseBody({
-        code: ResponseCodes.LoginSuccess
-      })
+        data: { username },
+        code: ResponseCodes.LoginSuccess,
+      });
     } catch (error) {
       const body = createErrorResponseBody({
         code: ResponseCodes.LoginFailed,
-        error: errorResponseBodyError(error)
-      })
+        error: errorResponseBodyError(error),
+      });
 
-      return body
+      return body;
     }
   });
+
+type GetAuthenticatedUserFn = Fetcher<
+  undefined,
+  undefined,
+  | SuccessResponse<
+      { username: string },
+      ResponseCodes.GetAuthenticatedUserSuccess
+    >
+  | ErrorResponse<{}, ResponseCodes.GetAuthenticatedUserError>,
+  'data'
+>;
+
+export const getAuthenticatedUser: GetAuthenticatedUserFn = createServerFn({
+  method: 'GET',
+}).handler(async () => {
+  try {
+    const username = Config.get('steamUsername');
+    const body = createResponseBody({
+      data: { username },
+      code: ResponseCodes.GetAuthenticatedUserSuccess,
+    });
+    return Promise.resolve(body);
+  } catch (error) {
+    const body = createErrorResponseBody({
+      code: ResponseCodes.GetAuthenticatedUserError,
+      error: errorResponseBodyError(error),
+    });
+    return Promise.resolve(body);
+  }
+});

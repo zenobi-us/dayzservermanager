@@ -1,9 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { IconPackageImport } from "@tabler/icons-react";
+import { IconPackageImport } from '@tabler/icons-react';
+
+import { Button } from '@/components/ui/button';
 
 export function InstallModButton() {
-    return <Button>
-        <IconPackageImport />
-        Install
+  return (
+    <Button>
+      <IconPackageImport />
+      Install
     </Button>
+  );
 }

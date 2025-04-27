@@ -1,68 +1,69 @@
-import { Store } from "@tanstack/react-store";
-import { useServerFn } from '@tanstack/react-start'
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query';
+import { useServerFn } from '@tanstack/react-start';
+import { Store } from '@tanstack/react-store';
 
-import { UrlSearchParamsFromObject } from "@/core/params";
+import { UrlSearchParamsFromObject } from '@/core/params';
 
-import * as api from '../../../core/api'
-import type { IPublishedFileServiceQueryFilesRequestParams } from "@dayzserver/sdk";
-import { isErrorResponse } from "@/types/response";
+import * as api from '../../../core/api';
 
+import { isErrorResponse } from '@/types/response';
 
+import type { IPublishedFileServiceQueryFilesRequestParams } from '@dayzserver/sdk/schema';
 
 export const modSearchStore = new Store({
-    search_text: '',
-    page: 1,
-    numperpage: 10,
-})
+  search_text: '',
+  page: 1,
+  numperpage: 10,
+});
 
+export const setSearchParams = (
+  options: Partial<(typeof modSearchStore)['state']> = {},
+) => {
+  modSearchStore.setState((state) => {
+    const newState = {
+      ...state,
+      ...options,
+    };
 
-export const setSearchParams = (options: Partial<typeof modSearchStore['state']> = {}) => {
-    modSearchStore.setState((state) => {
-        const newState = ({
-            ...state,
-            ...options
-        })
-
-        return newState;
-    })
-}
+    return newState;
+  });
+};
 
 export const resetSearch = () => {
-    setSearchParams({
-        search_text: '',
-        numperpage: 10,
-        page: 1
-    })
-}
+  setSearchParams({
+    search_text: '',
+    numperpage: 10,
+    page: 1,
+  });
+};
 
 export const setPage = (page: number) => {
-    setSearchParams({ page })
-
-}
+  setSearchParams({ page });
+};
 export const setSearchText = (search_text?: string) => {
-    setSearchParams({ search_text })
-
-}
+  setSearchParams({ search_text });
+};
 
 export const setPageSize = (numperpage: number) => {
-    setSearchParams({ numperpage })
-}
+  setSearchParams({ numperpage });
+};
 
-export const useModSearchQuery = (data: IPublishedFileServiceQueryFilesRequestParams) => {
-    const search = useServerFn(api.mods.searchWorkshop)
+export const useModSearchQuery = (
+  data: IPublishedFileServiceQueryFilesRequestParams,
+) => {
+  const search = useServerFn(api.mods.searchWorkshop);
 
-    const query = useQuery({
-        enabled: !!data.search_text,
-        queryKey: ['modsearch', UrlSearchParamsFromObject(data).toString()],
-        queryFn: async () => {
-            const results = await search({ data })
-            if (!isErrorResponse(results)) {
-                return results.data
-            }
-            throw new Error(results.errorCode)
-        },
-    })
+  const query = useQuery({
+    enabled: !!data.search_text,
+    queryKey: ['modsearch', UrlSearchParamsFromObject(data).toString()],
+    queryFn: async () => {
+      const results = await search({ data });
+      if (!isErrorResponse(results)) {
+        return results.data;
+      }
+      throw new Error(results.errorCode);
+    },
+  });
 
-    return query
-}
+  return query;
+};

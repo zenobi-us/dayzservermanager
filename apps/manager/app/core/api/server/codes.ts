@@ -1,7 +1,9 @@
 export enum ResponseCodes {
-    ServerBaseFilesUpdateSuccess = "ServerBaseFilesUpdateSuccess",
-    LoginFailed = "LoginFailed",
-    ServerBaseFilesUpdateError = "ServerBaseFilesUpdateError",
-    ServerListSuccess = "ServerListSuccess",
-    ServerListError = "ServerListError",
-  }
+  ServerBaseFilesUpdateSuccess = 'ServerBaseFilesUpdateSuccess',
+  LoginFailed = 'LoginFailed',
+  ServerBaseFilesUpdateError = 'ServerBaseFilesUpdateError',
+  ServerListSuccess = 'ServerListSuccess',
+  ServerListError = 'ServerListError',
+  CreateServerSuccess = 'CreateServerSuccess',
+  CreateServerError = 'CreateServerError',
+}

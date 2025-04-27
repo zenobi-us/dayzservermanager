@@ -1,67 +1,86 @@
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {
+  PublishedFileServiceQueryFilesRequestParamsSchema,
+  type IPublishedFileServiceQueryFilesRequestParams,
+} from '@dayzserver/sdk/schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { IconSearch } from '@tabler/icons-react';
+import { DeleteIcon } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { IconSearch } from "@tabler/icons-react";
-import { DeleteIcon } from "lucide-react";
-import { IPublishedFileServiceQueryFilesRequestParams, IPublishedFileServiceQueryFilesRequestParamsSchema } from "@dayzserver/sdk/steamSchema";
-
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
 function useModSearchForm() {
-    return useForm<IPublishedFileServiceQueryFilesRequestParams>({
-        resolver: zodResolver(IPublishedFileServiceQueryFilesRequestParamsSchema),
-        defaultValues: {
-            search_text: ""
-        },
-    });
+  return useForm<IPublishedFileServiceQueryFilesRequestParams>({
+    resolver: zodResolver(PublishedFileServiceQueryFilesRequestParamsSchema),
+    defaultValues: {
+      search_text: '',
+    },
+  });
 }
 
-export function ModSearchForm({ onSubmit }: {
-    onSubmit: (data: IPublishedFileServiceQueryFilesRequestParams) => void
+export function ModSearchForm({
+  onSubmit,
+}: {
+  onSubmit: (data: IPublishedFileServiceQueryFilesRequestParams) => void;
 }) {
-    const form = useModSearchForm();
+  const form = useModSearchForm();
 
-    return (
-        <Form  {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
-                <div className="relative flex w-full flex-grow gap-2 items-center">
-                    <FormField
-                        control={form.control}
-                        name="search_text"
-                        render={({ field }) => (
-                            <FormItem className="flex-1">
-                                <div className="flex gap-2 items-center">
-                                    <div className="flex-1 relative flex gap-2 items-center">
-                                        <FormControl>
-                                            <Input placeholder="search for mods..." {...field} />
-                                        </FormControl>
+  const handleSubmit = form.handleSubmit(onSubmit);
 
-                                        {form.formState.isDirty && (
-                                            <Button variant='link'
-                                                type="reset"
-                                                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-destructive cursor-pointer"
-                                                onClick={() => {
-                                                    form.reset();
-                                                }}
-                                            >
-                                                <DeleteIcon />
-                                            </Button>
-                                        )}
-                                    </div>
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={(event) => {
+          handleSubmit(event).catch(console.error);
+        }}
+        className="space-y-8 w-full"
+      >
+        <div className="relative flex w-full flex-grow gap-2 items-center">
+          <FormField
+            control={form.control}
+            name="search_text"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <div className="flex gap-2 items-center">
+                  <div className="flex-1 relative flex gap-2 items-center">
+                    <FormControl>
+                      <Input placeholder="search for mods..." {...field} />
+                    </FormControl>
 
-                                    <FormMessage />
+                    {form.formState.isDirty && (
+                      <Button
+                        variant="link"
+                        type="reset"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-destructive cursor-pointer"
+                        onClick={() => {
+                          form.reset();
+                        }}
+                      >
+                        <DeleteIcon />
+                      </Button>
+                    )}
+                  </div>
 
-                                    <Button variant='secondary' type="submit" className="gap-2">
-                                        <IconSearch /><span >Search</span>
-                                    </Button>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
+                  <FormMessage />
+
+                  <Button variant="secondary" type="submit" className="gap-2">
+                    <IconSearch />
+                    <span>Search</span>
+                  </Button>
                 </div>
-            </form>
-        </Form>
-    )
+              </FormItem>
+            )}
+          />
+        </div>
+      </form>
+    </Form>
+  );
 }

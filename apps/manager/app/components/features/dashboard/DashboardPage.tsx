@@ -1,5 +1,6 @@
-import type { Server } from '@dayzserver/sdk';
 import { ServerGrid } from '../servers/ServerGrid';
+
+import type { Server } from '@dayzserver/sdk/schema';
 
 export function DashboardPage({ servers = [] }: { servers?: Server[] }) {
   return (

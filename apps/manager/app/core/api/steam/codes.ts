@@ -1,4 +1,6 @@
 export enum ResponseCodes {
-  LoginFailed = "LoginFailed",
-  LoginSuccess = "LoginSuccess"
+  LoginFailed = 'LoginFailed',
+  LoginSuccess = 'LoginSuccess',
+  GetAuthenticatedUserSuccess = 'GetAuthenticatedUserSuccess',
+  GetAuthenticatedUserError = 'GetAuthenticatedUserError',
 }

@@ -13,7 +13,7 @@
     "outDir": "../../.moon/cache/types/pkgs/sdk"
   },
   "include": [
-    "src/*.ts"
+    "src/**/*.ts"
   ],
   "ts-node": {
     "transpileOnly": true,

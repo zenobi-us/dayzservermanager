@@ -1,23 +1,28 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { server } from '../core/api';
-import { ServersDashboardPage } from '@/components/features/servers/ServerListPage';
-import { isErrorResponse } from '@/types/response';
+
 import { ErrorScreen } from '@/components/error-screen';
+import { ServersDashboardPage } from '@/components/features/servers/ServerListPage';
+import { getServersQueryOptions } from '@/components/features/servers/useGetServersQuery';
+import { isErrorResponse } from '@/types/response';
 
 export const Route = createFileRoute('/_dashboard/servers/')({
   component: RouteComponent,
   staticData: {
     breadcrumb: 'Servers',
   },
-  loader: async () => server.getAllServers(),
+  loader: async ({ context: { queryClient } }) => {
+    return queryClient.ensureQueryData(getServersQueryOptions);
+  },
 });
 
 function RouteComponent() {
-  const state = Route.useLoaderData();
+  // Read the data from the cache and subscribe to updates
+  const { data } = useSuspenseQuery(getServersQueryOptions);
 
-  if (isErrorResponse(state)) {
+  if (isErrorResponse(data)) {
     return <ErrorScreen />;
   }
 
-  return <ServersDashboardPage servers={state?.data.servers || []} />;
+  return <ServersDashboardPage servers={data?.data.servers || []} />;
 }

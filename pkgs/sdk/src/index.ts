@@ -1,41 +1,31 @@
-import * as meta from './meta';
-import * as server from './server';
-import * as steam from './steam';
-import * as mods from './mods';
+import * as auth from './cmds/auth';
+import * as meta from './cmds/meta';
+import * as mods from './cmds/mods';
+import * as server from './cmds/server';
 
+export { Config } from './cmds/config';
 export {
-  Config,
   ConfigFiles,
   DbConfigFiles,
   EnvironmentConfigFiles,
   ModConfigFiles,
   RootConfigFiles,
   ServerVersionTypes,
-} from './config';
+} from './schema/configSchema';
 
-export type { Server } from './server';
+export {
+  PublishedFileServiceQueryFilesRequestParamsSchema,
+  EPublishedFileQueryTypeSchema,
+  SteamWorkshopSearchResultItemSchema,
+  SteamWorkshopSearchResultsSchema,
+  SteamWorkshopTagSchema,
+} from './schema/modsSchema';
 
-export type {
-  ModItem,
-  ModItemList,
-  CustomXmlItem,
-  ModeItemDetail,
-} from './mods';
-
-export type { IConfig, IEnvConfig, IFileConfig } from './config';
-
-export type { AppStatus } from './meta';
-
-export type {
-  SteamWorkshopSearchResultItem, SteamWorkshopSearchResults, SteamWorkshopTag,
-  IPublishedFileServiceQueryFilesRequestParams,
-} from './steamSchema';
-
-export { meta, server, steam, mods };
+export { meta, server, auth, mods };
 
 export default {
   meta,
   server,
-  steam,
+  auth,
   mods,
 };
