@@ -9,12 +9,9 @@ import { useServerFn } from '@tanstack/react-start';
 import { useStore, Effect } from '@tanstack/react-store';
 import { useEffect } from 'react';
 
-import { AuthStore } from '@/core/store/AuthStore';
-
 import * as api from '../core/api';
 
 import { NavMain } from '@/components/nav-main';
-import { NavSecondary } from '@/components/nav-secondary';
 import { NavUser } from '@/components/nav-user';
 import {
   Sidebar,
@@ -27,12 +24,9 @@ import {
 } from '@/components/ui/sidebar';
 import { isErrorResponse } from '@/types/response';
 
+import { AuthStore } from '@/core/store/AuthStore';
+
 const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
   navMain: [
     {
       title: 'Dashboard',
@@ -76,7 +70,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <UserContainer />

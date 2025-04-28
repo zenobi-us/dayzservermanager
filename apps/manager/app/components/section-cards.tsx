@@ -1,3 +1,5 @@
+import { IconChevronCompactRight } from '@tabler/icons-react';
+
 import { cn } from '../lib/utils/cn';
 
 import { Badge } from '@/components/ui/badge';
@@ -44,15 +46,22 @@ function SectionCardsItem({
 }) {
   return (
     <Card
-      className={cn('@container/card', className)}
+      className={cn(
+        '@container/card',
+        !!onClick && 'cursor-pointer hover:border-gray-400',
+        className,
+      )}
       onClick={onClick}
       {...props}
     >
       <CardHeader>
         <CardDescription>{description}</CardDescription>
         {title && (
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+          <CardTitle className="flex gap-2 items-center text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
             {title}
+            {!!onClick && (
+              <IconChevronCompactRight className="@container/card:hover:translate-x-1 transition-transform" />
+            )}
           </CardTitle>
         )}
         {actions}

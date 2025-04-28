@@ -13,10 +13,12 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as DashboardImport } from './routes/_dashboard'
 import { Route as DashboardIndexImport } from './routes/_dashboard.index'
+import { Route as DashboardServersImport } from './routes/_dashboard.servers'
 import { Route as DashboardServersIndexImport } from './routes/_dashboard.servers.index'
 import { Route as DashboardModsIndexImport } from './routes/_dashboard.mods.index'
 import { Route as DashboardServersServerIdImport } from './routes/_dashboard.servers.$serverId'
 import { Route as DashboardDemoDashboardImport } from './routes/_dashboard.demo.dashboard'
+import { Route as DashboardServersServerIdModsImport } from './routes/_dashboard.servers.$serverId.mods'
 
 // Create/Update Routes
 
@@ -31,10 +33,16 @@ const DashboardIndexRoute = DashboardIndexImport.update({
   getParentRoute: () => DashboardRoute,
 } as any)
 
-const DashboardServersIndexRoute = DashboardServersIndexImport.update({
-  id: '/servers/',
-  path: '/servers/',
+const DashboardServersRoute = DashboardServersImport.update({
+  id: '/servers',
+  path: '/servers',
   getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardServersIndexRoute = DashboardServersIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardServersRoute,
 } as any)
 
 const DashboardModsIndexRoute = DashboardModsIndexImport.update({
@@ -44,9 +52,9 @@ const DashboardModsIndexRoute = DashboardModsIndexImport.update({
 } as any)
 
 const DashboardServersServerIdRoute = DashboardServersServerIdImport.update({
-  id: '/servers/$serverId',
-  path: '/servers/$serverId',
-  getParentRoute: () => DashboardRoute,
+  id: '/$serverId',
+  path: '/$serverId',
+  getParentRoute: () => DashboardServersRoute,
 } as any)
 
 const DashboardDemoDashboardRoute = DashboardDemoDashboardImport.update({
@@ -54,6 +62,13 @@ const DashboardDemoDashboardRoute = DashboardDemoDashboardImport.update({
   path: '/demo/dashboard',
   getParentRoute: () => DashboardRoute,
 } as any)
+
+const DashboardServersServerIdModsRoute =
+  DashboardServersServerIdModsImport.update({
+    id: '/mods',
+    path: '/mods',
+    getParentRoute: () => DashboardServersServerIdRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -65,6 +80,13 @@ declare module '@tanstack/react-router' {
       fullPath: ''
       preLoaderRoute: typeof DashboardImport
       parentRoute: typeof rootRoute
+    }
+    '/_dashboard/servers': {
+      id: '/_dashboard/servers'
+      path: '/servers'
+      fullPath: '/servers'
+      preLoaderRoute: typeof DashboardServersImport
+      parentRoute: typeof DashboardImport
     }
     '/_dashboard/': {
       id: '/_dashboard/'
@@ -82,10 +104,10 @@ declare module '@tanstack/react-router' {
     }
     '/_dashboard/servers/$serverId': {
       id: '/_dashboard/servers/$serverId'
-      path: '/servers/$serverId'
+      path: '/$serverId'
       fullPath: '/servers/$serverId'
       preLoaderRoute: typeof DashboardServersServerIdImport
-      parentRoute: typeof DashboardImport
+      parentRoute: typeof DashboardServersImport
     }
     '/_dashboard/mods/': {
       id: '/_dashboard/mods/'
@@ -96,30 +118,62 @@ declare module '@tanstack/react-router' {
     }
     '/_dashboard/servers/': {
       id: '/_dashboard/servers/'
-      path: '/servers'
-      fullPath: '/servers'
+      path: '/'
+      fullPath: '/servers/'
       preLoaderRoute: typeof DashboardServersIndexImport
-      parentRoute: typeof DashboardImport
+      parentRoute: typeof DashboardServersImport
+    }
+    '/_dashboard/servers/$serverId/mods': {
+      id: '/_dashboard/servers/$serverId/mods'
+      path: '/mods'
+      fullPath: '/servers/$serverId/mods'
+      preLoaderRoute: typeof DashboardServersServerIdModsImport
+      parentRoute: typeof DashboardServersServerIdImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface DashboardRouteChildren {
-  DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardDemoDashboardRoute: typeof DashboardDemoDashboardRoute
-  DashboardServersServerIdRoute: typeof DashboardServersServerIdRoute
-  DashboardModsIndexRoute: typeof DashboardModsIndexRoute
+interface DashboardServersServerIdRouteChildren {
+  DashboardServersServerIdModsRoute: typeof DashboardServersServerIdModsRoute
+}
+
+const DashboardServersServerIdRouteChildren: DashboardServersServerIdRouteChildren =
+  {
+    DashboardServersServerIdModsRoute: DashboardServersServerIdModsRoute,
+  }
+
+const DashboardServersServerIdRouteWithChildren =
+  DashboardServersServerIdRoute._addFileChildren(
+    DashboardServersServerIdRouteChildren,
+  )
+
+interface DashboardServersRouteChildren {
+  DashboardServersServerIdRoute: typeof DashboardServersServerIdRouteWithChildren
   DashboardServersIndexRoute: typeof DashboardServersIndexRoute
 }
 
+const DashboardServersRouteChildren: DashboardServersRouteChildren = {
+  DashboardServersServerIdRoute: DashboardServersServerIdRouteWithChildren,
+  DashboardServersIndexRoute: DashboardServersIndexRoute,
+}
+
+const DashboardServersRouteWithChildren =
+  DashboardServersRoute._addFileChildren(DashboardServersRouteChildren)
+
+interface DashboardRouteChildren {
+  DashboardServersRoute: typeof DashboardServersRouteWithChildren
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardDemoDashboardRoute: typeof DashboardDemoDashboardRoute
+  DashboardModsIndexRoute: typeof DashboardModsIndexRoute
+}
+
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardServersRoute: DashboardServersRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardDemoDashboardRoute: DashboardDemoDashboardRoute,
-  DashboardServersServerIdRoute: DashboardServersServerIdRoute,
   DashboardModsIndexRoute: DashboardModsIndexRoute,
-  DashboardServersIndexRoute: DashboardServersIndexRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
@@ -128,50 +182,65 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
   '': typeof DashboardRouteWithChildren
+  '/servers': typeof DashboardServersRouteWithChildren
   '/': typeof DashboardIndexRoute
   '/demo/dashboard': typeof DashboardDemoDashboardRoute
-  '/servers/$serverId': typeof DashboardServersServerIdRoute
+  '/servers/$serverId': typeof DashboardServersServerIdRouteWithChildren
   '/mods': typeof DashboardModsIndexRoute
-  '/servers': typeof DashboardServersIndexRoute
+  '/servers/': typeof DashboardServersIndexRoute
+  '/servers/$serverId/mods': typeof DashboardServersServerIdModsRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof DashboardIndexRoute
   '/demo/dashboard': typeof DashboardDemoDashboardRoute
-  '/servers/$serverId': typeof DashboardServersServerIdRoute
+  '/servers/$serverId': typeof DashboardServersServerIdRouteWithChildren
   '/mods': typeof DashboardModsIndexRoute
   '/servers': typeof DashboardServersIndexRoute
+  '/servers/$serverId/mods': typeof DashboardServersServerIdModsRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_dashboard': typeof DashboardRouteWithChildren
+  '/_dashboard/servers': typeof DashboardServersRouteWithChildren
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/demo/dashboard': typeof DashboardDemoDashboardRoute
-  '/_dashboard/servers/$serverId': typeof DashboardServersServerIdRoute
+  '/_dashboard/servers/$serverId': typeof DashboardServersServerIdRouteWithChildren
   '/_dashboard/mods/': typeof DashboardModsIndexRoute
   '/_dashboard/servers/': typeof DashboardServersIndexRoute
+  '/_dashboard/servers/$serverId/mods': typeof DashboardServersServerIdModsRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | ''
+    | '/servers'
+    | '/'
+    | '/demo/dashboard'
+    | '/servers/$serverId'
+    | '/mods'
+    | '/servers/'
+    | '/servers/$serverId/mods'
+  fileRoutesByTo: FileRoutesByTo
+  to:
     | '/'
     | '/demo/dashboard'
     | '/servers/$serverId'
     | '/mods'
     | '/servers'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/demo/dashboard' | '/servers/$serverId' | '/mods' | '/servers'
+    | '/servers/$serverId/mods'
   id:
     | '__root__'
     | '/_dashboard'
+    | '/_dashboard/servers'
     | '/_dashboard/'
     | '/_dashboard/demo/dashboard'
     | '/_dashboard/servers/$serverId'
     | '/_dashboard/mods/'
     | '/_dashboard/servers/'
+    | '/_dashboard/servers/$serverId/mods'
   fileRoutesById: FileRoutesById
 }
 
@@ -199,10 +268,17 @@ export const routeTree = rootRoute
     "/_dashboard": {
       "filePath": "_dashboard.tsx",
       "children": [
+        "/_dashboard/servers",
         "/_dashboard/",
         "/_dashboard/demo/dashboard",
+        "/_dashboard/mods/"
+      ]
+    },
+    "/_dashboard/servers": {
+      "filePath": "_dashboard.servers.tsx",
+      "parent": "/_dashboard",
+      "children": [
         "/_dashboard/servers/$serverId",
-        "/_dashboard/mods/",
         "/_dashboard/servers/"
       ]
     },
@@ -216,7 +292,10 @@ export const routeTree = rootRoute
     },
     "/_dashboard/servers/$serverId": {
       "filePath": "_dashboard.servers.$serverId.tsx",
-      "parent": "/_dashboard"
+      "parent": "/_dashboard/servers",
+      "children": [
+        "/_dashboard/servers/$serverId/mods"
+      ]
     },
     "/_dashboard/mods/": {
       "filePath": "_dashboard.mods.index.tsx",
@@ -224,7 +303,11 @@ export const routeTree = rootRoute
     },
     "/_dashboard/servers/": {
       "filePath": "_dashboard.servers.index.tsx",
-      "parent": "/_dashboard"
+      "parent": "/_dashboard/servers"
+    },
+    "/_dashboard/servers/$serverId/mods": {
+      "filePath": "_dashboard.servers.$serverId.mods.tsx",
+      "parent": "/_dashboard/servers/$serverId"
     }
   }
 }

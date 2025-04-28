@@ -6,4 +6,6 @@ export enum ResponseCodes {
   ServerListError = 'ServerListError',
   CreateServerSuccess = 'CreateServerSuccess',
   CreateServerError = 'CreateServerError',
+  CreateServerContainerSuccess = 'CreateServerContainerSuccess',
+  CreateServerContainerError = 'CreateServerContainerError',
 }

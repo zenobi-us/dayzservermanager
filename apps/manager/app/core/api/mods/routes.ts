@@ -18,52 +18,36 @@ import {
   errorResponseBodyError,
 } from '../../response';
 
-import type { ErrorResponse, SuccessResponse } from '@/types/response';
-
 import { ResponseCodes } from './codes';
-
-import type {
-  ModItemDetail,
-  SteamWorkshopSearchResults,
-  UninstallModParamtersSchema,
-} from '@dayzserver/sdk/schema';
-import type { Fetcher } from '@tanstack/react-start';
 
 /**
  * Create a list of mods
  */
-const getModList = createServerFn({ method: 'GET' }).handler(async () => {
-  try {
-    const output = await sdk.mods.listAllMods();
-    const body = createResponseBody({
-      code: ResponseCodes.ModListSuccess,
-      data: { mods: output },
-    });
-    return body;
-  } catch (error) {
-    const body = createErrorResponseBody({
-      code: ResponseCodes.ModListError,
-      data: null,
-      error: errorResponseBodyError(error),
-    });
-    return body;
-  }
-});
+export const getModList = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    try {
+      const output = await sdk.mods.listAllMods();
+      const body = createResponseBody({
+        code: ResponseCodes.ModListSuccess,
+        data: { mods: output },
+      });
+      return body;
+    } catch (error) {
+      const body = createErrorResponseBody({
+        code: ResponseCodes.ModListError,
+        data: null,
+        error: errorResponseBodyError(error),
+      });
+      return body;
+    }
+  },
+);
 
 /**
  * get a list of mods installed to a server
  */
-type GetServerModListFn = Fetcher<
-  undefined,
-  typeof GetServerModsParametersSchema,
-  | SuccessResponse<
-      { mods: ModItemDetail[] },
-      ResponseCodes.ServerModListSuccess
-    >
-  | ErrorResponse<{}, ResponseCodes.ModListError>,
-  'data'
->;
-export const getServerModList: GetServerModListFn = createServerFn({
+
+export const getServerModList = createServerFn({
   method: 'GET',
 })
   .validator(GetServerModsParametersSchema)
@@ -88,17 +72,7 @@ export const getServerModList: GetServerModListFn = createServerFn({
 /**
  * Get mod metadata
  */
-type GetModFn = Fetcher<
-  undefined,
-  typeof DownloadModParametersSchema,
-  | SuccessResponse<ModItemDetail, ResponseCodes.ModDetailSuccess>
-  | ErrorResponse<{}, ResponseCodes.ModDetailError>
-  | ErrorResponse<{}, ResponseCodes.ModNotFoundError>
-  | ErrorResponse<string, ResponseCodes.ModParsingError>,
-  'data'
->;
-
-const getModDetails: GetModFn = createServerFn({ method: 'GET' })
+export const getModDetails = createServerFn({ method: 'GET' })
   .validator(GetModParametersSchema)
   .handler(async (context) => {
     const modId = context.data.modId;
@@ -136,15 +110,7 @@ const getModDetails: GetModFn = createServerFn({ method: 'GET' })
 /**
  * Get mod file data
  */
-type GetModFileFn = Fetcher<
-  undefined,
-  typeof GetModFileParametersSchema,
-  | SuccessResponse<string, ResponseCodes.ModFileFound>
-  | ErrorResponse<{}, ResponseCodes.ModFileNotFound>
-  | ErrorResponse<{}, ResponseCodes.ModFileContentsError>,
-  'data'
->;
-const getModFileDetails: GetModFileFn = createServerFn({ method: 'GET' })
+export const getModFileDetails = createServerFn({ method: 'GET' })
   .validator(GetModFileParametersSchema)
   .handler(async (context) => {
     const { modId, file } = context.data;
@@ -179,15 +145,8 @@ const getModFileDetails: GetModFileFn = createServerFn({ method: 'GET' })
 /**
  * Install a mod from steam
  */
-type DownloadModFn = Fetcher<
-  undefined,
-  typeof DownloadModParametersSchema,
-  | SuccessResponse<string, ResponseCodes.ModDownloadSuccess>
-  | ErrorResponse<{}, ResponseCodes.ModInstallError>,
-  'data'
->;
 
-const downloadMod: DownloadModFn = createServerFn({ method: 'POST' })
+export const downloadMod = createServerFn({ method: 'POST' })
   .validator(DownloadModParametersSchema)
   .handler(async (context) => {
     const { modId } = context.data;
@@ -210,14 +169,7 @@ const downloadMod: DownloadModFn = createServerFn({ method: 'POST' })
 /**
  * Remove a mod from the server
  */
-type RemoveModFn = Fetcher<
-  undefined,
-  typeof RemoveModParamtersSchema,
-  | SuccessResponse<string, ResponseCodes.ModRemovedSuccess>
-  | ErrorResponse<{}, ResponseCodes.ModRemoveError>,
-  'data'
->;
-const removeMod: RemoveModFn = createServerFn({ method: 'POST' })
+export const removeMod = createServerFn({ method: 'POST' })
   .validator(RemoveModParamtersSchema)
   .handler((context) => {
     const { modId } = context.data;
@@ -233,14 +185,7 @@ const removeMod: RemoveModFn = createServerFn({ method: 'POST' })
 /**
  * Update a mod on the server
  */
-type UpdateModFn = Fetcher<
-  undefined,
-  typeof UpdateModParametersSchema,
-  | SuccessResponse<string, ResponseCodes.ModUpdateSuccess>
-  | ErrorResponse<{}, ResponseCodes.ModUpdateError>,
-  'data'
->;
-const updateMod: UpdateModFn = createServerFn({ method: 'POST' })
+export const updateMod = createServerFn({ method: 'POST' })
   .validator(UpdateModParametersSchema)
   .handler((context) => {
     const { modId } = context.data;
@@ -256,14 +201,7 @@ const updateMod: UpdateModFn = createServerFn({ method: 'POST' })
 /**
  * Activate a mod on the server
  */
-type InstallModToServerFn = Fetcher<
-  undefined,
-  typeof InstallModParametersSchema,
-  | SuccessResponse<string, ResponseCodes.ModInstallSuccess>
-  | ErrorResponse<{}, ResponseCodes.ModInstallError>,
-  'data'
->;
-export const installModToServer: InstallModToServerFn = createServerFn({
+export const installModToServer = createServerFn({
   method: 'POST',
 })
   .validator(InstallModParametersSchema)
@@ -288,14 +226,7 @@ export const installModToServer: InstallModToServerFn = createServerFn({
 /**
  * Deactivate a mod on the server
  */
-type UninstallModToServerFn = Fetcher<
-  undefined,
-  typeof UninstallModParamtersSchema,
-  | SuccessResponse<string, ResponseCodes.ModUninstallSuccess>
-  | ErrorResponse<{}, ResponseCodes.ModUninstallError>,
-  'data'
->;
-export const uninstallModFromServer: UninstallModToServerFn = createServerFn({
+export const uninstallModFromServer = createServerFn({
   method: 'POST',
 })
   .validator(InstallModParametersSchema)
@@ -320,18 +251,7 @@ export const uninstallModFromServer: UninstallModToServerFn = createServerFn({
 /**
  * Search for mods
  */
-type SearchWorkshopFn = Fetcher<
-  undefined,
-  typeof PublishedFileServiceQueryFilesRequestParamsSchema,
-  | SuccessResponse<
-      SteamWorkshopSearchResults,
-      ResponseCodes.SearchQuerySuccess
-    >
-  | ErrorResponse<string, ResponseCodes.SearchQueryError>,
-  'data'
->;
-
-export const searchWorkshop: SearchWorkshopFn = createServerFn()
+export const searchWorkshop = createServerFn({ method: 'POST' })
   .validator(PublishedFileServiceQueryFilesRequestParamsSchema)
   .handler(async (context) => {
     try {
@@ -357,14 +277,3 @@ export const searchWorkshop: SearchWorkshopFn = createServerFn()
       return body;
     }
   });
-
-export {
-  uninstallModFromServer as deactivateMod,
-  installModToServer as activateMod,
-  updateMod,
-  removeMod,
-  downloadMod as installMod,
-  getModFileDetails,
-  getModDetails,
-  getModList,
-};

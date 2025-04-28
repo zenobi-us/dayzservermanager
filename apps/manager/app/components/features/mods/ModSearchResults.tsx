@@ -1,9 +1,9 @@
-import { ComponentProps } from 'react';
-
 import { FullScreenLoader } from '@/components/full-screen-loader';
 import { cn } from '@/lib/utils';
 
 import { ModSearchResultList } from './ModResultList';
+
+import type { ComponentProps } from 'react';
 
 export function ModSearchResults({
   total,

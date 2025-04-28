@@ -7,20 +7,26 @@ export type IBreadcrumb = {
 };
 
 export function useBreadcrumbs() {
-  const matches = useRouterState({ select: (s) => s.matches });
+  const matches = useRouterState({
+    select: (s) => {
+      return s.matches;
+    },
+  });
 
-  const breadcrumbs = matches
-    .filter(({ staticData }) => staticData.breadcrumb)
-    .reduce((results, match) => {
-      return {
-        ...results,
-        [match.id]: {
-          id: match.id,
-          name: match.staticData.breadcrumb,
-          path: match.pathname,
-        },
-      };
-    }, {});
+  const withBreadcrumbs = matches.filter(
+    (match): match is typeof match & { staticData: { breadcrumb: string } } => {
+      return !!match.staticData?.breadcrumb;
+    },
+  );
 
-  return Object.values(breadcrumbs) as IBreadcrumb[];
+  const output: IBreadcrumb[] = [];
+  for (const match of withBreadcrumbs) {
+    output.push({
+      id: match.id,
+      name: match.staticData.breadcrumb,
+      path: match.pathname,
+    });
+  }
+
+  return output;
 }

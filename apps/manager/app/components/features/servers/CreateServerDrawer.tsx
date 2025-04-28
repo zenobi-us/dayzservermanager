@@ -9,7 +9,7 @@ import { useRouter } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import { useForm } from 'react-hook-form';
 
-import { postCreateServer } from '../../../core/api/server/routes';
+import { createServer } from '../../../core/api/server/routes';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -68,7 +68,7 @@ export function CreateServerDrawer({ children }: PropsWithChildren) {
 function useCreateServerMutation() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const createServerFn = useServerFn(postCreateServer);
+  const createServerFn = useServerFn(createServer);
   return useMutation({
     onMutate() {},
     mutationFn: createServerFn,

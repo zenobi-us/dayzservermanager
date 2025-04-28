@@ -1,13 +1,20 @@
+import { ServerExistanceStatus } from '@dayzserver/sdk/schema';
 import {
+  IconDotsVertical,
   IconDownload,
   IconDownloadOff,
   IconFidgetSpinner,
+  IconLoader,
+  IconPackageImport,
   IconPackages,
-  IconPlus,
+  IconPlayerPlay,
+  IconPlayerStop,
+  IconUpload,
 } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
-import { useMemo } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 
 import * as api from '../../../core/api';
 import { PaginatedDataTable } from '../../PaginatedDataTable';
@@ -17,11 +24,20 @@ import {
   DrawerControllerContent,
 } from '@/components/controlled-drawer';
 import { FullScreenLoader } from '@/components/full-screen-loader';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { SectionCards } from '@/components/section-cards';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DrawerTrigger } from '@/components/ui/drawer';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 import { useGetDownloadedModsQuery } from './useGetDownloadedModsQuery';
 import { useGetServerModsQuery } from './useGetServerModsQuery';
@@ -30,53 +46,178 @@ import type { ModItem, Server } from '@dayzserver/sdk/schema';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { PropsWithChildren } from 'react';
 
+const ServerDetailContext = createContext<{
+  server: Server;
+  isLoading?: boolean;
+  status: ServerExistanceStatus;
+} | null>(null);
+
+const computeServerStatus = (server?: Server) => {
+  if (server && server.container?.Created) {
+    return ServerExistanceStatus.Exists;
+  }
+
+  if (server && server.container && !server.container.Created) {
+    return ServerExistanceStatus.Creating;
+  }
+
+  return ServerExistanceStatus.DoesNotExist;
+};
+
+const ServerDetailProvider = ({
+  server,
+  children,
+}: PropsWithChildren<{ server: Server }>) => {
+  const status = computeServerStatus(server);
+  const isLoading = status === ServerExistanceStatus.Creating;
+
+  return (
+    <ServerDetailContext.Provider
+      value={{
+        server,
+        status,
+        isLoading,
+      }}
+    >
+      {children}
+    </ServerDetailContext.Provider>
+  );
+};
+
+const useServerDetails = () => {
+  const context = useContext(ServerDetailContext);
+  if (!context) {
+    throw new Error('useServer must be used within a ServerDetailProvider');
+  }
+  return context;
+};
+
 export function ServerDetailPage({ server }: { server: Server }) {
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="@container/main flex flex-1 flex-col gap-2">
-        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-          <ServerDetailHeader server={server} />
-          <SectionCards>
-            <ServerMapCard server={server} />
-            <ServerModCard server={server} />
-          </SectionCards>
-        </div>
-      </div>
-    </div>
+    <ServerDetailProvider server={server}>
+      <Page>
+        <ServerDetailHeader />
+        <SectionCards>
+          <ServerMapCard />
+          <ServerModCard />
+        </SectionCards>
+      </Page>
+    </ServerDetailProvider>
   );
 }
 
-function ServerDetailHeader({ server }: { server: Server }) {
+function useCreateServerContainerMutation(server?: Server) {
+  const queryClient = useQueryClient();
+  const createServerContainerFn = useServerFn(api.server.createServerContainer);
+  return useMutation({
+    mutationFn: async () => {
+      if (!server) {
+        return;
+      }
+
+      return await createServerContainerFn({
+        data: {
+          serverId: server.id,
+        },
+      });
+    },
+    async onSuccess() {
+      if (!server) {
+        return;
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ['servers'] });
+      await queryClient.invalidateQueries({ queryKey: ['server', server.id] });
+    },
+  });
+}
+
+function ServerDetailHeader() {
+  const details = useServerDetails();
+  const createServerContainerMutation = useCreateServerContainerMutation();
+  const isCreatingContainer = createServerContainerMutation.isPending;
   return (
     <PageHeader
-      title={server.id}
+      title={details.server.id}
       actions={
-        <>
-          <AddServerModDrawer serverId={server.id}>
-            <Button variant="outline">
-              <IconPlus className="mr-2" /> Add mod
+        <div>
+          <AddServerModDrawer>
+            <Button>
+              <IconPackageImport /> Add Mod
             </Button>
           </AddServerModDrawer>
-        </>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger className="cursor-pointer">
+              {!isCreatingContainer && <IconDotsVertical />}
+              {isCreatingContainer && <IconLoader className="animate-spin" />}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="right" align="start">
+              <DropdownMenuLabel className="text-sm font-bold">
+                Docker
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {!details.server.container?.Created && (
+                <DropdownMenuItem
+                  // disabled={isCreatingContainer}
+                  onClick={() => {
+                    createServerContainerMutation.mutate();
+                  }}
+                >
+                  <IconUpload /> Create
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem
+                disabled={
+                  !details.server.container?.Created ||
+                  details.server.container?.State === 'running'
+                }
+              >
+                <IconPlayerPlay /> Start
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={
+                  !details.server.container?.Created ||
+                  details.server.container?.State !== 'running'
+                }
+              >
+                <IconPlayerStop /> Stop
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       }
-    />
+    ></PageHeader>
   );
 }
 
-function ServerMapCard({ server }: { server: Server }) {
+function ServerMapCard() {
+  const details = useServerDetails();
+  const server = details.server;
+
   if (server.error) {
     return null;
   }
   return <SectionCards.Item title="map" description={server.map} />;
 }
 
-function ServerModCard({ server }: { server: Server }) {
+function ServerModCard() {
+  const navigate = useNavigate();
+  const details = useServerDetails();
+  const server = details.server;
+
   const mods = useMemo(() => (!server.error && server.mods) || [], [server]);
 
   return (
     <SectionCards.Item
       title="mods"
       description={`${mods.length} activated mods`}
+      onClick={() => {
+        navigate({
+          to: '/servers/$serverId/mods',
+          params: { serverId: server.id },
+        }).catch(console.error);
+      }}
       footer={
         <>
           {mods.length > 0 && (
@@ -91,21 +232,24 @@ function ServerModCard({ server }: { server: Server }) {
 }
 
 function AddServerModDrawer({
-  serverId,
   isOpen,
   children,
-}: PropsWithChildren<{ serverId: string; isOpen?: boolean }>) {
+}: PropsWithChildren<{ isOpen?: boolean }>) {
   return (
     <DrawerController isOpen={isOpen}>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerControllerContent className="flex flex-col mx-4 min-h-3/4 max-h-3/4">
-        <AddServerModListContainer serverId={serverId} />
+        <AddServerModListContainer />
       </DrawerControllerContent>
     </DrawerController>
   );
 }
 
-function AddServerModListContainer({ serverId }: { serverId: string }) {
+function AddServerModListContainer() {
+  const details = useServerDetails();
+  const server = details.server;
+  const serverId = server.id;
+
   const queryClient = useQueryClient();
   const installedModsQuery = useGetServerModsQuery({ serverId });
   const downloadedModsQuery = useGetDownloadedModsQuery();

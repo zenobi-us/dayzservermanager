@@ -1,5 +1,5 @@
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Link } from '@tanstack/react-router';
+import { Fragment } from 'react';
 
 import {
   Breadcrumb,
@@ -7,11 +7,13 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Fragment } from "react"
-import type { IBreadcrumb } from "@/hooks/use-breadcrumbs"
-import { useBreadcrumbs } from "@/hooks/use-breadcrumbs"
-import { Link } from "@tanstack/react-router"
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+
+import type { IBreadcrumb } from '@/hooks/use-breadcrumbs';
+
+import { useBreadcrumbs } from '@/hooks/use-breadcrumbs';
 
 export function SiteHeader() {
   const breadcrumbs = useBreadcrumbs();
@@ -27,10 +29,14 @@ export function SiteHeader() {
         <SiteHeaderBreadcrumbs items={breadcrumbs} />
       </div>
     </header>
-  )
+  );
 }
 
-export function SiteHeaderBreadcrumbs({ items = [] }: { items: IBreadcrumb[] }) {
+export function SiteHeaderBreadcrumbs({
+  items = [],
+}: {
+  items: IBreadcrumb[];
+}) {
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -41,12 +47,10 @@ export function SiteHeaderBreadcrumbs({ items = [] }: { items: IBreadcrumb[] }) 
                 <Link to={item.path}>{item.name}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
-            {items.length - 1 > index && (
-              <BreadcrumbSeparator />
-            )}
+            {items.length - 1 > index && <BreadcrumbSeparator />}
           </Fragment>
         ))}
       </BreadcrumbList>
     </Breadcrumb>
-  )
+  );
 }

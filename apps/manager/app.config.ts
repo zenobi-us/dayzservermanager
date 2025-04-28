@@ -1,6 +1,7 @@
-import { defineConfig } from '@tanstack/react-start/config';
 import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from '@tanstack/react-start/config';
 import tsConfigPaths from 'vite-tsconfig-paths';
+
 import type { App } from 'vinxi';
 
 const config: Promise<App> = defineConfig({
@@ -17,8 +18,8 @@ const config: Promise<App> = defineConfig({
     resolve: {
       alias: {
         '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
-      }
-    }
+      },
+    },
   },
 });
 

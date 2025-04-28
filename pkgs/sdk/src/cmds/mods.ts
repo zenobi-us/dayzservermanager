@@ -138,7 +138,10 @@ export const installModToServer = async ({
   assertIsManagerMode();
   const workshopModPath = getSteamStoreModPath({ modId });
   const modMeta = await getModMeta({ path: workshopModPath });
-  const targetPath = getServerStoreModPath(serverId, modMeta.name);
+  const targetPath = getServerStoreModItemPath({
+    serverId,
+    modName: modMeta.name,
+  });
 
   if (!(await fsExists(workshopModPath))) {
     throw new errors.ModNoExistsError();
@@ -163,7 +166,10 @@ export const uninstallModFromServer = async ({
   assertIsManagerMode();
   const workshopModPath = getSteamStoreModPath({ modId });
   const modMeta = await getModMeta({ path: workshopModPath });
-  const serverModPath = getServerStoreModPath(serverId, modMeta.name);
+  const serverModPath = getServerStoreModItemPath({
+    serverId,
+    modName: modMeta.name,
+  });
 
   if (!(await fsExists(serverModPath))) {
     throw new errors.InstallModNoExistsError();
@@ -201,7 +207,7 @@ export const listAllMods = async () => {
     Config.get('STEAMSTORE_MODS'),
     Config.get('CLIENT_APPID'),
   );
-  const mods = await _listModsAtServerStorePath(modStorePath);
+  const mods = await listModsAtPath({ path: modStorePath });
   return mods;
 };
 
@@ -211,7 +217,7 @@ export const listAllMods = async () => {
 export const listServerMods = async ({ serverId }: { serverId: string }) => {
   assertIsManagerMode();
   const modStorePath = join(Config.get('SERVERSTORE_MODS'), serverId);
-  return await _listModsAtServerStorePath(modStorePath);
+  return await listModsAtPath({ path: modStorePath });
 };
 
 /**
@@ -282,14 +288,14 @@ export const getModMeta = async ({ path }: { path: string }) => {
   );
 };
 
-async function _listModsAtServerStorePath(serverModPath: string) {
-  const modFiles = await fs.readdir(serverModPath, {
+export async function listModsAtPath({ path }: { path: string }) {
+  const modFiles = await fs.readdir(path, {
     withFileTypes: true,
   });
   const mods: ModItemDetail[] = [];
 
   for (const file of modFiles) {
-    const modPath = join(serverModPath, file.name);
+    const modPath = join(path, file.name);
     const meta = await getModDetails({ path: modPath });
 
     if (!meta) {
@@ -309,14 +315,14 @@ async function _listModsAtServerStorePath(serverModPath: string) {
 /**
  * Does the server have a mod?
  */
-export async function doesServerModExist({
+export async function doesServerModItemExist({
   serverId,
   modName,
 }: {
   serverId: string;
   modName: string;
 }) {
-  const modPath = getServerStoreModPath(serverId, modName);
+  const modPath = getServerStoreModItemPath({ serverId, modName });
   return await fsExists(modPath);
 }
 export async function assertServerModExists({
@@ -326,17 +332,28 @@ export async function assertServerModExists({
   serverId: string;
   modName: string;
 }) {
-  const yesno = await doesServerModExist({ serverId, modName });
+  const yesno = await doesServerModItemExist({ serverId, modName });
   if (!yesno) {
     throw new Error(`"${serverId}" does not have mod "${modName}"`);
   }
 }
-export function getServerStoreModPath(serverId: string, modName: string) {
+
+export function getServerStoreModItemPath({
+  serverId,
+  modName,
+}: {
+  serverId: string;
+  modName: string;
+}) {
   return join(
     Config.get('SERVERSTORE_MODS'),
     serverId,
     getServerModIdentifier(modName),
   );
+}
+
+export function getServerStoreModListPath({ serverId }: { serverId: string }) {
+  return join(Config.get('SERVERSTORE_MODS'), serverId);
 }
 
 export function getServerModIdentifier(modName: string) {

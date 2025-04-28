@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import { ModItemListSchema } from './modsSchema';
 
+import type { ContainerInfo } from 'dockerode';
+
 const ServerConfigBooleanEnum = z.union([
   z.literal(0),
   z.literal(1),
@@ -48,6 +50,13 @@ export const CreateServerPayloadSchema = ServerConfigSchema.pick({
     hostname: true,
   }).partial(),
 );
+
+export const CreateServerContainerPayloadSchema = z.object({
+  serverId: z.string(),
+});
+export type CreateServerContainerPayload = z.infer<
+  typeof CreateServerContainerPayloadSchema
+>;
 
 export type CreateServerPayload = z.infer<typeof CreateServerPayloadSchema>;
 
@@ -99,4 +108,18 @@ export const ServerSchema = ServerBaseSchema.and(
     ServerWithGenericErrorSchema,
   ]),
 );
-export type Server = z.infer<typeof ServerSchema>;
+export type Server = z.infer<typeof ServerSchema> & {
+  container?: ContainerInfo;
+};
+
+export enum ServerExistanceStatus {
+  Creating = 'creating',
+  DoesNotExist = 'doesNotExist',
+  Exists = 'exists',
+  Unknown = 'unknown',
+}
+
+export const GetServerDetailParamsSchema = z.object({
+  serverId: z.string(),
+});
+export type GetServerDetailParams = z.infer<typeof GetServerDetailParamsSchema>;

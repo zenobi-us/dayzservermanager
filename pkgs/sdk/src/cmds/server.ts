@@ -5,19 +5,30 @@ import { snakeCase } from 'lodash-es';
 
 import { ServerConfigInvalidError, ServerConfigParseError } from '../errors';
 import { createCppFileParser } from '../lib/cpp';
+import { dockerClient } from '../lib/docker';
 import { ServerConfigSchema } from '../schema/serverSchema';
 
 import { Config } from './config';
 import { assertIsManagerMode } from './mode';
+import { listModsAtPath, listServerMods } from './mods';
 
-import type { ModItem } from '../schema/modsSchema';
 import type {
   CreateServerPayload,
   Server,
   ServerConfig,
 } from '../schema/serverSchema';
 
+/**
+ * Main
+ */
+/**
+ * Get a list of servers
+ *
+ * @scope manager
+ */
 export async function getServerList() {
+  assertIsManagerMode();
+
   const serverFiles = Config.get('SERVERSTORE_FILES');
   const servers = await fs.readdir(serverFiles, {
     withFileTypes: true,
@@ -28,7 +39,7 @@ export async function getServerList() {
     if (!entry.isDirectory()) {
       continue;
     }
-    const server = await getServerDetail(entry.name);
+    const server = await getServerDetail({ serverId: entry.name });
 
     if (!server) {
       continue;
@@ -40,9 +51,16 @@ export async function getServerList() {
   return output;
 }
 
-export async function getServerDetail(serverId: string): Promise<Server> {
+/**
+ * Get details of a server
+ *
+ * @scope manager
+ */
+export async function getServerDetail({ serverId }: { serverId: string }) {
+  assertIsManagerMode();
+
   const id = serverId;
-  const path = join(createServerPath(serverId), serverId);
+  const path = join(createServerStorePath(serverId), serverId);
   let config = {} as ServerConfig;
 
   try {
@@ -67,12 +85,19 @@ export async function getServerDetail(serverId: string): Promise<Server> {
     };
   }
 
+  const container = await getServerContainer({ serverId });
+
+  const mods = await listServerMods({
+    serverId,
+  });
+
   const output: Server = {
     id: serverId,
     path,
-    mods: [],
+    mods,
     map: config.template,
     config,
+    container,
     error: null,
   };
 
@@ -90,6 +115,8 @@ const ServerConfigTemplate = ({ template, ...data }: ServerConfig) => `
 `;
 
 export async function createServer(details: CreateServerPayload) {
+  assertIsManagerMode();
+
   const formattedServerId = snakeCase(details.hostname);
 
   const serverFiles = join(Config.get('SERVERSTORE_FILES'), formattedServerId);
@@ -110,46 +137,101 @@ export async function createServer(details: CreateServerPayload) {
     }),
   );
 
-  const server = await getServerDetail(formattedServerId);
+  // create container
+  // label it
+
+  await createServerContainer({ serverId: formattedServerId });
+
+  const server = await getServerDetail({ serverId: formattedServerId });
 
   return Promise.resolve(server);
 }
 
-/**
- * Return a mod list suitable to be used for
- * dayz modlist args
- */
-export async function getServerModCommandArgs() {
-  const serverFiles = Config.get('SERVERFILES_MODS');
-  const modFiles = await fs.readdir(serverFiles, {
-    withFileTypes: true,
+export async function getServerContainer({ serverId }: { serverId: string }) {
+  const container = (await dockerClient.listContainers()).find((container) => {
+    return container.Labels[Config.get('CONTAINER_SERVERLABEL')] === serverId;
   });
 
-  const mods: ModItem[] = [];
+  return container;
+}
 
-  for (const file of modFiles) {
-    if (!file.isSymbolicLink() || !file.name.startsWith('@')) {
-      continue;
-    }
+export async function createServerContainer({
+  serverId,
+}: {
+  serverId: string;
+}) {
+  const container = await dockerClient.createContainer({
+    Image: Config.get('CONTAINER_SERVERIMAGE'),
+    Labels: {
+      [Config.get('CONTAINER_SERVERLABEL')]: serverId,
+    },
+    Volumes: {
+      '/home/user': {},
+      '/store/steam': {},
+      '/store/serverstore': {},
+      '/store/severmissions': {},
+      '/store/serverprofiles': {},
+      '/store/servermods': {},
+    },
+    HostConfig: {
+      Mounts: [
+        {
+          Type: 'volume',
+          Source: 'homes',
+          Target: '/home/user',
+          VolumeOptions: {
+            NoCopy: true,
+            DriverConfig: {
+              Name: '',
+              Options: {},
+            },
+            Labels: {},
+            Subpath: serverId,
+          },
+        },
+        {
+          Type: 'volume',
+          Source: 'serverstore',
+          Target: '/store/serverstore',
+          VolumeOptions: {
+            NoCopy: true,
+            DriverConfig: {
+              Name: '',
+              Options: {},
+            },
+            Labels: {},
+            Subpath: serverId,
+          },
+        },
+      ],
+    },
+  });
 
-    mods.push({ name: 'todo: get name', id: file.name, path: file.parentPath });
-  }
-
-  return mods;
+  return container;
 }
 
 /**
-
-^: Start of line.
-(?!\/\/): Ensures line doesn't start with // (comments).
-\s*: allow an amount of white space
-(?<key>\w+): Captures key (e.g., hostname).
-\s*=\s*: allow whitespace around the =.
-(?<value>[^;]*): Captures value (e.g., "Faceroll") up to ;.
-;: Matches ending semicolon.
-/gm: g for all matches, m for multiline.
-
+ * Helpers
  */
+
+export async function getServerModCommandArgs({
+  serverId,
+}: {
+  serverId?: string;
+}) {
+  const modfilesPath = serverId
+    ? join(Config.get('SERVERFILES_MODS'), serverId)
+    : Config.get('SERVERSTORE_MODS');
+
+  const modList = await listModsAtPath({ path: modfilesPath });
+
+  return modList
+    .map((mod) => {
+      return mod.identifier;
+    })
+    .join(';');
+}
+
 const serverConfigParser = createCppFileParser(ServerConfigSchema);
 
 export async function getServerStoreConfig(serverId: string) {
@@ -177,7 +259,7 @@ export async function getServerConfig({ path }: { path: string }) {
  * Write the provided server config to <serverId>/serverDZ.cfg.save
  */
 export async function saveServerConfig(serverId: string, config: string) {
-  const serverPath = createServerPath(serverId);
+  const serverPath = createServerStorePath(serverId);
   await fs.writeFile(
     join(serverPath, Config.get('SERVER_CONFIG_FILENAME')),
     config,
@@ -198,7 +280,7 @@ export async function getServerMapName(serverId: string) {
   return config.template;
 }
 
-export function createServerPath(serverId: string) {
+export function createServerStorePath(serverId: string) {
   const serverFiles = Config.get('SERVERSTORE_FILES');
   return join(serverFiles, serverId);
 }

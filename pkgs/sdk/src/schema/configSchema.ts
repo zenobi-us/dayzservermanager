@@ -38,6 +38,9 @@ export const EnvConfigSchema = z.object({
   SERVERFILES_MISSIONS: z.string().default('/serverfiles/mpmissions'),
   SERVERFILES_PROFILES: z.string().default('/serverfiles/profiles'),
 
+  CONTAINER_SERVERLABEL: z.string().default('dayzdocker-server'),
+  CONTAINER_SERVERIMAGE: z.string().default('dayzdocker:server-local'),
+
   /**
    * The server config file name.
    *
@@ -67,9 +70,20 @@ export const EnvConfigSchema = z.object({
    */
   ROOT_CONFIGFILE_MAP: z.string().transform((value) => value.split(',')),
   /**
-   * Searching steam workshop requires an apikey: https://steamcommunity.com/dev/apikey
+   * Searching steam workshop requires an apikey
+   *
+   * - https://steamcommunity.com/dev/apikey
    */
   STEAM_APIKEY: z.string().optional(),
+  /**
+   * How we communicate with docker. can be any valid value docker accepts here
+   * - /var/run/docker.sock
+   * - https://...
+   * - http://...
+   *
+   * https://github.com/apocas/docker-modem/blob/d5407c3ece1c13ee6f81632c737bc16ff75015b7/lib/modem.js#L16
+   */
+  DOCKER_HOST: z.string().default('/var/run/docker.sock'),
 });
 
 export type IEnvConfig = z.infer<typeof EnvConfigSchema>;

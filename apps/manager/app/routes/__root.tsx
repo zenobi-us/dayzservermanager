@@ -6,13 +6,13 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
-import appCss from '@/app.css?url';
-
 import { FullScreenLoader } from '@/components/full-screen-loader';
 
 import type { AuthStore } from '@/core/store/AuthStore';
 import type { QueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+
+import appCss from '@/app.css?url';
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;

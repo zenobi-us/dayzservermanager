@@ -1,6 +1,4 @@
 import { IconPlus } from '@tabler/icons-react';
-import { useStore } from '@tanstack/react-store';
-import { useMemo } from 'react';
 
 import { DrawerCloseButton } from '@/components/drawer-close-button';
 import { ErrorNotice } from '@/components/error-notice';
@@ -19,34 +17,12 @@ import {
 import { ModSearchForm } from './ModSearchForm';
 import { ModSearchPagination } from './ModSearchPagination';
 import { ModSearchResults } from './ModSearchResults';
-import {
-  modSearchStore,
-  setSearchText,
-  useModSearchQuery,
-} from './useModSearch';
+import { useModSearchMutation } from './useModSearch';
 
 import type { SteamWorkshopSearchResults } from '@dayzserver/sdk/schema';
 
 export function ModSearchDrawerContainer() {
-  const page = useStore(modSearchStore, (state) => state.page);
-  const search_text = useStore(modSearchStore, (state) => state.search_text);
-  const numperpage = useStore(modSearchStore, (state) => state.numperpage);
-  const modSearchQuery = useModSearchQuery({
-    search_text,
-    page,
-    numperpage,
-  });
-
-  const pageCount = useMemo(() => {
-    const totalResults = modSearchQuery.data?.response.total;
-    if (!totalResults) {
-      return 0;
-    }
-    if (totalResults < numperpage) {
-      return 1;
-    }
-    return Math.ceil(totalResults / numperpage);
-  }, [modSearchQuery, numperpage]);
+  const modSearchMutation = useModSearchMutation();
 
   return (
     <Drawer>
@@ -64,33 +40,35 @@ export function ModSearchDrawerContainer() {
             </div>
             <ModSearchForm
               onSubmit={(query) => {
-                setSearchText(query.search_text);
+                modSearchMutation.search(query);
               }}
             />
             <DrawerCloseButton />
           </div>
         </DrawerHeader>
+
         <ModSearchDrawerResults
-          currentPage={page}
-          pageCount={pageCount}
-          pageSize={numperpage}
-          publishedfiledetails={
-            modSearchQuery.data?.response.publishedfiledetails || []
-          }
-          error={modSearchQuery.error?.message || ''}
-          total={modSearchQuery.data?.response.total || 0}
-          isFetching={modSearchQuery.isFetching}
-          isPending={modSearchQuery.isPending}
+          currentPage={modSearchMutation.page}
+          pageCount={modSearchMutation.pageCount}
+          pageSize={modSearchMutation.numperpage}
+          publishedfiledetails={modSearchMutation.results}
+          error={modSearchMutation.error || ''}
+          total={modSearchMutation.total}
+          isFetching={modSearchMutation.isPending}
           onNextPageClick={() => {
-            modSearchStore.setState((state) => {
-              const page = state.page + 1 > pageCount ? 1 : state.page + 1;
-              return { ...state, page };
+            modSearchMutation.search({
+              page:
+                modSearchMutation.page + 1 > modSearchMutation.pageCount
+                  ? 1
+                  : modSearchMutation.page + 1,
             });
           }}
           onPreviousPageClick={() => {
-            modSearchStore.setState((state) => {
-              const page = state.page - 1 < 1 ? pageCount : state.page - 1;
-              return { ...state, page };
+            modSearchMutation.search({
+              page:
+                modSearchMutation.page - 1 < 1
+                  ? modSearchMutation.pageCount
+                  : modSearchMutation.page - 1,
             });
           }}
         />
@@ -102,7 +80,6 @@ export function ModSearchDrawerContainer() {
 function ModSearchDrawerResults({
   error,
   isFetching,
-  isPending,
   publishedfiledetails,
   total,
   //   pageSize,
@@ -112,7 +89,6 @@ function ModSearchDrawerResults({
   onPreviousPageClick,
 }: {
   error: string;
-  isPending?: boolean;
   isFetching?: boolean;
   total: number;
   pageSize: number;
@@ -127,7 +103,7 @@ function ModSearchDrawerResults({
       <div className="overflow-y-scroll rounded-md border m-2 p-2 flex flex-col flex-grow">
         {error && <ErrorNotice>{error}</ErrorNotice>}
         {isFetching && <FullScreenLoader />}
-        {!isPending && (
+        {!isFetching && (
           <ModSearchResults
             className="block overflow-visible"
             publishedfiledetails={publishedfiledetails}

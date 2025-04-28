@@ -48,7 +48,7 @@ export default tseslint.config(
         createTypeScriptImportResolver({
           alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
 
-          bun: true, // resolve Bun modules https://github.com/import-js/eslint-import-resolver-typescript#bun
+          // bun: true, // resolve Bun modules https://github.com/import-js/eslint-import-resolver-typescript#bun
 
           // Choose from one of the "project" configs below or omit to use <root>/tsconfig.json or <root>/jsconfig.json by default
 
@@ -82,6 +82,7 @@ export default tseslint.config(
   {
     rules: {
       'no-unused-vars': 'off',
+      "import/no-unresolved": "off",
       "@typescript-eslint/consistent-type-imports": "error",
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',

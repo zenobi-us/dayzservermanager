@@ -1,6 +1,6 @@
 import sdk, { Config } from '@dayzserver/sdk';
+import { LoginParametersSchema } from '@dayzserver/sdk/schema';
 import { createServerFn } from '@tanstack/react-start';
-import { z } from 'zod';
 
 import {
   createErrorResponseBody,
@@ -8,26 +8,9 @@ import {
   errorResponseBodyError,
 } from '../../response';
 
-import type { ErrorResponse, SuccessResponse } from '@/types/response';
-
 import { ResponseCodes } from './codes';
 
-import type { Fetcher } from '@tanstack/react-start';
-
-const LoginParametersSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-});
-
-type LoginFn = Fetcher<
-  undefined,
-  typeof LoginParametersSchema,
-  | SuccessResponse<{ username: string }, ResponseCodes.LoginSuccess>
-  | ErrorResponse<{}, ResponseCodes.LoginFailed>,
-  'data'
->;
-
-export const login: LoginFn = createServerFn({ method: 'POST' })
+export const login = createServerFn({ method: 'POST' })
   .validator(LoginParametersSchema)
   .handler(async (context) => {
     try {
@@ -46,18 +29,7 @@ export const login: LoginFn = createServerFn({ method: 'POST' })
     }
   });
 
-type GetAuthenticatedUserFn = Fetcher<
-  undefined,
-  undefined,
-  | SuccessResponse<
-      { username: string },
-      ResponseCodes.GetAuthenticatedUserSuccess
-    >
-  | ErrorResponse<{}, ResponseCodes.GetAuthenticatedUserError>,
-  'data'
->;
-
-export const getAuthenticatedUser: GetAuthenticatedUserFn = createServerFn({
+export const getAuthenticatedUser = createServerFn({
   method: 'GET',
 }).handler(async () => {
   try {

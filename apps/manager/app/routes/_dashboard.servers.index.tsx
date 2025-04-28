@@ -8,9 +8,6 @@ import { isErrorResponse } from '@/types/response';
 
 export const Route = createFileRoute('/_dashboard/servers/')({
   component: RouteComponent,
-  staticData: {
-    breadcrumb: 'Servers',
-  },
   loader: async ({ context: { queryClient } }) => {
     return queryClient.ensureQueryData(getServersQueryOptions);
   },

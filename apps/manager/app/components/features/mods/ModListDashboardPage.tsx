@@ -12,7 +12,7 @@ import type { ComponentProps } from 'react';
 
 export function ModListDashboardPage({
   data = [],
-}: Omit<ComponentProps<typeof PaginatedDataTable>, 'data'> & {
+}: Omit<ComponentProps<typeof PaginatedDataTable>, 'data' | 'columns'> & {
   data: ModItemList;
 }) {
   return (
