@@ -1,5 +1,7 @@
 # Dayz Server
 
+[Docs]('./index.md)
+
 > [!NOTE]
 > based on a project by [Daniel Ceregatti](https://ceregatti.org/git/daniel).
 

@@ -134,7 +134,7 @@ function useCreateServerContainerMutation(server?: Server) {
 
 function ServerDetailHeader() {
   const details = useServerDetails();
-  const createServerContainerMutation = useCreateServerContainerMutation();
+  const createServerContainerMutation = useCreateServerContainerMutation(details.server);
   const isCreatingContainer = createServerContainerMutation.isPending;
   return (
     <PageHeader

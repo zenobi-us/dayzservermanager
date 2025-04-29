@@ -39,7 +39,8 @@ export const EnvConfigSchema = z.object({
   SERVERFILES_PROFILES: z.string().default('/serverfiles/profiles'),
 
   CONTAINER_SERVERLABEL: z.string().default('dayzdocker-server'),
-  CONTAINER_SERVERIMAGE: z.string().default('dayzdocker:server-local'),
+  CONTAINER_SERVERIMAGE: z.string().default('dayzserver:server-local'),
+  CONTAINER_SERVERNAME_TMPL: z.string().default('dayzdocker-server-{{serverId}}'),
 
   /**
    * The server config file name.

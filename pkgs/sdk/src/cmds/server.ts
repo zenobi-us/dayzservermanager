@@ -11,6 +11,8 @@ import { ServerConfigSchema } from '../schema/serverSchema';
 import { Config } from './config';
 import { assertIsManagerMode } from './mode';
 import { listModsAtPath, listServerMods } from './mods';
+import template from 'lodash-es/template'
+import templateSettings from 'lodash-es/templateSettings'
 
 import type {
   CreateServerPayload,
@@ -155,59 +157,74 @@ export async function getServerContainer({ serverId }: { serverId: string }) {
   return container;
 }
 
+
+const containerNameTmpl = template(Config.get('CONTAINER_SERVERNAME_TMPL'), {
+  interpolate: /\{\{(.+?)\}\}/g
+})
+
 export async function createServerContainer({
   serverId,
 }: {
   serverId: string;
 }) {
-  const container = await dockerClient.createContainer({
-    Image: Config.get('CONTAINER_SERVERIMAGE'),
-    Labels: {
-      [Config.get('CONTAINER_SERVERLABEL')]: serverId,
-    },
-    Volumes: {
-      '/home/user': {},
-      '/store/steam': {},
-      '/store/serverstore': {},
-      '/store/severmissions': {},
-      '/store/serverprofiles': {},
-      '/store/servermods': {},
-    },
-    HostConfig: {
-      Mounts: [
-        {
-          Type: 'volume',
-          Source: 'homes',
-          Target: '/home/user',
-          VolumeOptions: {
-            NoCopy: true,
-            DriverConfig: {
-              Name: '',
-              Options: {},
-            },
-            Labels: {},
-            Subpath: serverId,
-          },
-        },
-        {
-          Type: 'volume',
-          Source: 'serverstore',
-          Target: '/store/serverstore',
-          VolumeOptions: {
-            NoCopy: true,
-            DriverConfig: {
-              Name: '',
-              Options: {},
-            },
-            Labels: {},
-            Subpath: serverId,
-          },
-        },
-      ],
-    },
-  });
+  const serverImage = Config.get('CONTAINER_SERVERIMAGE')
+  const serverLabel = Config.get('CONTAINER_SERVERLABEL')
+  const containerName = containerNameTmpl({ serverId })
 
-  return container;
+  try {
+    const container = await dockerClient.createContainer({
+      name: containerName,
+      Image: serverImage,
+      Labels: {
+        [serverLabel]: serverId,
+      },
+      Volumes: {
+        '/home/user': {},
+        '/store/steam': {},
+        '/store/serverstore': {},
+        '/store/severmissions': {},
+        '/store/serverprofiles': {},
+        '/store/servermods': {},
+      },
+      HostConfig: {
+        Mounts: [
+          {
+            Type: 'volume',
+            Source: 'homes',
+            Target: '/home/user',
+            VolumeOptions: {
+              NoCopy: true,
+              DriverConfig: {
+                Name: '',
+                Options: {},
+              },
+              Labels: {},
+              Subpath: serverId,
+            },
+          },
+          {
+            Type: 'volume',
+            Source: 'serverstore',
+            Target: '/store/serverstore',
+            VolumeOptions: {
+              NoCopy: true,
+              DriverConfig: {
+                Name: '',
+                Options: {},
+              },
+              Labels: {},
+              Subpath: serverId,
+            },
+          },
+        ],
+      },
+    });
+
+    return container;
+  } catch (error) {
+    debugger
+  }
+  
 }
 
 /**
