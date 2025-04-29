@@ -38,6 +38,10 @@ devcontainer() {
 }
 
 case "$1" in
+clean)
+    sudo git clean -xdf
+    sudo chown "$USER:$USER" -R ./
+    ;;
 images)
     build_base_image
     build_manager_image
