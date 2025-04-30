@@ -19,15 +19,16 @@
       "@dayzserver/sdk": [
         "../../pkgs/sdk/src/index.ts"
       ],
-      "@dayzserver/sdk/schema": [
-        "../../pkgs/sdk/src/schema/index.ts"
+      "@dayzserver/sdk/*": [
+        "../../pkgs/sdk/src/*"
       ]
     },
     "outDir": "../../.moon/cache/types/apps/manager"
   },
   "include": [
+    "../../pkgs/sdk/**/*",
     "**/*.ts",
-    "**/*.tsx",
+    "**/*.tsx"
   ],
   "references": [
     {

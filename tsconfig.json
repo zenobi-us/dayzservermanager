@@ -3,13 +3,16 @@
   "exclude": [],
   "references": [
     {
+      "path": "apps/manager"
+    },
+    {
+      "path": "pkgs/cli"
+    },
+    {
       "path": "pkgs/codes"
     },
     {
       "path": "pkgs/sdk"
-    },
-    {
-      "path": "pkgs/cli"
     }
   ]
 }
