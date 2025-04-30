@@ -26,13 +26,15 @@
     "outDir": "../../.moon/cache/types/apps/manager"
   },
   "include": [
-    "../../pkgs/sdk/**/*",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
   ],
   "references": [
     {
       "path": "../../pkgs/sdk"
+    },
+    {
+      "path": "../../pkgs/codes"
     }
   ]
 }

@@ -3,6 +3,9 @@
   "exclude": [],
   "references": [
     {
+      "path": "pkgs/codes"
+    },
+    {
       "path": "pkgs/sdk"
     },
     {

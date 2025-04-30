@@ -8,13 +8,5 @@
         "strict": true,
         "skipLibCheck": true,
         "strictNullChecks": true,
-        "paths": {
-            "@dayzserver/sdk": [
-                "./pkgs/sdk/src/index.ts"
-            ],
-            "@dayzserver/cli": [
-                "./pkgs/cli/src/index.ts"
-            ]
-        }
     },
 }

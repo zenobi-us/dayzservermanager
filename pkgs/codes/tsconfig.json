@@ -10,13 +10,14 @@
     "strictNullChecks": true,
     "esModuleInterop": true,
     "composite": true,
-    "outDir": "../../.moon/cache/types/pkgs/sdk",
+    "outDir": "../../.moon/cache/types/pkgs/codes",
     "paths": {
-      "@dayzserver/codes": [ "../codes/src/index.ts"]
+      "@dayzserver/sdk": [ "../codes/src/index.ts"]
     }
   },
   "include": [
-    "src/**/*.ts"],
+    "src/**/*.ts"
+  ],
   "ts-node": {
     "transpileOnly": true,
     "files": true,

@@ -3,11 +3,11 @@ import fs from 'fs/promises';
 import https from 'https';
 import { join } from 'path';
 
+import { errors } from '@dayzserver/codes';
 import fsExists from 'fs.promises.exists';
 import { startCase } from 'lodash-es';
 import { z } from 'zod';
 
-import * as errors from '../errors';
 import { createCppFileParser } from '../lib/cpp';
 import { getDirSize } from '../lib/fs';
 import { ModConfigFiles } from '../schema/configSchema';

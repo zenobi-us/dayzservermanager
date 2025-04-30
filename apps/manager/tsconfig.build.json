@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "emitDeclarationOnly": false
+  },
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"],
+  "files": [
+    "app/client.tsx",
+    "app/ssr.tsx",
+    "app/router.tsx",
+    "app/routerTree.gen.ts",
+  ]
+}

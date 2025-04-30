@@ -8,4 +8,7 @@ export enum ResponseCodes {
   CreateServerError = 'CreateServerError',
   CreateServerContainerSuccess = 'CreateServerContainerSuccess',
   CreateServerContainerError = 'CreateServerContainerError',
+  StartServerContainerSuccess = 'StartServerContainerSuccess',
+  StartServerContainerError = 'StartServerContainerError',
+  StartServerContainerNotRunningError = 'StartServerContainerNotRunningError',
 }

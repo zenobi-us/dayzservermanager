@@ -1,0 +1,19 @@
+$schema: '../../.moon/cache/schemas/workspace.json'
+
+stack: backend
+type: application
+
+
+fileGroups:
+  app:
+    - 'Dockerfile'
+  sources:
+    - 'bin/**/*'
+    - 's6/**/*'
+
+tasks:
+  image:
+    command: mise run server:image
+    inputs:
+      - '@group(app)'
+      - '@group(sources)'

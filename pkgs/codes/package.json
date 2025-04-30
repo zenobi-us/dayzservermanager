@@ -1,0 +1,9 @@
+{
+    "name": "@dayzserver/codes",
+    "type": "module",
+    "types": "./src/index.ts",
+    "exports": {
+        ".": "./src/index.ts",
+        "./schema": "./src/schema/index.ts"
+    }
+}

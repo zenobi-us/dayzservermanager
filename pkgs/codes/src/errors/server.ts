@@ -1,4 +1,4 @@
-import type { ServerConfigSchema } from './schema/serverSchema';
+import type { ServerConfigSchema } from '@dayzserver/sdk/schema';
 import type { z } from 'zod';
 
 export class MissingServerDirectoryError extends Error {
@@ -47,12 +47,7 @@ export class NotManagerModeError extends Error {
 export class NoModeError extends Error {
   code = 'NoModeError';
 }
-export class InstallModAlreadyExistsError extends Error {
-  code = 'InstallModAlreadyExistsError';
-}
-export class InstallModNoExistsError extends Error {
-  code = 'InstallModNoExistsError';
-}
-export class ModNoExistsError extends Error {
-  code = 'ModNoExistsError';
+
+export class ServerContainerNotFoundError extends Error {
+  code = 'ServerContainerNotFoundError';
 }

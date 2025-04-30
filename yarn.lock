@@ -1877,6 +1877,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@dayzserver/codes@workspace:pkgs/codes":
+  version: 0.0.0-use.local
+  resolution: "@dayzserver/codes@workspace:pkgs/codes"
+  languageName: unknown
+  linkType: soft
+
 "@dayzserver/manager@workspace:apps/manager":
   version: 0.0.0-use.local
   resolution: "@dayzserver/manager@workspace:apps/manager"
@@ -3351,17 +3357,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@moonrepo/cli@npm:^1.33.1":
-  version: 1.35.1
-  resolution: "@moonrepo/cli@npm:1.35.1"
+"@moonrepo/cli@npm:^1.35.2":
+  version: 1.35.2
+  resolution: "@moonrepo/cli@npm:1.35.2"
   dependencies:
-    "@moonrepo/core-linux-arm64-gnu": "npm:1.35.1"
-    "@moonrepo/core-linux-arm64-musl": "npm:1.35.1"
-    "@moonrepo/core-linux-x64-gnu": "npm:1.35.1"
-    "@moonrepo/core-linux-x64-musl": "npm:1.35.1"
-    "@moonrepo/core-macos-arm64": "npm:1.35.1"
-    "@moonrepo/core-macos-x64": "npm:1.35.1"
-    "@moonrepo/core-windows-x64-msvc": "npm:1.35.1"
+    "@moonrepo/core-linux-arm64-gnu": "npm:1.35.2"
+    "@moonrepo/core-linux-arm64-musl": "npm:1.35.2"
+    "@moonrepo/core-linux-x64-gnu": "npm:1.35.2"
+    "@moonrepo/core-linux-x64-musl": "npm:1.35.2"
+    "@moonrepo/core-macos-arm64": "npm:1.35.2"
+    "@moonrepo/core-macos-x64": "npm:1.35.2"
+    "@moonrepo/core-windows-x64-msvc": "npm:1.35.2"
     detect-libc: "npm:^2.0.3"
   dependenciesMeta:
     "@moonrepo/core-linux-arm64-gnu":
@@ -3380,55 +3386,55 @@ __metadata:
       optional: true
   bin:
     moon: moon.js
-  checksum: 10c0/569af4385318328f4ee5044f3e88761c513b06f625fa2ebd6e333466e72fb4c2303ce28550e9329a1bae87775e24577a7df03fbededc11e8ddd2479534dab527
+  checksum: 10c0/d2e00626d56501b46e76314f7fab3b8c04693baf80ea17b347f209b990136269d7917f146ccd4026173ad66612165870a5a5a8d40b695f7580dcf5e41508fb7f
   languageName: node
   linkType: hard
 
-"@moonrepo/core-linux-arm64-gnu@npm:1.35.1":
-  version: 1.35.1
-  resolution: "@moonrepo/core-linux-arm64-gnu@npm:1.35.1"
+"@moonrepo/core-linux-arm64-gnu@npm:1.35.2":
+  version: 1.35.2
+  resolution: "@moonrepo/core-linux-arm64-gnu@npm:1.35.2"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@moonrepo/core-linux-arm64-musl@npm:1.35.1":
-  version: 1.35.1
-  resolution: "@moonrepo/core-linux-arm64-musl@npm:1.35.1"
+"@moonrepo/core-linux-arm64-musl@npm:1.35.2":
+  version: 1.35.2
+  resolution: "@moonrepo/core-linux-arm64-musl@npm:1.35.2"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@moonrepo/core-linux-x64-gnu@npm:1.35.1":
-  version: 1.35.1
-  resolution: "@moonrepo/core-linux-x64-gnu@npm:1.35.1"
+"@moonrepo/core-linux-x64-gnu@npm:1.35.2":
+  version: 1.35.2
+  resolution: "@moonrepo/core-linux-x64-gnu@npm:1.35.2"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@moonrepo/core-linux-x64-musl@npm:1.35.1":
-  version: 1.35.1
-  resolution: "@moonrepo/core-linux-x64-musl@npm:1.35.1"
+"@moonrepo/core-linux-x64-musl@npm:1.35.2":
+  version: 1.35.2
+  resolution: "@moonrepo/core-linux-x64-musl@npm:1.35.2"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@moonrepo/core-macos-arm64@npm:1.35.1":
-  version: 1.35.1
-  resolution: "@moonrepo/core-macos-arm64@npm:1.35.1"
+"@moonrepo/core-macos-arm64@npm:1.35.2":
+  version: 1.35.2
+  resolution: "@moonrepo/core-macos-arm64@npm:1.35.2"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@moonrepo/core-macos-x64@npm:1.35.1":
-  version: 1.35.1
-  resolution: "@moonrepo/core-macos-x64@npm:1.35.1"
+"@moonrepo/core-macos-x64@npm:1.35.2":
+  version: 1.35.2
+  resolution: "@moonrepo/core-macos-x64@npm:1.35.2"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@moonrepo/core-windows-x64-msvc@npm:1.35.1":
-  version: 1.35.1
-  resolution: "@moonrepo/core-windows-x64-msvc@npm:1.35.1"
+"@moonrepo/core-windows-x64-msvc@npm:1.35.2":
+  version: 1.35.2
+  resolution: "@moonrepo/core-windows-x64-msvc@npm:1.35.2"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -7731,7 +7737,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-preset-moon@npm:^3.0.2":
+"babel-preset-moon@npm:^3.1.1":
   version: 3.1.1
   resolution: "babel-preset-moon@npm:3.1.1"
   dependencies:
@@ -8862,11 +8868,11 @@ __metadata:
     "@arethetypeswrong/cli": "npm:^0.17.4"
     "@devcontainers/cli": "npm:^0.75.0"
     "@eslint/js": "npm:^9.8.0"
-    "@moonrepo/cli": "npm:^1.33.1"
+    "@moonrepo/cli": "npm:^1.35.2"
     "@swc/core": "npm:^1.11.21"
     "@types/node": "npm:^22.14.1"
     "@types/underscore": "npm:^1"
-    babel-preset-moon: "npm:^3.0.2"
+    babel-preset-moon: "npm:^3.1.1"
     chalk-template: "npm:^1.1.0"
     eslint: "npm:^9.18.0"
     eslint-config-prettier: "npm:^10.1.2"

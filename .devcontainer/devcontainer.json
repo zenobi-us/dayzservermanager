@@ -10,7 +10,8 @@
 	],
 	"service": "manager",
 	"features": {
-		"ghcr.io/devcontainers-extra/features/mise:1": {}
+		"ghcr.io/devcontainers-extra/features/mise:1": {},
+		"ghcr.io/devcontainer-community/devcontainer-features/starship.rs:1": {}
 	},
 	"customizations": {
 		"vscode": {

@@ -3,7 +3,7 @@ import { join } from 'path';
 
 import { snakeCase } from 'lodash-es';
 
-import { ServerConfigInvalidError, ServerConfigParseError } from '../errors';
+import { ServerConfigInvalidError, ServerConfigParseError, ServerContainerNotFoundError } from '../../../codes/src/errors/server';
 import { createCppFileParser } from '../lib/cpp';
 import { dockerClient } from '../lib/docker';
 import { ServerConfigSchema } from '../schema/serverSchema';
@@ -12,7 +12,6 @@ import { Config } from './config';
 import { assertIsManagerMode } from './mode';
 import { listModsAtPath, listServerMods } from './mods';
 import template from 'lodash-es/template'
-import templateSettings from 'lodash-es/templateSettings'
 
 import type {
   CreateServerPayload,
@@ -87,7 +86,7 @@ export async function getServerDetail({ serverId }: { serverId: string }) {
     };
   }
 
-  const container = await getServerContainer({ serverId });
+  const container = await getServerContainerInfo({ serverId });
 
   const mods = await listServerMods({
     serverId,
@@ -149,12 +148,15 @@ export async function createServer(details: CreateServerPayload) {
   return Promise.resolve(server);
 }
 
-export async function getServerContainer({ serverId }: { serverId: string }) {
-  const container = (await dockerClient.listContainers()).find((container) => {
+export async function getServerContainerInfo({ serverId }: { serverId: string }) {
+  const containers = await dockerClient.listContainers({
+    all: true,
+  })
+  const container = containers.find((container) => {
     return container.Labels[Config.get('CONTAINER_SERVERLABEL')] === serverId;
   });
 
-  return container;
+  return container
 }
 
 
@@ -225,6 +227,19 @@ export async function createServerContainer({
     debugger
   }
   
+}
+
+export async function startServerContainer({serverId}: { serverId: string}){
+  const containerInfo = await getServerContainerInfo({ serverId })
+  if (!containerInfo) {
+    throw new ServerContainerNotFoundError()
+  }
+
+  const container = await dockerClient.getContainer(containerInfo?.Id)
+
+  await container.start()
+  
+  return container
 }
 
 /**

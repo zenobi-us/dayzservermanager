@@ -1,0 +1,46 @@
+$schema: '../../.moon/cache/schemas/workspace.json'
+
+tags:
+  - tanstack
+  - typescript
+
+stack: backend
+type: application
+
+workspace:
+  inheritedTasks:
+    exclude: ['lint']
+
+fileGroups:
+  app:
+    - 'Dockerfile'
+    - 'app.config.ts'
+  sources:
+    - 'src/**/*'
+    - 'bin/**/*'
+    - 's6/**/*'
+
+tasks:
+  image:
+    command: mise run manager:image
+    inputs:
+      - '@group(app)'
+      - '@group(sources)'
+
+  start:
+    command: vinxi start
+    
+  dev:
+    command: 'vinxi dev'
+    local: true
+
+  build:
+    command: 'vinxi build'
+    inputs:
+      - '@group(app)'
+      - '@group(sources)'
+
+  typecheck:
+    args:
+      # Force build every time
+      - '--force'

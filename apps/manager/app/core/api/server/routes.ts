@@ -119,12 +119,17 @@ export const createServerContainer = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     try {
       const container = await sdk.server.createServerContainer(data);
+      if (!container) { 
+        throw new Error()
+      }
+
       return createResponseBody({
         data: {
           containerId: container.id,
         },
         code: ResponseCodes.CreateServerContainerSuccess,
       });
+
     } catch (error) {
       return createErrorResponseBody({
         code: ResponseCodes.CreateServerContainerError,
@@ -132,3 +137,33 @@ export const createServerContainer = createServerFn({ method: 'POST' })
       });
     }
   });
+
+/**
+ * Start Server Container
+ */
+export const startServerContainer = createServerFn({ method: 'POST' })
+  .validator(CreateServerContainerPayloadSchema)
+  .handler(async ({ data }) => {
+    try {
+      const container = await sdk.server.startServerContainer(data);
+
+      if (container?.Status === 'running') { 
+        throw new Error()
+      }
+
+      return createResponseBody({
+        data: {
+          containerId: container.id,
+        },
+        code: ResponseCodes.CreateServerContainerSuccess,
+      });
+      
+    } catch (error) {
+      return createErrorResponseBody({
+        code: ResponseCodes.CreateServerContainerError,
+        error: errorResponseBodyError(error),
+      });
+    }
+  });
+
+

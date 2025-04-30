@@ -29,6 +29,13 @@ RUN mkdir -p /store/steam /serverfiles/{mpmissions, mods, profiles}
 
 ENV MODE=server
 
+ENV STEAMSTORE=/store/steam
+ENV STEAMSTORE_MODS=/store/steam/workshop/content
+ENV SERVERSTORE_FILES=/store/serverfiles
+ENV SERVERSTORE_MODS=/store/servermods
+ENV SERVERSTORE_MISSIONS=/store/servermissions
+ENV SERVERSTORE_PROFILES=/store/serverprofiles
+
 #
 # Mounted from subpath volume
 # serverfiles:/<serverid>/
