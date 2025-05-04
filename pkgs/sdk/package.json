@@ -1,13 +1,13 @@
 {
-    "name": "@dayzserver/sdk",
-    "type": "module",
-    "types": "./src/index.ts",
-    "exports": {
-        ".": "./src/index.ts",
-        "./schema": "./src/schema/index.ts"
-    },
-    "dependencies": {
-        "@types/nconf": "^0.10.7",
-        "nconf": "^0.13.0"
-    }
+  "name": "@dayzserver/sdk",
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts"
+  },
+  "dependencies": {
+    "@types/nconf": "^0.10.7",
+    "nconf": "^0.13.0"
+  }
 }
