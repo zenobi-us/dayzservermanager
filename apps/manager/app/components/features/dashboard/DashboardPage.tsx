@@ -34,7 +34,7 @@ function SteamModCard({ mods }: { mods: ModItemList }) {
       description={`${mods.length} activated mods`}
       onClick={() => {
         navigate({
-          to: '/mods',
+          to: '/d/mods',
         }).catch(console.error);
       }}
     />
@@ -49,7 +49,7 @@ function ServerCard({ servers }: { servers: Server[] }) {
       description={`${servers.length} servers`}
       onClick={() => {
         navigate({
-          to: '/servers',
+          to: '/d/servers',
         }).catch(console.error);
       }}
     />

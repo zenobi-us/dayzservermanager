@@ -68,13 +68,8 @@ services:
       # stores all our customisations
       - ./files:/store/files
 
-      # these are for development
-      - ./:/opt/repo/
-
       - /var/run/docker.sock:/var/run/docker.sock
 
     ports:
-      - '5173:5173/tcp'
+      - '80:80/tcp'
     restart: always
-    environment:
-      - MANAGER_PORT=8000

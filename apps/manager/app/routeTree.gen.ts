@@ -11,245 +11,270 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as DashboardImport } from './routes/_dashboard'
-import { Route as DashboardIndexImport } from './routes/_dashboard.index'
-import { Route as DashboardServersImport } from './routes/_dashboard.servers'
-import { Route as DashboardServersIndexImport } from './routes/_dashboard.servers.index'
-import { Route as DashboardModsIndexImport } from './routes/_dashboard.mods.index'
-import { Route as DashboardServersServerIdImport } from './routes/_dashboard.servers.$serverId'
-import { Route as DashboardDemoDashboardImport } from './routes/_dashboard.demo.dashboard'
-import { Route as DashboardServersServerIdModsImport } from './routes/_dashboard.servers.$serverId.mods'
+import { Route as AppImport } from './routes/_app'
+import { Route as AppIndexImport } from './routes/_app.index'
+import { Route as AppDRouteImport } from './routes/_app.d/route'
+import { Route as AppDIndexImport } from './routes/_app.d/index'
+import { Route as AppDServersImport } from './routes/_app.d/servers'
+import { Route as AppDServersIndexImport } from './routes/_app.d/servers.index'
+import { Route as AppDModsIndexImport } from './routes/_app.d/mods.index'
+import { Route as AppDServersServerIdImport } from './routes/_app.d/servers.$serverId'
+import { Route as AppDServersServerIdModsImport } from './routes/_app.d/servers.$serverId.mods'
 
 // Create/Update Routes
 
-const DashboardRoute = DashboardImport.update({
-  id: '/_dashboard',
+const AppRoute = AppImport.update({
+  id: '/_app',
   getParentRoute: () => rootRoute,
 } as any)
 
-const DashboardIndexRoute = DashboardIndexImport.update({
+const AppIndexRoute = AppIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => DashboardRoute,
+  getParentRoute: () => AppRoute,
 } as any)
 
-const DashboardServersRoute = DashboardServersImport.update({
+const AppDRouteRoute = AppDRouteImport.update({
+  id: '/d',
+  path: '/d',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppDIndexRoute = AppDIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppDRouteRoute,
+} as any)
+
+const AppDServersRoute = AppDServersImport.update({
   id: '/servers',
   path: '/servers',
-  getParentRoute: () => DashboardRoute,
+  getParentRoute: () => AppDRouteRoute,
 } as any)
 
-const DashboardServersIndexRoute = DashboardServersIndexImport.update({
+const AppDServersIndexRoute = AppDServersIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => DashboardServersRoute,
+  getParentRoute: () => AppDServersRoute,
 } as any)
 
-const DashboardModsIndexRoute = DashboardModsIndexImport.update({
+const AppDModsIndexRoute = AppDModsIndexImport.update({
   id: '/mods/',
   path: '/mods/',
-  getParentRoute: () => DashboardRoute,
+  getParentRoute: () => AppDRouteRoute,
 } as any)
 
-const DashboardServersServerIdRoute = DashboardServersServerIdImport.update({
+const AppDServersServerIdRoute = AppDServersServerIdImport.update({
   id: '/$serverId',
   path: '/$serverId',
-  getParentRoute: () => DashboardServersRoute,
+  getParentRoute: () => AppDServersRoute,
 } as any)
 
-const DashboardDemoDashboardRoute = DashboardDemoDashboardImport.update({
-  id: '/demo/dashboard',
-  path: '/demo/dashboard',
-  getParentRoute: () => DashboardRoute,
+const AppDServersServerIdModsRoute = AppDServersServerIdModsImport.update({
+  id: '/mods',
+  path: '/mods',
+  getParentRoute: () => AppDServersServerIdRoute,
 } as any)
-
-const DashboardServersServerIdModsRoute =
-  DashboardServersServerIdModsImport.update({
-    id: '/mods',
-    path: '/mods',
-    getParentRoute: () => DashboardServersServerIdRoute,
-  } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_dashboard': {
-      id: '/_dashboard'
+    '/_app': {
+      id: '/_app'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof DashboardImport
+      preLoaderRoute: typeof AppImport
       parentRoute: typeof rootRoute
     }
-    '/_dashboard/servers': {
-      id: '/_dashboard/servers'
-      path: '/servers'
-      fullPath: '/servers'
-      preLoaderRoute: typeof DashboardServersImport
-      parentRoute: typeof DashboardImport
+    '/_app/d': {
+      id: '/_app/d'
+      path: '/d'
+      fullPath: '/d'
+      preLoaderRoute: typeof AppDRouteImport
+      parentRoute: typeof AppImport
     }
-    '/_dashboard/': {
-      id: '/_dashboard/'
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof DashboardIndexImport
-      parentRoute: typeof DashboardImport
+      preLoaderRoute: typeof AppIndexImport
+      parentRoute: typeof AppImport
     }
-    '/_dashboard/demo/dashboard': {
-      id: '/_dashboard/demo/dashboard'
-      path: '/demo/dashboard'
-      fullPath: '/demo/dashboard'
-      preLoaderRoute: typeof DashboardDemoDashboardImport
-      parentRoute: typeof DashboardImport
+    '/_app/d/servers': {
+      id: '/_app/d/servers'
+      path: '/servers'
+      fullPath: '/d/servers'
+      preLoaderRoute: typeof AppDServersImport
+      parentRoute: typeof AppDRouteImport
     }
-    '/_dashboard/servers/$serverId': {
-      id: '/_dashboard/servers/$serverId'
-      path: '/$serverId'
-      fullPath: '/servers/$serverId'
-      preLoaderRoute: typeof DashboardServersServerIdImport
-      parentRoute: typeof DashboardServersImport
-    }
-    '/_dashboard/mods/': {
-      id: '/_dashboard/mods/'
-      path: '/mods'
-      fullPath: '/mods'
-      preLoaderRoute: typeof DashboardModsIndexImport
-      parentRoute: typeof DashboardImport
-    }
-    '/_dashboard/servers/': {
-      id: '/_dashboard/servers/'
+    '/_app/d/': {
+      id: '/_app/d/'
       path: '/'
-      fullPath: '/servers/'
-      preLoaderRoute: typeof DashboardServersIndexImport
-      parentRoute: typeof DashboardServersImport
+      fullPath: '/d/'
+      preLoaderRoute: typeof AppDIndexImport
+      parentRoute: typeof AppDRouteImport
     }
-    '/_dashboard/servers/$serverId/mods': {
-      id: '/_dashboard/servers/$serverId/mods'
+    '/_app/d/servers/$serverId': {
+      id: '/_app/d/servers/$serverId'
+      path: '/$serverId'
+      fullPath: '/d/servers/$serverId'
+      preLoaderRoute: typeof AppDServersServerIdImport
+      parentRoute: typeof AppDServersImport
+    }
+    '/_app/d/mods/': {
+      id: '/_app/d/mods/'
       path: '/mods'
-      fullPath: '/servers/$serverId/mods'
-      preLoaderRoute: typeof DashboardServersServerIdModsImport
-      parentRoute: typeof DashboardServersServerIdImport
+      fullPath: '/d/mods'
+      preLoaderRoute: typeof AppDModsIndexImport
+      parentRoute: typeof AppDRouteImport
+    }
+    '/_app/d/servers/': {
+      id: '/_app/d/servers/'
+      path: '/'
+      fullPath: '/d/servers/'
+      preLoaderRoute: typeof AppDServersIndexImport
+      parentRoute: typeof AppDServersImport
+    }
+    '/_app/d/servers/$serverId/mods': {
+      id: '/_app/d/servers/$serverId/mods'
+      path: '/mods'
+      fullPath: '/d/servers/$serverId/mods'
+      preLoaderRoute: typeof AppDServersServerIdModsImport
+      parentRoute: typeof AppDServersServerIdImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface DashboardServersServerIdRouteChildren {
-  DashboardServersServerIdModsRoute: typeof DashboardServersServerIdModsRoute
+interface AppDServersServerIdRouteChildren {
+  AppDServersServerIdModsRoute: typeof AppDServersServerIdModsRoute
 }
 
-const DashboardServersServerIdRouteChildren: DashboardServersServerIdRouteChildren =
-  {
-    DashboardServersServerIdModsRoute: DashboardServersServerIdModsRoute,
-  }
-
-const DashboardServersServerIdRouteWithChildren =
-  DashboardServersServerIdRoute._addFileChildren(
-    DashboardServersServerIdRouteChildren,
-  )
-
-interface DashboardServersRouteChildren {
-  DashboardServersServerIdRoute: typeof DashboardServersServerIdRouteWithChildren
-  DashboardServersIndexRoute: typeof DashboardServersIndexRoute
+const AppDServersServerIdRouteChildren: AppDServersServerIdRouteChildren = {
+  AppDServersServerIdModsRoute: AppDServersServerIdModsRoute,
 }
 
-const DashboardServersRouteChildren: DashboardServersRouteChildren = {
-  DashboardServersServerIdRoute: DashboardServersServerIdRouteWithChildren,
-  DashboardServersIndexRoute: DashboardServersIndexRoute,
+const AppDServersServerIdRouteWithChildren =
+  AppDServersServerIdRoute._addFileChildren(AppDServersServerIdRouteChildren)
+
+interface AppDServersRouteChildren {
+  AppDServersServerIdRoute: typeof AppDServersServerIdRouteWithChildren
+  AppDServersIndexRoute: typeof AppDServersIndexRoute
 }
 
-const DashboardServersRouteWithChildren =
-  DashboardServersRoute._addFileChildren(DashboardServersRouteChildren)
-
-interface DashboardRouteChildren {
-  DashboardServersRoute: typeof DashboardServersRouteWithChildren
-  DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardDemoDashboardRoute: typeof DashboardDemoDashboardRoute
-  DashboardModsIndexRoute: typeof DashboardModsIndexRoute
+const AppDServersRouteChildren: AppDServersRouteChildren = {
+  AppDServersServerIdRoute: AppDServersServerIdRouteWithChildren,
+  AppDServersIndexRoute: AppDServersIndexRoute,
 }
 
-const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardServersRoute: DashboardServersRouteWithChildren,
-  DashboardIndexRoute: DashboardIndexRoute,
-  DashboardDemoDashboardRoute: DashboardDemoDashboardRoute,
-  DashboardModsIndexRoute: DashboardModsIndexRoute,
-}
-
-const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
-  DashboardRouteChildren,
+const AppDServersRouteWithChildren = AppDServersRoute._addFileChildren(
+  AppDServersRouteChildren,
 )
 
+interface AppDRouteRouteChildren {
+  AppDServersRoute: typeof AppDServersRouteWithChildren
+  AppDIndexRoute: typeof AppDIndexRoute
+  AppDModsIndexRoute: typeof AppDModsIndexRoute
+}
+
+const AppDRouteRouteChildren: AppDRouteRouteChildren = {
+  AppDServersRoute: AppDServersRouteWithChildren,
+  AppDIndexRoute: AppDIndexRoute,
+  AppDModsIndexRoute: AppDModsIndexRoute,
+}
+
+const AppDRouteRouteWithChildren = AppDRouteRoute._addFileChildren(
+  AppDRouteRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppDRouteRoute: typeof AppDRouteRouteWithChildren
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppDRouteRoute: AppDRouteRouteWithChildren,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '': typeof DashboardRouteWithChildren
-  '/servers': typeof DashboardServersRouteWithChildren
-  '/': typeof DashboardIndexRoute
-  '/demo/dashboard': typeof DashboardDemoDashboardRoute
-  '/servers/$serverId': typeof DashboardServersServerIdRouteWithChildren
-  '/mods': typeof DashboardModsIndexRoute
-  '/servers/': typeof DashboardServersIndexRoute
-  '/servers/$serverId/mods': typeof DashboardServersServerIdModsRoute
+  '': typeof AppRouteWithChildren
+  '/d': typeof AppDRouteRouteWithChildren
+  '/': typeof AppIndexRoute
+  '/d/servers': typeof AppDServersRouteWithChildren
+  '/d/': typeof AppDIndexRoute
+  '/d/servers/$serverId': typeof AppDServersServerIdRouteWithChildren
+  '/d/mods': typeof AppDModsIndexRoute
+  '/d/servers/': typeof AppDServersIndexRoute
+  '/d/servers/$serverId/mods': typeof AppDServersServerIdModsRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof DashboardIndexRoute
-  '/demo/dashboard': typeof DashboardDemoDashboardRoute
-  '/servers/$serverId': typeof DashboardServersServerIdRouteWithChildren
-  '/mods': typeof DashboardModsIndexRoute
-  '/servers': typeof DashboardServersIndexRoute
-  '/servers/$serverId/mods': typeof DashboardServersServerIdModsRoute
+  '/': typeof AppIndexRoute
+  '/d': typeof AppDIndexRoute
+  '/d/servers/$serverId': typeof AppDServersServerIdRouteWithChildren
+  '/d/mods': typeof AppDModsIndexRoute
+  '/d/servers': typeof AppDServersIndexRoute
+  '/d/servers/$serverId/mods': typeof AppDServersServerIdModsRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/_dashboard': typeof DashboardRouteWithChildren
-  '/_dashboard/servers': typeof DashboardServersRouteWithChildren
-  '/_dashboard/': typeof DashboardIndexRoute
-  '/_dashboard/demo/dashboard': typeof DashboardDemoDashboardRoute
-  '/_dashboard/servers/$serverId': typeof DashboardServersServerIdRouteWithChildren
-  '/_dashboard/mods/': typeof DashboardModsIndexRoute
-  '/_dashboard/servers/': typeof DashboardServersIndexRoute
-  '/_dashboard/servers/$serverId/mods': typeof DashboardServersServerIdModsRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_app/d': typeof AppDRouteRouteWithChildren
+  '/_app/': typeof AppIndexRoute
+  '/_app/d/servers': typeof AppDServersRouteWithChildren
+  '/_app/d/': typeof AppDIndexRoute
+  '/_app/d/servers/$serverId': typeof AppDServersServerIdRouteWithChildren
+  '/_app/d/mods/': typeof AppDModsIndexRoute
+  '/_app/d/servers/': typeof AppDServersIndexRoute
+  '/_app/d/servers/$serverId/mods': typeof AppDServersServerIdModsRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | ''
-    | '/servers'
+    | '/d'
     | '/'
-    | '/demo/dashboard'
-    | '/servers/$serverId'
-    | '/mods'
-    | '/servers/'
-    | '/servers/$serverId/mods'
+    | '/d/servers'
+    | '/d/'
+    | '/d/servers/$serverId'
+    | '/d/mods'
+    | '/d/servers/'
+    | '/d/servers/$serverId/mods'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/demo/dashboard'
-    | '/servers/$serverId'
-    | '/mods'
-    | '/servers'
-    | '/servers/$serverId/mods'
+    | '/d'
+    | '/d/servers/$serverId'
+    | '/d/mods'
+    | '/d/servers'
+    | '/d/servers/$serverId/mods'
   id:
     | '__root__'
-    | '/_dashboard'
-    | '/_dashboard/servers'
-    | '/_dashboard/'
-    | '/_dashboard/demo/dashboard'
-    | '/_dashboard/servers/$serverId'
-    | '/_dashboard/mods/'
-    | '/_dashboard/servers/'
-    | '/_dashboard/servers/$serverId/mods'
+    | '/_app'
+    | '/_app/d'
+    | '/_app/'
+    | '/_app/d/servers'
+    | '/_app/d/'
+    | '/_app/d/servers/$serverId'
+    | '/_app/d/mods/'
+    | '/_app/d/servers/'
+    | '/_app/d/servers/$serverId/mods'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  DashboardRoute: typeof DashboardRouteWithChildren
+  AppRoute: typeof AppRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  DashboardRoute: DashboardRouteWithChildren,
+  AppRoute: AppRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -262,52 +287,59 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/_dashboard"
+        "/_app"
       ]
     },
-    "/_dashboard": {
-      "filePath": "_dashboard.tsx",
+    "/_app": {
+      "filePath": "_app.tsx",
       "children": [
-        "/_dashboard/servers",
-        "/_dashboard/",
-        "/_dashboard/demo/dashboard",
-        "/_dashboard/mods/"
+        "/_app/d",
+        "/_app/"
       ]
     },
-    "/_dashboard/servers": {
-      "filePath": "_dashboard.servers.tsx",
-      "parent": "/_dashboard",
+    "/_app/d": {
+      "filePath": "_app.d/route.tsx",
+      "parent": "/_app",
       "children": [
-        "/_dashboard/servers/$serverId",
-        "/_dashboard/servers/"
+        "/_app/d/servers",
+        "/_app/d/",
+        "/_app/d/mods/"
       ]
     },
-    "/_dashboard/": {
-      "filePath": "_dashboard.index.tsx",
-      "parent": "/_dashboard"
+    "/_app/": {
+      "filePath": "_app.index.tsx",
+      "parent": "/_app"
     },
-    "/_dashboard/demo/dashboard": {
-      "filePath": "_dashboard.demo.dashboard.tsx",
-      "parent": "/_dashboard"
-    },
-    "/_dashboard/servers/$serverId": {
-      "filePath": "_dashboard.servers.$serverId.tsx",
-      "parent": "/_dashboard/servers",
+    "/_app/d/servers": {
+      "filePath": "_app.d/servers.tsx",
+      "parent": "/_app/d",
       "children": [
-        "/_dashboard/servers/$serverId/mods"
+        "/_app/d/servers/$serverId",
+        "/_app/d/servers/"
       ]
     },
-    "/_dashboard/mods/": {
-      "filePath": "_dashboard.mods.index.tsx",
-      "parent": "/_dashboard"
+    "/_app/d/": {
+      "filePath": "_app.d/index.tsx",
+      "parent": "/_app/d"
     },
-    "/_dashboard/servers/": {
-      "filePath": "_dashboard.servers.index.tsx",
-      "parent": "/_dashboard/servers"
+    "/_app/d/servers/$serverId": {
+      "filePath": "_app.d/servers.$serverId.tsx",
+      "parent": "/_app/d/servers",
+      "children": [
+        "/_app/d/servers/$serverId/mods"
+      ]
     },
-    "/_dashboard/servers/$serverId/mods": {
-      "filePath": "_dashboard.servers.$serverId.mods.tsx",
-      "parent": "/_dashboard/servers/$serverId"
+    "/_app/d/mods/": {
+      "filePath": "_app.d/mods.index.tsx",
+      "parent": "/_app/d"
+    },
+    "/_app/d/servers/": {
+      "filePath": "_app.d/servers.index.tsx",
+      "parent": "/_app/d/servers"
+    },
+    "/_app/d/servers/$serverId/mods": {
+      "filePath": "_app.d/servers.$serverId.mods.tsx",
+      "parent": "/_app/d/servers/$serverId"
     }
   }
 }

@@ -13,6 +13,7 @@
 		"ghcr.io/devcontainers-extra/features/mise:1": {},
 		"ghcr.io/devcontainer-community/devcontainer-features/starship.rs:1": {}
 	},
+	"postCreateCommand": ".devcontainer/postcreate.sh",
 	"customizations": {
 		"vscode": {
 			"extensions": [

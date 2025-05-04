@@ -4,15 +4,8 @@ import {
   IconInnerShadowTop,
   IconListDetails,
 } from '@tabler/icons-react';
-import { useMutation } from '@tanstack/react-query';
-import { useServerFn } from '@tanstack/react-start';
-import { useStore, Effect } from '@tanstack/react-store';
-import { useEffect } from 'react';
-
-import * as api from '../core/api';
 
 import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
 import {
   Sidebar,
   SidebarContent,
@@ -22,25 +15,24 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { isErrorResponse } from '@/types/response';
 
-import { AuthStore } from '@/core/store/AuthStore';
+import { UserContainer } from './UserContainer';
 
 const data = {
   navMain: [
     {
       title: 'Dashboard',
-      url: '/',
+      url: '/d',
       icon: IconDashboard,
     },
     {
       title: 'Servers',
-      url: '/servers',
+      url: '/d/servers',
       icon: IconListDetails,
     },
     {
       title: 'Mods',
-      url: '/mods',
+      url: '/d/mods',
       icon: IconChartBar,
     },
   ],
@@ -75,81 +67,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <UserContainer />
       </SidebarFooter>
     </Sidebar>
-  );
-}
-
-function UserContainer() {
-  const getAuthenticatedUser = useServerFn(api.steam.getAuthenticatedUser);
-  const loginFn = useServerFn(api.steam.login);
-  const loginMutation = useMutation({
-    mutationFn: loginFn,
-    onSuccess(data) {
-      if (isErrorResponse(data)) {
-        throw new Error(data.errorCode);
-      }
-      AuthStore.setState((state) => ({
-        ...state,
-        username: data.data.username,
-        isAuthenticated: true,
-      }));
-    },
-  });
-
-  const username = useStore(
-    AuthStore,
-    (state) => state.isAuthenticated && state.username,
-  );
-
-  useEffect(() => {
-    getAuthenticatedUser()
-      .then((data) => {
-        if (isErrorResponse(data)) {
-          return;
-        }
-        AuthStore.setState((state) => ({
-          ...state,
-          isAuthenticated: !!data.data.username,
-          username: data.data.username,
-        }));
-      })
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    const effect = new Effect({
-      fn: () => {
-        console.log('The AuthStore is now:', AuthStore.state);
-      },
-      // Array of `Store`s or `Derived`s
-      deps: [AuthStore],
-      // Should effect run immediately, default is false
-      eager: true,
-    });
-
-    return () => {
-      effect.mount();
-    };
-  }, []);
-
-  if (!username) {
-    return (
-      <NavUser
-        onLoginSubmit={(data) => {
-          console.log('login', data);
-          loginMutation.mutate({ data });
-        }}
-      />
-    );
-  }
-
-  return (
-    <NavUser
-      user={{
-        avatar:
-          'https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/female/512/39.jpg',
-        name: username,
-        email: '',
-      }}
-    />
   );
 }

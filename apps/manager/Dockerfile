@@ -22,7 +22,8 @@ COPY ./.yarnrc.yml ./yarn.lock ./package.json ./
 COPY ./apps/manager/package.json ./apps/manager/
 COPY ./pkgs/sdk/package.json ./pkgs/sdk/
 
-RUN mise trust --yes --silent
+RUN echo 'eval "$(mise activate bash)"' >> ~/.bashrc
+RUN mise trust --all --yes
 RUN mise install
 RUN mise run setup
 
@@ -33,7 +34,7 @@ COPY ./.mise ./.mise
 RUN mise run core:tasks
 RUN mise run manager:build
 
-RUN mkdir -p /store/{serverfiles, steam, servermods, servermissions, serverprofiles}
+RUN mkdir -p /store/{serverfiles,steam,servermods,servermissions,serverprofiles}
 
 ENV MODE=manager
 ENV STEAMSTORE=/store/steam

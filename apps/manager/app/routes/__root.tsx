@@ -6,13 +6,15 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
+import appCss from '@/app.css?url';
+
+import { ScreenLayout } from '@/components/app/Screen';
+import { Theme } from '@/components/app/ThemeSystem';
 import { FullScreenLoader } from '@/components/full-screen-loader';
 
 import type { AuthStore } from '@/core/store/AuthStore';
 import type { QueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-
-import appCss from '@/app.css?url';
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -56,14 +58,16 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html>
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
+    <Theme.Provider attribute="class" defaultTheme="system" enableSystem>
+      <ScreenLayout>
+        <head>
+          <HeadContent />
+        </head>
+        <ScreenLayout.Body>
+          {children}
+          <Scripts />
+        </ScreenLayout.Body>
+      </ScreenLayout>
+    </Theme.Provider>
   );
 }

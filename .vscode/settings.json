@@ -1,4 +1,8 @@
 {
+
+  "tailwindCSS.experimental.classRegex": [
+    ["([\"'`][^\"'`]*.*?[\"'`])", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
     "editor.snippetSuggestions": "bottom",
     "editor.suggest.localityBonus": true,
     "editor.suggest.filterGraceful": true,
