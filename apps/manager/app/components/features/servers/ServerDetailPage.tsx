@@ -22,14 +22,14 @@ import { PaginatedDataTable } from '../../PaginatedDataTable';
 import {
   DrawerController,
   DrawerControllerContent,
-} from '@/components/controlled-drawer';
-import { FullScreenLoader } from '@/components/full-screen-loader';
-import { Page } from '@/components/page';
-import { PageHeader } from '@/components/page-header';
-import { SectionCards } from '@/components/section-cards';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { DrawerTrigger } from '@/components/ui/drawer';
+} from ':components/controlled-drawer';
+import { FullScreenLoader } from ':components/full-screen-loader';
+import { Page } from ':components/page';
+import { PageHeader } from ':components/page-header';
+import { SectionCards } from ':components/section-cards';
+import { Badge } from ':components/ui/badge';
+import { Button } from ':components/ui/button';
+import { DrawerTrigger } from ':components/ui/drawer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,7 +37,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from ':components/ui/dropdown-menu';
 
 import { useGetDownloadedModsQuery } from './useGetDownloadedModsQuery';
 import { useGetServerModsQuery } from './useGetServerModsQuery';
@@ -134,7 +134,9 @@ function useCreateServerContainerMutation(server?: Server) {
 
 function ServerDetailHeader() {
   const details = useServerDetails();
-  const createServerContainerMutation = useCreateServerContainerMutation(details.server);
+  const createServerContainerMutation = useCreateServerContainerMutation(
+    details.server,
+  );
   const isCreatingContainer = createServerContainerMutation.isPending;
   return (
     <PageHeader
@@ -214,7 +216,7 @@ function ServerModCard() {
       description={`${mods.length} activated mods`}
       onClick={() => {
         navigate({
-          to: '/servers/$serverId/mods',
+          to: '/d/servers/$serverId/mods',
           params: { serverId: server.id },
         }).catch(console.error);
       }}

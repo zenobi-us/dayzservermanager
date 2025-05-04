@@ -46,17 +46,17 @@ import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from ':hooks/use-mobile';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import type { ChartConfig } from '@/components/ui/chart';
+import { Badge } from ':components/ui/badge';
+import { Button } from ':components/ui/button';
+import type { ChartConfig } from ':components/ui/chart';
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from '@/components/ui/chart';
-import { Checkbox } from '@/components/ui/checkbox';
+} from ':components/ui/chart';
+import { Checkbox } from ':components/ui/checkbox';
 import {
   Drawer,
   DrawerClose,
@@ -66,7 +66,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '@/components/ui/drawer';
+} from ':components/ui/drawer';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -74,17 +74,17 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from ':components/ui/dropdown-menu';
+import { Input } from ':components/ui/input';
+import { Label } from ':components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+} from ':components/ui/select';
+import { Separator } from ':components/ui/separator';
 import {
   Table,
   TableBody,
@@ -92,7 +92,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from ':components/ui/table';
 
 import { DataTableRow } from './data-table-row';
 

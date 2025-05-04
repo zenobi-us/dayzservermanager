@@ -2,8 +2,13 @@ import fs from 'fs/promises';
 import { join } from 'path';
 
 import { snakeCase } from 'lodash-es';
+import template from 'lodash-es/template';
 
-import { ServerConfigInvalidError, ServerConfigParseError, ServerContainerNotFoundError } from '../../../codes/src/errors/server';
+import {
+  ServerConfigInvalidError,
+  ServerConfigParseError,
+  ServerContainerNotFoundError,
+} from '../errors/server';
 import { createCppFileParser } from '../lib/cpp';
 import { dockerClient } from '../lib/docker';
 import { ServerConfigSchema } from '../schema/serverSchema';
@@ -11,7 +16,6 @@ import { ServerConfigSchema } from '../schema/serverSchema';
 import { Config } from './config';
 import { assertIsManagerMode } from './mode';
 import { listModsAtPath, listServerMods } from './mods';
-import template from 'lodash-es/template'
 
 import type {
   CreateServerPayload,
@@ -148,30 +152,33 @@ export async function createServer(details: CreateServerPayload) {
   return Promise.resolve(server);
 }
 
-export async function getServerContainerInfo({ serverId }: { serverId: string }) {
+export async function getServerContainerInfo({
+  serverId,
+}: {
+  serverId: string;
+}) {
   const containers = await dockerClient.listContainers({
     all: true,
-  })
+  });
   const container = containers.find((container) => {
     return container.Labels[Config.get('CONTAINER_SERVERLABEL')] === serverId;
   });
 
-  return container
+  return container;
 }
 
-
 const containerNameTmpl = template(Config.get('CONTAINER_SERVERNAME_TMPL'), {
-  interpolate: /\{\{(.+?)\}\}/g
-})
+  interpolate: /\{\{(.+?)\}\}/g,
+});
 
 export async function createServerContainer({
   serverId,
 }: {
   serverId: string;
 }) {
-  const serverImage = Config.get('CONTAINER_SERVERIMAGE')
-  const serverLabel = Config.get('CONTAINER_SERVERLABEL')
-  const containerName = containerNameTmpl({ serverId })
+  const serverImage = Config.get('CONTAINER_SERVERIMAGE');
+  const serverLabel = Config.get('CONTAINER_SERVERLABEL');
+  const containerName = containerNameTmpl({ serverId });
 
   try {
     const container = await dockerClient.createContainer({
@@ -223,23 +230,22 @@ export async function createServerContainer({
     });
 
     return container;
-  } catch (error) {
-    debugger
+  } catch {
+    //
   }
-  
 }
 
-export async function startServerContainer({serverId}: { serverId: string}){
-  const containerInfo = await getServerContainerInfo({ serverId })
+export async function startServerContainer({ serverId }: { serverId: string }) {
+  const containerInfo = await getServerContainerInfo({ serverId });
   if (!containerInfo) {
-    throw new ServerContainerNotFoundError()
+    throw new ServerContainerNotFoundError();
   }
 
-  const container = await dockerClient.getContainer(containerInfo?.Id)
+  const container = dockerClient.getContainer(containerInfo?.Id);
 
-  await container.start()
-  
-  return container
+  await container.start();
+
+  return container;
 }
 
 /**

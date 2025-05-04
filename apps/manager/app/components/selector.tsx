@@ -2,7 +2,7 @@
 import {
     TabsList,
     TabsTrigger,
-} from "@/components/ui/tabs"
+} from ":components/ui/tabs"
 import { Label } from "./ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { ReactNode } from "react"

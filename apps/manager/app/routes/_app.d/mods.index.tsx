@@ -3,9 +3,9 @@ import { createFileRoute } from '@tanstack/react-router';
 import { ModListDashboardPage } from '../../components/features/mods/ModListDashboardPage';
 import { mods } from '../../core/api';
 
-import { ErrorScreen } from '@/components/error-screen';
-import { FullScreenLoader } from '@/components/full-screen-loader';
-import { isErrorResponse } from '@/types/response';
+import { ErrorScreen } from ':components/error-screen';
+import { FullScreenLoader } from ':components/full-screen-loader';
+import { isErrorResponse } from ':types/response';
 
 export const Route = createFileRoute('/_app/d/mods/')({
   component: RouteComponent,

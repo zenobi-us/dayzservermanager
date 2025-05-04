@@ -1,6 +1,6 @@
 import React, { type ReactNode, type ComponentProps, Fragment } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from ':lib/utils';
 
 export function SeparatedBy({
   children,

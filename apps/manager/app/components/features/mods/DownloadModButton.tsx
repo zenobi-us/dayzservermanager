@@ -4,8 +4,8 @@ import { useServerFn } from '@tanstack/react-start';
 
 import * as api from '../../../core/api';
 
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Button } from ':components/ui/button';
+import { cn } from ':lib/utils';
 
 import type { ComponentProps } from 'react';
 

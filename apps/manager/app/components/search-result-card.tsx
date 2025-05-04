@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+import { cn } from ":lib/utils"
 import {
     Card,
     CardContent,
@@ -6,7 +6,7 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from ":components/ui/card"
 import { ComponentProps, PropsWithChildren, ReactNode } from "react"
 
 

@@ -1,12 +1,11 @@
-# https://moonrepo.dev/docs/config/workspace
-$schema: './cache/schemas/workspace.json'
+# yaml-language-server: $schema=./cache/schemas/workspace.json
 
 # Require a specific version of moon while running commands, otherwise fail.
 # versionConstraint: '>=1.0.0'
 
 vcs:
   manager: 'git'
-  defaultBranch: 'master'
+  defaultBranch: 'main'
   hooks:
     prePush:
       - 'moon run :lint --affected'
@@ -21,3 +20,4 @@ vcs:
 projects:
   - 'apps/*'
   - 'pkgs/*'
+  - '.'

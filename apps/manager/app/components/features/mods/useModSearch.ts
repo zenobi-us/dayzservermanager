@@ -4,9 +4,9 @@ import { useCallback, useState } from 'react';
 
 import * as api from '../../../core/api';
 
-import { isErrorResponse } from '@/types/response';
+import { isErrorResponse } from ':types/response';
 
-import type { ResponseCodes } from '@/core/api/mods/codes';
+import type { ResponseCodes } from ':core/api/mods/codes';
 import type { SteamWorkshopSearchResults } from '@dayzserver/sdk/schema';
 
 const computePageCount = ({

@@ -1,4 +1,4 @@
-type: 'library'
+type: 'tool'
 
 tasks:
   build:

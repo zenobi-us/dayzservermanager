@@ -1,4 +1,5 @@
 {
+  "extends": "./tsconfig.options.json",
   "compilerOptions": {
     "moduleResolution": "node",
     "module": "CommonJS",
@@ -10,9 +11,10 @@
     "strictNullChecks": true,
     "esModuleInterop": true,
     "composite": true,
-    "outDir": "../../.moon/cache/types/pkgs/sdk",
+    "outDir": "../../.moon/cache/types/pkgs/sdk"
   },
   "include": [
+    "../../types/**/*",
     "src/**/*.ts"
   ],
   "ts-node": {
@@ -21,10 +23,5 @@
     "compilerOptions": {
       "module": "CommonJS"
     }
-  },
-  "references": [
-    {
-      "path": "../sdk"
-    }
-  ]
+  }
 }

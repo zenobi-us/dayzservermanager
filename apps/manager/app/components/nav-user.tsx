@@ -1,6 +1,6 @@
 import { IconBrandSteam, IconLogout } from '@tabler/icons-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from ':components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,7 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from ':components/ui/dropdown-menu';
 
 import { LoginDrawer } from './features/auth/LoginDrawer';
 import { Button } from './ui/button';

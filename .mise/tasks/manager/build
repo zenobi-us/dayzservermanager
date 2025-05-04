@@ -2,4 +2,4 @@
 
 #MISE dir="apps/manager"
 
-vinxi build
+moon manager:build

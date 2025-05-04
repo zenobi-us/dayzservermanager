@@ -1,5 +1,5 @@
-import { FullScreenLoader } from '@/components/full-screen-loader';
-import { cn } from '@/lib/utils';
+import { FullScreenLoader } from ':components/full-screen-loader';
+import { cn } from ':lib/utils';
 
 import { ModSearchResultList } from './ModResultList';
 

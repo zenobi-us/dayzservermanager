@@ -1,7 +1,3 @@
-type: 'library'
-language: "docker"
-
-tasks:
-  build:
-    outputs:
-      - 'lib'
+type: "scaffolding"
+platform: system
+language: unknown

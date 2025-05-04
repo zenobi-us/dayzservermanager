@@ -1,10 +1,10 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
-import { ErrorScreen } from '@/components/error-screen';
-import { ServerList } from '@/components/features/servers/ServerList';
-import { getServersQueryOptions } from '@/components/features/servers/useGetServersQuery';
-import { isErrorResponse } from '@/types/response';
+import { ErrorScreen } from ':components/error-screen';
+import { ServerList } from ':components/features/servers/ServerList';
+import { getServersQueryOptions } from ':components/features/servers/useGetServersQuery';
+import { isErrorResponse } from ':types/response';
 
 export const Route = createFileRoute('/_app/d/servers/')({
   component: RouteComponent,

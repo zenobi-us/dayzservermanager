@@ -3,11 +3,11 @@ import { useServerFn } from '@tanstack/react-start';
 import { Effect, useStore } from '@tanstack/react-store';
 import { useEffect } from 'react';
 
-import { AuthStore } from '@/core/store/AuthStore';
+import { AuthStore } from ':core/store/AuthStore';
 
 import * as api from '../../../core/api';
 
-import { isErrorResponse } from '@/types/response';
+import { isErrorResponse } from ':types/response';
 
 export function useLoginApi() {
   const authenticatedUserFn = useServerFn(api.steam.getAuthenticatedUser);

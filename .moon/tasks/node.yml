@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../cache/schemas/tasks.json
 implicitDeps:
   - '^:build'
 

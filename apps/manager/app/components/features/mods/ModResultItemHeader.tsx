@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { IconDownload } from "@tabler/icons-react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from ":components/ui/button";
 
 export const ModResultItemHeader = ({ children, onDownloadClick }: PropsWithChildren<
     {

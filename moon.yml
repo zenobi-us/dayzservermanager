@@ -1,1 +1,6 @@
-$schema: '.moon/cache/schemas/workspace.json'
+tasks:
+  versionCheck:
+    command: 'yarn version check'
+    inputs: []
+    options:
+      cache: false

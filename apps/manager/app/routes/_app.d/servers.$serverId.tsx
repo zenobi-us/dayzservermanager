@@ -2,9 +2,9 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import { server } from '../../core/api';
 
-import { ErrorScreen } from '@/components/error-screen';
-import { ServerDetailPage } from '@/components/features/servers/ServerDetailPage';
-import { isErrorResponse } from '@/types/response';
+import { ErrorScreen } from ':components/error-screen';
+import { ServerDetailPage } from ':components/features/servers/ServerDetailPage';
+import { isErrorResponse } from ':types/response';
 
 export const Route = createFileRoute('/_app/d/servers/$serverId')({
   component: RouteComponent,

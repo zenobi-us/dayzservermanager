@@ -1,4 +1,4 @@
-import type { ServerConfigSchema } from '@dayzserver/sdk/schema';
+import type { ServerConfigSchema } from '../schema';
 import type { z } from 'zod';
 
 export class MissingServerDirectoryError extends Error {

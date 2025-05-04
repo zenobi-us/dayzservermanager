@@ -1,16 +1,16 @@
 import { IconDotsVertical } from '@tabler/icons-react';
 
-import { DragHandle } from '@/components/data-table-drag-handle';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { DragHandle } from ':components/data-table-drag-handle';
+import { Badge } from ':components/ui/badge';
+import { Button } from ':components/ui/button';
+import { Checkbox } from ':components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from ':components/ui/dropdown-menu';
 
 import type { ModItem } from '@dayzserver/sdk/schema';
 import type { ColumnDef } from '@tanstack/react-table';

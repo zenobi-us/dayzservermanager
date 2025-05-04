@@ -5,7 +5,7 @@ import {
   IconListDetails,
 } from '@tabler/icons-react';
 
-import { NavMain } from '@/components/nav-main';
+import { NavMain } from ':components/nav-main';
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +14,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
+} from ':components/ui/sidebar';
 
 import { UserContainer } from './UserContainer';
 

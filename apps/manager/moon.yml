@@ -7,6 +7,9 @@ tags:
 stack: backend
 type: application
 
+dependsOn:
+  - sdk
+
 workspace:
   inheritedTasks:
     exclude: ['lint']

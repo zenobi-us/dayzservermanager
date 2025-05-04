@@ -2,7 +2,7 @@ import {
   NoModeError,
   NotManagerModeError,
   NotServerModeError,
-} from '../../../codes/src/errors/server';
+} from '../errors/server';
 
 import { Config } from './config';
 

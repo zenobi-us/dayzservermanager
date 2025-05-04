@@ -1,4 +1,4 @@
-import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from ":components/ui/pagination";
 
 
 export const ModSearchPagination = ({

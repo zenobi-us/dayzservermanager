@@ -2,7 +2,7 @@ import * as ProgressPrimitive from '@radix-ui/react-progress';
 import * as React from 'react';
 import { tv } from 'tailwind-variants';
 
-import { cn } from '@/lib/utils/index';
+import { cn } from ':lib/utils/index';
 
 import type { VariantProps } from 'tailwind-variants';
 

@@ -1,9 +1,9 @@
 import { IconPlus } from '@tabler/icons-react';
 
-import { DrawerCloseButton } from '@/components/drawer-close-button';
-import { ErrorNotice } from '@/components/error-notice';
-import { FullScreenLoader } from '@/components/full-screen-loader';
-import { Button } from '@/components/ui/button';
+import { DrawerCloseButton } from ':components/drawer-close-button';
+import { ErrorNotice } from ':components/error-notice';
+import { FullScreenLoader } from ':components/full-screen-loader';
+import { Button } from ':components/ui/button';
 import {
   Drawer,
   DrawerContent,
@@ -12,7 +12,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '@/components/ui/drawer';
+} from ':components/ui/drawer';
 
 import { ModSearchForm } from './ModSearchForm';
 import { ModSearchPagination } from './ModSearchPagination';

@@ -1,12 +1,12 @@
-import { Button } from '@/components/ui/button';
+import { Button } from ':components/ui/button';
 import {
   Drawer,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerTrigger,
-} from '@/components/ui/drawer';
-import { cn } from '@/lib/utils';
+} from ':components/ui/drawer';
+import { cn } from ':lib/utils';
 
 import { LoginFormFields } from './LoginFormFields';
 import { LoginFormProvider } from './LoginFormProvider';

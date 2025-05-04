@@ -3,7 +3,7 @@ import { useServerFn } from '@tanstack/react-start';
 
 import * as api from '../../../core/api';
 
-import { isErrorResponse } from '@/types/response';
+import { isErrorResponse } from ':types/response';
 
 export function useGetServerModsQuery({ serverId }: { serverId: string }) {
   const getModsListServerFn = useServerFn(api.mods.getServerModList);

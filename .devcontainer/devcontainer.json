@@ -23,7 +23,8 @@
 				"KalimahApps.tailwind-config-viewer",
 				"esbenp.prettier-vscode",
 				"dbaeumer.vscode-eslint",
-				"maattdd.gitless"
+				"maattdd.gitless",
+				"foxundermoon.shell-format"
 			]
 		}
 	}

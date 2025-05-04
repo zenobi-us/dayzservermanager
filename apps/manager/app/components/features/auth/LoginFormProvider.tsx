@@ -1,4 +1,4 @@
-import { Form } from '@/components/ui/form';
+import { Form } from ':components/ui/form';
 
 import { LoginFormContext } from './LoginFormContext';
 import { useLoginForm } from './useLoginForm';

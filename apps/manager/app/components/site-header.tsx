@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Fragment } from 'react';
 
-import { useBreadcrumbs } from '@/hooks/use-breadcrumbs';
+import { useBreadcrumbs } from ':hooks/use-breadcrumbs';
 
 import {
   Breadcrumb,
@@ -9,14 +9,14 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+} from ':components/ui/breadcrumb';
 
 import { UserContainer } from './UserContainer';
 import { ThemeSelector } from './app/ThemeSelector';
 import { Container } from './container';
 import { Button } from './ui/button';
 
-import type { IBreadcrumb } from '@/hooks/use-breadcrumbs';
+import type { IBreadcrumb } from ':hooks/use-breadcrumbs';
 
 export function SiteHeader() {
   const breadcrumbs = useBreadcrumbs();

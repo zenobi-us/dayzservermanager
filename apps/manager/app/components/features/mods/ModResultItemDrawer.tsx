@@ -9,8 +9,8 @@ import {
 } from '@tabler/icons-react';
 import { useCallback } from 'react';
 
-import { DrawerCloseButton } from '@/components/drawer-close-button';
-import { Badge } from '@/components/ui/badge';
+import { DrawerCloseButton } from ':components/drawer-close-button';
+import { Badge } from ':components/ui/badge';
 import {
   Card,
   CardContent,
@@ -18,7 +18,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from ':components/ui/card';
 import {
   DrawerContent,
   DrawerDescription,
@@ -26,8 +26,8 @@ import {
   DrawerTitle,
   DrawerTrigger,
   NestedDrawer,
-} from '@/components/ui/drawer';
-import { cn } from '@/lib/utils';
+} from ':components/ui/drawer';
+import { cn } from ':lib/utils';
 
 import { DownloadModButton } from './DownloadModButton';
 import { ModResultItemHeader } from './ModResultItemHeader';

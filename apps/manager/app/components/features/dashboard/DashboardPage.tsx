@@ -1,6 +1,6 @@
 import { useNavigate } from '@tanstack/react-router';
 
-import { SectionCards } from '@/components/section-cards';
+import { SectionCards } from ':components/section-cards';
 
 import type { ModItemList, Server } from '@dayzserver/sdk/schema';
 

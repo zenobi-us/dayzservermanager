@@ -4,5 +4,8 @@
     "forceConsistentCasingInFileNames": true,
     "composite": true,
     "outDir": "../../.moon/cache/types/apps/server"
-  }
+  },
+  "include": [
+    "../../types/**/*"
+  ]
 }

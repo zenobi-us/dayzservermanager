@@ -1,4 +1,4 @@
-$schema: './cache/schemas/toolchain.json'
+# yaml-language-server: $schema=./cache/schemas/toolchain.json
 
 typescript:
   projectConfigFileName: 'tsconfig.json'
@@ -7,6 +7,10 @@ typescript:
   syncProjectReferences: true
   syncProjectReferencesToPaths: true
   includeProjectReferenceSources: true
+  createMissingConfig: true
+  includeSharedTypes: true
+  rootOptionsConfigFileName: tsconfig.options.json
+  root: .
 
 node:
   packageManager: 'yarn'

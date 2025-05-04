@@ -1,11 +1,11 @@
 import { useNavigate } from '@tanstack/react-router';
 
-import { Container } from '@/components/container';
-import { createFiltering } from '@/components/filteirng-list';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ItemList } from '@/components/ui/item-list';
-import { SeparatedBy } from '@/components/ui/separated-by';
+import { Container } from ':components/container';
+import { createFiltering } from ':components/filteirng-list';
+import { Badge } from ':components/ui/badge';
+import { Button } from ':components/ui/button';
+import { ItemList } from ':components/ui/item-list';
+import { SeparatedBy } from ':components/ui/separated-by';
 
 import type { Server } from '@dayzserver/sdk/schema';
 

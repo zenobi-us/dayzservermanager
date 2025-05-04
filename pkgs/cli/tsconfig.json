@@ -1,4 +1,5 @@
 {
+  "extends": "./tsconfig.options.json",
   "compilerOptions": {
     "moduleResolution": "node",
     "module": "CommonJS",
@@ -13,6 +14,7 @@
     "outDir": "../../.moon/cache/types/pkgs/cli"
   },
   "include": [
+    "../../types/**/*",
     "src/*.ts"
   ],
   "ts-node": {

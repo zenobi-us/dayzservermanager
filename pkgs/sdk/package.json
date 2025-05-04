@@ -9,5 +9,11 @@
   "dependencies": {
     "@types/nconf": "^0.10.7",
     "nconf": "^0.13.0"
+  },
+  "packemon": {
+    "inputs": {
+      "index": "./src/index.ts"
+    },
+    "platform": "node"
   }
 }

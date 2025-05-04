@@ -96,7 +96,7 @@ export default tseslint.config(
         {
           pathGroups: [
             {
-              pattern: '@/{components,types,utils,lib}/**',
+              pattern: ':**',
               group: 'parent',
               position: 'after',
             },

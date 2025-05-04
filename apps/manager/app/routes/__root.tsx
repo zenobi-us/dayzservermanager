@@ -6,13 +6,13 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
-import appCss from '@/app.css?url';
+import appCss from ':app.css?url';
 
-import { ScreenLayout } from '@/components/app/Screen';
-import { Theme } from '@/components/app/ThemeSystem';
-import { FullScreenLoader } from '@/components/full-screen-loader';
+import { ScreenLayout } from ':components/app/Screen';
+import { Theme } from ':components/app/ThemeSystem';
+import { FullScreenLoader } from ':components/full-screen-loader';
 
-import type { AuthStore } from '@/core/store/AuthStore';
+import type { AuthStore } from ':core/store/AuthStore';
 import type { QueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 

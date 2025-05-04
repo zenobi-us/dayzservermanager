@@ -1877,12 +1877,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dayzserver/codes@workspace:pkgs/codes":
-  version: 0.0.0-use.local
-  resolution: "@dayzserver/codes@workspace:pkgs/codes"
-  languageName: unknown
-  linkType: soft
-
 "@dayzserver/manager@workspace:apps/manager":
   version: 0.0.0-use.local
   resolution: "@dayzserver/manager@workspace:apps/manager"

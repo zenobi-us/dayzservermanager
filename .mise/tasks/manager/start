@@ -1,5 +1,4 @@
 #!/bin/bash
 
-#MISE dir="apps/manager"
 
-vinxi start
+moon manager:start

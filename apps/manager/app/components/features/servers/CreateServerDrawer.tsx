@@ -11,9 +11,9 @@ import { useForm } from 'react-hook-form';
 
 import { createServer } from '../../../core/api/server/routes';
 
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Button } from ':components/ui/button';
+import { Checkbox } from ':components/ui/checkbox';
+import { CollapsibleTrigger } from ':components/ui/collapsible';
 import {
   Drawer,
   DrawerContent,
@@ -22,7 +22,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '@/components/ui/drawer';
+} from ':components/ui/drawer';
 import {
   Form,
   FormControl,
@@ -31,8 +31,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from ':components/ui/form';
+import { Input } from ':components/ui/input';
 
 import type { ElementType, PropsWithChildren, ReactNode } from 'react';
 
