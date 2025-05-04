@@ -10,10 +10,10 @@ import {
   DropdownMenuTrigger,
 } from ':components/ui/dropdown-menu';
 
-import { LoginDrawer } from './features/auth/LoginDrawer';
+import { LoginFormDrawer } from './features/auth/LoginFormDrawer';
 import { Button } from './ui/button';
 
-import type { LoginFormData } from './features/auth/LoginFormData';
+import type { LoginFormData } from './features/auth/LoginFormSchema';
 
 export function NavUser(
   props:
@@ -23,6 +23,7 @@ export function NavUser(
           email: string;
           avatar: string;
         };
+        onLogoutClick: () => void;
       }
     | {
         onLoginSubmit: (data: LoginFormData) => void;
@@ -30,7 +31,7 @@ export function NavUser(
 ) {
   if (!('user' in props)) {
     return (
-      <LoginDrawer onSubmit={props.onLoginSubmit}>
+      <LoginFormDrawer onSubmit={props.onLoginSubmit}>
         <Button
           size="lg"
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground justify-between cursor-pointer"
@@ -38,7 +39,7 @@ export function NavUser(
           Login
           <IconBrandSteam />
         </Button>
-      </LoginDrawer>
+      </LoginFormDrawer>
     );
   }
 
@@ -74,7 +75,7 @@ export function NavUser(
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={props.onLogoutClick}>
           <IconLogout />
           Log out
         </DropdownMenuItem>

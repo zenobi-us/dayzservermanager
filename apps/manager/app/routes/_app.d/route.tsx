@@ -3,6 +3,7 @@ import { useEffect, useMemo } from 'react';
 
 import { AppLayout } from ':components/app/AppLayout';
 import { Container } from ':components/container';
+import { LoginForm } from ':components/features/auth/LoginForm';
 import { useLoginApi } from ':components/features/auth/useLoginApi';
 import { SiteHeader } from ':components/site-header';
 import { Progress } from ':components/ui/progress';
@@ -44,12 +45,28 @@ function RouteComponent() {
             <Progress className="h-4" indeterminant />
           </Container>
         )}
-        {!isError && !loginApi.userQuery.isPending && (
-          <>
-            <SiteHeader />
-            <Outlet />
-          </>
-        )}
+
+        {!isError &&
+          !loginApi.userQuery.isPending &&
+          !loginApi.isAuthenticated && (
+            <Container className="max-w-64 p-8 flex flex-grow items-center justify-center">
+              <LoginForm
+                onSubmit={(data) => {
+                  loginApi.loginMutation.mutate({ data });
+                }}
+                isSending={loginApi.loginMutation.isPending}
+              />
+            </Container>
+          )}
+
+        {!isError &&
+          !!loginApi.isAuthenticated &&
+          !loginApi.userQuery.isPending && (
+            <>
+              <SiteHeader />
+              <Outlet />
+            </>
+          )}
       </AppLayout.Main>
     </AppLayout>
   );

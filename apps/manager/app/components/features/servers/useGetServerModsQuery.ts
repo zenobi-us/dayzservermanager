@@ -1,20 +1,27 @@
 import { useQuery } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 
-import * as api from '../../../core/api';
-
 import { isErrorResponse } from ':types/response';
 
-export function useGetServerModsQuery({ serverId }: { serverId: string }) {
+import * as api from '../../../core/api';
+
+export function useGetServerModsQuery({ serverId }: { serverId?: string }) {
   const getModsListServerFn = useServerFn(api.mods.getServerModList);
   return useQuery({
-    queryFn: () => getModsListServerFn({ data: { serverId } }),
+    enabled: !!serverId,
+    queryFn: () => {
+      if (!serverId) {
+        return null;
+      }
+
+      return getModsListServerFn({ data: { serverId } });
+    },
     queryKey: useGetServerModsQuery.createKey({ serverId }),
     select: (data) => {
       if (isErrorResponse(data)) {
         return [];
       }
-      return data.data.mods || [];
+      return data?.data.mods || [];
     },
     staleTime: Infinity,
     refetchOnWindowFocus: false,
@@ -24,7 +31,7 @@ export function useGetServerModsQuery({ serverId }: { serverId: string }) {
 useGetServerModsQuery.createKey = function ({
   serverId,
 }: {
-  serverId: string;
+  serverId?: string;
 }) {
-  return ['get-installed-mods', serverId];
+  return ['server-mods', serverId];
 };

@@ -1,3 +1,5 @@
+import { Codes } from '../codes/server';
+
 import type { ServerConfigSchema } from '../schema';
 import type { z } from 'zod';
 
@@ -49,5 +51,39 @@ export class NoModeError extends Error {
 }
 
 export class ServerContainerNotFoundError extends Error {
-  code = 'ServerContainerNotFoundError';
+  code = Codes.ServerContainerNotFoundError;
+}
+
+export class ServerContainerStartError extends Error {
+  code = Codes.StartServerContainerError;
+  constructor({ serverId, error }: { serverId: string; error?: Error }) {
+    super(`Server[${serverId}] error starting server`);
+    this.cause = error?.cause;
+    this.stack = error?.stack;
+  }
+}
+
+export class ServerContainerRemoveError extends Error {
+  code = Codes.RemoveServerContainerError;
+  constructor({ serverId, error }: { serverId: string; error?: Error }) {
+    super(`Server[${serverId}] error removing server`);
+    this.cause = error?.cause;
+    this.stack = error?.stack;
+  }
+}
+export class ServerContainerStopError extends Error {
+  code = Codes.StopServerContainerError;
+  constructor({ serverId, error }: { serverId: string; error?: Error }) {
+    super(`Server[${serverId}] error stopping server`);
+    this.cause = error?.cause;
+    this.stack = error?.stack;
+  }
+}
+export class ServerContainerRestartError extends Error {
+  code = Codes.RestartServerContainerError;
+  constructor({ serverId, error }: { serverId: string; error?: Error }) {
+    super(`Server[${serverId}] error restarting server`);
+    this.cause = error?.cause;
+    this.stack = error?.stack;
+  }
 }

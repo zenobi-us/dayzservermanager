@@ -1,15 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 
-import * as api from '../../../core/api';
-
 import { isErrorResponse } from ':types/response';
+
+import * as api from '../../../core/api';
 
 export function useGetDownloadedModsQuery() {
   const getModsListServerFn = useServerFn(api.mods.getModList);
   return useQuery({
     queryFn: () => getModsListServerFn(),
-    queryKey: ['get-downloaded-mods'],
+    queryKey: useGetDownloadedModsQuery.createKey(),
     select: (data) => {
       if (isErrorResponse(data)) {
         return [];
@@ -20,3 +20,4 @@ export function useGetDownloadedModsQuery() {
     refetchOnWindowFocus: false,
   });
 }
+useGetDownloadedModsQuery.createKey = () => ['downloaded-mods'];

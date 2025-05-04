@@ -1,4 +1,5 @@
 import sdk, { Config } from '@dayzserver/sdk';
+import * as codes from '@dayzserver/sdk/codes';
 import { LoginParametersSchema } from '@dayzserver/sdk/schema';
 import { createServerFn } from '@tanstack/react-start';
 
@@ -8,8 +9,6 @@ import {
   errorResponseBodyError,
 } from '../../response';
 
-import { ResponseCodes } from './codes';
-
 export const login = createServerFn({ method: 'POST' })
   .validator(LoginParametersSchema)
   .handler(async (context) => {
@@ -17,17 +16,30 @@ export const login = createServerFn({ method: 'POST' })
       const username = await sdk.auth.login(context.data);
       return createResponseBody({
         data: { username },
-        code: ResponseCodes.LoginSuccess,
       });
     } catch (error) {
       const body = createErrorResponseBody({
-        code: ResponseCodes.LoginFailed,
+        code: codes.auth.LoginFailed,
         error: errorResponseBodyError(error),
       });
 
       return body;
     }
   });
+
+export const logout = createServerFn({ method: 'POST' }).handler(async () => {
+  try {
+    await sdk.auth.logout();
+    return createResponseBody({});
+  } catch (error) {
+    const body = createErrorResponseBody({
+      code: codes.auth.LogoutFailed,
+      error: errorResponseBodyError(error),
+    });
+
+    return body;
+  }
+});
 
 export const getAuthenticatedUser = createServerFn({
   method: 'GET',
@@ -36,12 +48,11 @@ export const getAuthenticatedUser = createServerFn({
     const username = Config.get('steamUsername');
     const body = createResponseBody({
       data: { username },
-      code: ResponseCodes.GetAuthenticatedUserSuccess,
     });
     return Promise.resolve(body);
   } catch (error) {
     const body = createErrorResponseBody({
-      code: ResponseCodes.GetAuthenticatedUserError,
+      code: codes.auth.GetAuthenticatedUserError,
       error: errorResponseBodyError(error),
     });
     return Promise.resolve(body);

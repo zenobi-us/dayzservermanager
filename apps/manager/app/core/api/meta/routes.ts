@@ -1,9 +1,8 @@
 import sdk from '@dayzserver/sdk';
+import * as codes from '@dayzserver/sdk/codes';
 import { createServerFn } from '@tanstack/react-start';
 
-import { createResponseBody } from '../../response';
-
-import { ResponseCodes } from './codes';
+import { createErrorResponseBody, createResponseBody } from '../../response';
 
 /**
  * Get the status of things:
@@ -17,12 +16,11 @@ export const getServerMeta = createServerFn({ method: 'GET' }).handler(
       const status = await sdk.meta.getMetaStatus();
       const body = createResponseBody({
         data: status,
-        code: ResponseCodes.ServerBaseFilesUpdateSuccess,
       });
       return body;
     } catch (error) {
-      const body = createResponseBody({
-        code: ResponseCodes.ServerStatusError,
+      const body = createErrorResponseBody({
+        code: codes.meta.ServerStatusError,
         data: error instanceof Error ? error : 'Something went wrong.',
       });
       return body;

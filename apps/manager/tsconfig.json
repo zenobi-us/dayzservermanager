@@ -9,6 +9,7 @@
     "strict": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
+    "composite": false,
     "declaration": false,
     "types": [
       "vinxi"

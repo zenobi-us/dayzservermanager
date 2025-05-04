@@ -6,6 +6,7 @@ import tseslint from 'typescript-eslint';
 import { flatConfigs as importPluginFlatConfigs } from 'eslint-plugin-import';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
 import pluginRouter from '@tanstack/eslint-plugin-router'
+// import moonPlugin from 'eslint-config-moon';
 
 export default tseslint.config(
   {

@@ -8,6 +8,10 @@ import {
   ServerConfigInvalidError,
   ServerConfigParseError,
   ServerContainerNotFoundError,
+  ServerContainerRemoveError,
+  ServerContainerRestartError,
+  ServerContainerStartError,
+  ServerContainerStopError,
 } from '../errors/server';
 import { createCppFileParser } from '../lib/cpp';
 import { dockerClient } from '../lib/docker';
@@ -90,7 +94,14 @@ export async function getServerDetail({ serverId }: { serverId: string }) {
     };
   }
 
-  const container = await getServerContainerInfo({ serverId });
+  let container:
+    | Awaited<ReturnType<typeof getServerContainerInfo>>
+    | undefined = undefined;
+  try {
+    container = await getServerContainerInfo({ serverId });
+  } catch {
+    //
+  }
 
   const mods = await listServerMods({
     serverId,
@@ -160,11 +171,17 @@ export async function getServerContainerInfo({
   const containers = await dockerClient.listContainers({
     all: true,
   });
-  const container = containers.find((container) => {
+  const containerInfo = containers.find((container) => {
     return container.Labels[Config.get('CONTAINER_SERVERLABEL')] === serverId;
   });
 
-  return container;
+  if (!containerInfo) {
+    throw new ServerContainerNotFoundError();
+  }
+
+  const container = dockerClient.getContainer(containerInfo?.Id);
+
+  return await container.inspect();
 }
 
 const containerNameTmpl = template(Config.get('CONTAINER_SERVERNAME_TMPL'), {
@@ -233,6 +250,8 @@ export async function createServerContainer({
   } catch {
     //
   }
+
+  return null;
 }
 
 export async function startServerContainer({ serverId }: { serverId: string }) {
@@ -241,11 +260,113 @@ export async function startServerContainer({ serverId }: { serverId: string }) {
     throw new ServerContainerNotFoundError();
   }
 
+  try {
+    const container = dockerClient.getContainer(containerInfo?.Id);
+    const inspection = await container.inspect();
+
+    if (
+      inspection.State.Running ||
+      inspection.State.Paused ||
+      inspection.State.Restarting
+    ) {
+      return;
+    }
+
+    await container.start();
+
+    return container;
+  } catch (error) {
+    throw new ServerContainerStartError({
+      serverId,
+      error: error instanceof Error ? error : undefined,
+    });
+  }
+}
+
+export async function removeServerContainer({
+  serverId,
+}: {
+  serverId: string;
+}) {
+  const containerInfo = await getServerContainerInfo({ serverId });
+  if (!containerInfo) {
+    throw new ServerContainerNotFoundError();
+  }
+
   const container = dockerClient.getContainer(containerInfo?.Id);
 
-  await container.start();
+  await stopServerContainer({ serverId });
 
-  return container;
+  try {
+    await container.remove();
+
+    return container;
+  } catch (error) {
+    throw new ServerContainerRemoveError({
+      serverId,
+      error: error instanceof Error ? error : undefined,
+    });
+  }
+}
+export async function restartServerContainer({
+  serverId,
+}: {
+  serverId: string;
+}) {
+  const containerInfo = await getServerContainerInfo({ serverId });
+  if (!containerInfo) {
+    throw new ServerContainerNotFoundError();
+  }
+
+  try {
+    const container = dockerClient.getContainer(containerInfo?.Id);
+    const inspection = await container.inspect();
+    if (inspection.State.Restarting) {
+      return;
+    }
+
+    if (!inspection.State.Running || !inspection.State.Paused) {
+      return;
+    }
+
+    await container.restart();
+
+    return container;
+  } catch (error) {
+    throw new ServerContainerRestartError({
+      serverId,
+      error: error instanceof Error ? error : undefined,
+    });
+  }
+}
+
+export async function stopServerContainer({ serverId }: { serverId: string }) {
+  const containerInfo = await getServerContainerInfo({ serverId });
+  if (!containerInfo) {
+    throw new ServerContainerNotFoundError();
+  }
+
+  try {
+    const container = dockerClient.getContainer(containerInfo?.Id);
+    const inspection = await container.inspect();
+
+    if (
+      !inspection.State.Running ||
+      !inspection.State.Paused ||
+      !inspection.State.Restarting
+    ) {
+      return;
+    }
+
+    await container.stop();
+
+    return container;
+  } catch (error) {
+    throw new ServerContainerStopError({
+      serverId,
+      error: error instanceof Error ? error : undefined,
+    });
+  }
 }
 
 /**

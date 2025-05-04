@@ -1,18 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { DashboardPage } from '../../components/features/dashboard/DashboardPage';
-import { server } from '../../core/api';
-
 import { ErrorScreen } from ':components/error-screen';
 import { isErrorResponse } from ':types/response';
+
+import { DashboardPage } from '../../components/features/dashboard/DashboardPage';
+import { server, mods } from '../../core/api';
 
 export const Route = createFileRoute('/_app/d/')({
   component: RouteComponent,
   loader: async () => {
-    const servers = await server.getAllServers();
+    const [serversData, modsData] = await Promise.all([
+      server.getAllServers(),
+      mods.getModList(),
+    ]);
 
     return {
-      ...servers,
+      ...serversData.data,
+      ...modsData.data,
     };
   },
 });
@@ -24,5 +28,5 @@ function RouteComponent() {
     return <ErrorScreen />;
   }
 
-  return <DashboardPage servers={state.data?.servers} />;
+  return <DashboardPage servers={state.servers} mods={state.mods} />;
 }

@@ -2,7 +2,7 @@
   "extends": "./tsconfig.options.json",
   "compilerOptions": {
     "moduleResolution": "node",
-    "module": "CommonJS",
+    "module": "ESNext",
     "target": "ES2022",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,

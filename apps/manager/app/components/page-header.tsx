@@ -1,3 +1,5 @@
+import { Container } from './container';
+
 import type { PropsWithChildren, ReactNode } from 'react';
 
 export function PageHeader({
@@ -9,13 +11,13 @@ export function PageHeader({
   actions?: ReactNode;
 }>) {
   return (
-    <div className="flex flex-col lg:px-6 gap-4 px-4">
+    <Container className="flex-col gap-4">
       <div className="flex gap-4 justify-start items-center">
-        <h1 className="text-4xl">{title}</h1>
+        <h1 className="text-4xl text-accent-foreground">{title}</h1>
         {actions}
       </div>
       {children}
       <hr />
-    </div>
+    </Container>
   );
 }

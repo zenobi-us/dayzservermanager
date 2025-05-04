@@ -1,24 +1,17 @@
-import { ServerExistanceStatus } from '@dayzserver/sdk/schema';
 import {
-  IconDotsVertical,
+  IconBusStop,
   IconDownload,
   IconDownloadOff,
   IconFidgetSpinner,
   IconLoader,
-  IconPackageImport,
-  IconPackages,
-  IconPlayerPlay,
-  IconPlayerStop,
-  IconUpload,
+  IconReload,
+  IconShip,
 } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import { createContext, useContext, useMemo } from 'react';
 
-import * as api from '../../../core/api';
-import { PaginatedDataTable } from '../../PaginatedDataTable';
-
+import { Container } from ':components/container';
 import {
   DrawerController,
   DrawerControllerContent,
@@ -26,57 +19,50 @@ import {
 import { FullScreenLoader } from ':components/full-screen-loader';
 import { Page } from ':components/page';
 import { PageHeader } from ':components/page-header';
-import { SectionCards } from ':components/section-cards';
+import { Text } from ':components/text';
 import { Badge } from ':components/ui/badge';
-import { Button } from ':components/ui/button';
+import { AsyncButton, Button } from ':components/ui/button';
+import { Card, CardContent } from ':components/ui/card';
+import { DefinitionData } from ':components/ui/definition-data-list';
+import { Divider } from ':components/ui/divider';
 import { DrawerTrigger } from ':components/ui/drawer';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from ':components/ui/dropdown-menu';
+import { SectionHeading } from ':components/ui/headings';
+import { SeparatedBy } from ':components/ui/separated-by';
+
+import * as api from '../../../core/api';
+import { PaginatedDataTable } from '../../PaginatedDataTable';
 
 import { useGetDownloadedModsQuery } from './useGetDownloadedModsQuery';
+import { useGetServerDetailQuery } from './useGetServerDetailQuery';
 import { useGetServerModsQuery } from './useGetServerModsQuery';
+import {
+  useCreateServerContainerMutation,
+  useRemoveServerContainerMutation,
+  useRestartServerContainerMutation,
+  useStartServerContainerMutation,
+  useStopServerContainerMutation,
+} from './useServerContainerMutation';
 
 import type { ModItem, Server } from '@dayzserver/sdk/schema';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { PropsWithChildren } from 'react';
 
 const ServerDetailContext = createContext<{
-  server: Server;
+  server: Server | null | undefined;
   isLoading?: boolean;
-  status: ServerExistanceStatus;
 } | null>(null);
 
-const computeServerStatus = (server?: Server) => {
-  if (server && server.container?.Created) {
-    return ServerExistanceStatus.Exists;
-  }
-
-  if (server && server.container && !server.container.Created) {
-    return ServerExistanceStatus.Creating;
-  }
-
-  return ServerExistanceStatus.DoesNotExist;
-};
-
 const ServerDetailProvider = ({
-  server,
+  serverId,
   children,
-}: PropsWithChildren<{ server: Server }>) => {
-  const status = computeServerStatus(server);
-  const isLoading = status === ServerExistanceStatus.Creating;
+}: PropsWithChildren<{ serverId: string }>) => {
+  const serverQuery = useGetServerDetailQuery({ serverId });
 
   return (
     <ServerDetailContext.Provider
       value={{
-        server,
-        status,
-        isLoading,
+        server: serverQuery.data,
+        isLoading: serverQuery.isPending,
       }}
     >
       {children}
@@ -92,151 +78,116 @@ const useServerDetails = () => {
   return context;
 };
 
-export function ServerDetailPage({ server }: { server: Server }) {
+export function ServerDetailPageContainer({ serverId }: { serverId: string }) {
   return (
-    <ServerDetailProvider server={server}>
-      <Page>
-        <ServerDetailHeader />
-        <SectionCards>
-          <ServerMapCard />
-          <ServerModCard />
-        </SectionCards>
-      </Page>
+    <ServerDetailProvider serverId={serverId}>
+      <ServerDetailPage />
     </ServerDetailProvider>
   );
 }
-
-function useCreateServerContainerMutation(server?: Server) {
-  const queryClient = useQueryClient();
-  const createServerContainerFn = useServerFn(api.server.createServerContainer);
-  return useMutation({
-    mutationFn: async () => {
-      if (!server) {
-        return;
-      }
-
-      return await createServerContainerFn({
-        data: {
-          serverId: server.id,
-        },
-      });
-    },
-    async onSuccess() {
-      if (!server) {
-        return;
-      }
-
-      await queryClient.invalidateQueries({ queryKey: ['servers'] });
-      await queryClient.invalidateQueries({ queryKey: ['server', server.id] });
-    },
-  });
+function ServerDetailPage() {
+  return (
+    <Page>
+      <ServerDetailHeader />
+      <Container className="grid grid-cols-2">
+        <ServerDetails />
+        <ServerContainerCard />
+      </Container>
+      <Divider />
+      <ServerModList />
+    </Page>
+  );
 }
 
 function ServerDetailHeader() {
   const details = useServerDetails();
-  const createServerContainerMutation = useCreateServerContainerMutation(
-    details.server,
-  );
-  const isCreatingContainer = createServerContainerMutation.isPending;
-  return (
-    <PageHeader
-      title={details.server.id}
-      actions={
-        <div>
-          <AddServerModDrawer>
-            <Button>
-              <IconPackageImport /> Add Mod
-            </Button>
-          </AddServerModDrawer>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger className="cursor-pointer">
-              {!isCreatingContainer && <IconDotsVertical />}
-              {isCreatingContainer && <IconLoader className="animate-spin" />}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="right" align="start">
-              <DropdownMenuLabel className="text-sm font-bold">
-                Docker
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {!details.server.container?.Created && (
-                <DropdownMenuItem
-                  // disabled={isCreatingContainer}
-                  onClick={() => {
-                    createServerContainerMutation.mutate();
-                  }}
-                >
-                  <IconUpload /> Create
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem
-                disabled={
-                  !details.server.container?.Created ||
-                  details.server.container?.State === 'running'
-                }
-              >
-                <IconPlayerPlay /> Start
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                disabled={
-                  !details.server.container?.Created ||
-                  details.server.container?.State !== 'running'
-                }
-              >
-                <IconPlayerStop /> Stop
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      }
-    ></PageHeader>
-  );
-}
-
-function ServerMapCard() {
-  const details = useServerDetails();
-  const server = details.server;
-
-  if (server.error) {
+  if (!details.server) {
     return null;
   }
-  return <SectionCards.Item title="map" description={server.map} />;
+
+  return (
+    <PageHeader title={details.server.id}>
+      <SeparatedBy>
+        <ServerContainerStatus />
+        <ServerUptime />
+      </SeparatedBy>
+    </PageHeader>
+  );
 }
 
-function ServerModCard() {
-  const navigate = useNavigate();
+function ServerDetails() {
   const details = useServerDetails();
   const server = details.server;
 
-  const mods = useMemo(() => (!server.error && server.mods) || [], [server]);
+  if (!server || server.error) {
+    return null;
+  }
+  return (
+    <DefinitionData.List>
+      <DefinitionData.Item label="Map">{server.map}</DefinitionData.Item>
+      <DefinitionData.Item label="Max Players">
+        {server.config.maxPlayers}
+      </DefinitionData.Item>
+      <DefinitionData.Item label="Login Queue Size">
+        {server.config.loginQueueConcurrentPlayers}
+      </DefinitionData.Item>
+    </DefinitionData.List>
+  );
+}
+
+function ServerModList() {
+  const details = useServerDetails();
+  const serverId = details.server?.id;
+
+  const installedModsQuery = useGetServerModsQuery({
+    serverId,
+  });
 
   return (
-    <SectionCards.Item
-      title="mods"
-      description={`${mods.length} activated mods`}
-      onClick={() => {
-        navigate({
-          to: '/d/servers/$serverId/mods',
-          params: { serverId: server.id },
-        }).catch(console.error);
-      }}
-      footer={
-        <>
-          {mods.length > 0 && (
-            <SectionCards.TextPrimary icon={IconPackages}>
-              {mods.length} installed mods
-            </SectionCards.TextPrimary>
-          )}
-        </>
-      }
-    />
+    <Container className="flex-col gap-2">
+      <SectionHeading
+        title="Mods"
+        subtitle={`${installedModsQuery.data?.length} activated mods`}
+      >
+        <AddServerModDrawer>
+          <Button variant="outline">Add mods</Button>
+        </AddServerModDrawer>
+      </SectionHeading>
+
+      {!installedModsQuery.isPending && (
+        <PaginatedDataTable
+          columns={[
+            {
+              id: 'name',
+              header: 'Name',
+              cell: ({ row }) => (
+                <div className="flex items-center space-x-2 min-w-96">
+                  <span>{row.original.name}</span>
+                </div>
+              ),
+            },
+            {
+              id: 'identifier',
+              header: 'Identifier',
+              cell: ({ row }) => (
+                <Badge variant="secondary">{row.original.identifier}</Badge>
+              ),
+            },
+          ]}
+          data={installedModsQuery.data || []}
+        />
+      )}
+    </Container>
   );
 }
 
 function AddServerModDrawer({
   isOpen,
   children,
-}: PropsWithChildren<{ isOpen?: boolean }>) {
+}: PropsWithChildren<{
+  isOpen?: boolean;
+}>) {
   return (
     <DrawerController isOpen={isOpen}>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
@@ -250,28 +201,28 @@ function AddServerModDrawer({
 function AddServerModListContainer() {
   const details = useServerDetails();
   const server = details.server;
-  const serverId = server.id;
-
+  const serverId = server?.id;
   const queryClient = useQueryClient();
+  const handleInvalidateQuery = async () => {
+    await queryClient.resetQueries({
+      queryKey: useGetServerModsQuery.createKey({ serverId }),
+    });
+  };
+
   const installedModsQuery = useGetServerModsQuery({ serverId });
   const downloadedModsQuery = useGetDownloadedModsQuery();
 
-  const installModFn = useServerFn(api.mods.installModToServer);
   const installModMutation = useMutation({
-    mutationFn: installModFn,
+    mutationFn: useServerFn(api.mods.installModToServer),
     async onSuccess() {
-      await queryClient.invalidateQueries({
-        queryKey: useGetServerModsQuery.createKey({ serverId }),
-      });
+      await handleInvalidateQuery();
     },
   });
-  const uninstallModFn = useServerFn(api.mods.uninstallModFromServer);
+
   const uninstallModMutation = useMutation({
-    mutationFn: uninstallModFn,
+    mutationFn: useServerFn(api.mods.uninstallModFromServer),
     async onSuccess() {
-      await queryClient.invalidateQueries({
-        queryKey: useGetServerModsQuery.createKey({ serverId }),
-      });
+      await handleInvalidateQuery();
     },
   });
 
@@ -298,6 +249,9 @@ function AddServerModListContainer() {
         uninstallingModId,
         installingModId,
         onInstallClick: (modId: string) => {
+          if (!serverId) {
+            return;
+          }
           installModMutation.mutate({
             data: {
               modId,
@@ -306,6 +260,9 @@ function AddServerModListContainer() {
           });
         },
         onUninstallClick: (modId: string) => {
+          if (!serverId) {
+            return;
+          }
           uninstallModMutation.mutate({
             data: {
               modId,
@@ -314,7 +271,12 @@ function AddServerModListContainer() {
           });
         },
       }),
-    [installModMutation, installingModId],
+    [
+      installModMutation,
+      uninstallModMutation,
+      installingModId,
+      uninstallingModId,
+    ],
   );
 
   if (downloadedModsQuery.isPending) return <FullScreenLoader />;
@@ -394,4 +356,152 @@ function createServerInstallableModColumns({
     },
   ];
   return columns;
+}
+
+function ServerContainerCard() {
+  const details = useServerDetails();
+  const createServerContainerMutation = useCreateServerContainerMutation(
+    details.server,
+  );
+  const startServerContainerMutation = useStartServerContainerMutation(
+    details.server,
+  );
+  const removeServerContainerMutation = useRemoveServerContainerMutation(
+    details.server,
+  );
+  const restartServerContainerMutation = useRestartServerContainerMutation(
+    details.server,
+  );
+  const stopServerContainerMutation = useStopServerContainerMutation(
+    details.server,
+  );
+  const container = details.server?.container;
+
+  return (
+    <Card>
+      {!container && (
+        <CardContent className="items-center justify-center flex flex-grow">
+          <Button
+            variant="outline"
+            onClick={() => {
+              createServerContainerMutation.mutate();
+            }}
+            disabled={createServerContainerMutation.isPending}
+          >
+            <Text>Create Container</Text>
+            {createServerContainerMutation.isPending && (
+              <IconLoader className="animate-spin" />
+            )}
+          </Button>
+        </CardContent>
+      )}
+      {!!container && (
+        <CardContent className="flex flex-col gap-2 flex-grow">
+          <ServerContainerStatus />
+          <div className="items-center justify-center flex flex-col gap-2 flex-grow">
+            <AsyncButton
+              variant="outline"
+              loading={startServerContainerMutation.isPending}
+              onClick={() => {
+                startServerContainerMutation.mutate();
+              }}
+            >
+              Start Container
+            </AsyncButton>
+            <AsyncButton
+              variant="outline"
+              loading={stopServerContainerMutation.isPending}
+              onClick={() => {
+                stopServerContainerMutation.mutate();
+              }}
+            >
+              Stop Container
+            </AsyncButton>
+            <AsyncButton
+              variant="outline"
+              loading={restartServerContainerMutation.isPending}
+              onClick={() => {
+                restartServerContainerMutation.mutate();
+              }}
+            >
+              Restart Container
+            </AsyncButton>
+            <AsyncButton
+              variant="destructive"
+              loading={removeServerContainerMutation.isPending}
+              onClick={() => {
+                removeServerContainerMutation.mutate();
+              }}
+            >
+              Remove Container
+            </AsyncButton>
+          </div>
+        </CardContent>
+      )}
+    </Card>
+  );
+}
+
+function ServerContainerStatus() {
+  const details = useServerDetails();
+
+  if (details.isLoading || !details.server?.container) {
+    return;
+  }
+
+  const state = details.server.container.State;
+
+  if (state.Running) {
+    return (
+      <Badge variant="outline">
+        <IconShip />
+        Running
+      </Badge>
+    );
+  }
+
+  if (state.Restarting) {
+    return (
+      <Badge variant="outline">
+        <IconReload />
+        Restarting
+      </Badge>
+    );
+  }
+
+  if (state.Status === 'created') {
+    return (
+      <Badge variant="outline">
+        <IconBusStop />
+        Stopped
+      </Badge>
+    );
+  }
+
+  return <Badge variant="cautious">{state.Status}</Badge>;
+}
+
+function ServerUptime() {
+  const details = useServerDetails();
+  if (!details.server?.container) {
+    return null;
+  }
+
+  if (details.server?.container.State.Dead) {
+    return (
+      <Badge>
+        <Text>Created: {details.server.container?.Created}</Text>
+      </Badge>
+    );
+  }
+
+  if (details.server?.container.State.Running) {
+    return (
+      <Badge>
+        <Text>Created: {details.server.container?.Created}</Text>
+      </Badge>
+    );
+  }
+
+  return null;
 }

@@ -1,8 +1,1 @@
 type: library
-tags:
-  - typescript
-  
-tasks:
-  build:
-    outputs:
-      - 'lib'

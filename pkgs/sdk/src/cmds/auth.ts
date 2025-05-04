@@ -32,3 +32,10 @@ export const login = async ({
 
   return username;
 };
+
+export const logout = async () => {
+  Config.set('steamUsername', '');
+  Config.save();
+
+  return Promise.resolve();
+};

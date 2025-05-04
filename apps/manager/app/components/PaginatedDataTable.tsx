@@ -130,8 +130,8 @@ export function PaginatedDataTable<T extends { id: string }>({
   const RowElement = isDraggable ? DraggableDataTableRow : DataTableRow;
 
   return (
-    <div className="w-full flex-col justify-start gap-6">
-      <div className="overflow-hidden rounded-lg border">
+    <div className="w-full flex flex-col justify-start gap-6">
+      <div className="overflow-hidden rounded-lg border ">
         <DndContext
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}

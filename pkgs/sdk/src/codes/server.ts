@@ -1,14 +1,13 @@
-export enum ResponseCodes {
-  ServerBaseFilesUpdateSuccess = 'ServerBaseFilesUpdateSuccess',
+export enum Codes {
   LoginFailed = 'LoginFailed',
   ServerBaseFilesUpdateError = 'ServerBaseFilesUpdateError',
-  ServerListSuccess = 'ServerListSuccess',
   ServerListError = 'ServerListError',
-  CreateServerSuccess = 'CreateServerSuccess',
   CreateServerError = 'CreateServerError',
-  CreateServerContainerSuccess = 'CreateServerContainerSuccess',
+  ServerContainerNotFoundError = 'ServerContainerNotFoundError',
   CreateServerContainerError = 'CreateServerContainerError',
-  StartServerContainerSuccess = 'StartServerContainerSuccess',
   StartServerContainerError = 'StartServerContainerError',
+  RemoveServerContainerError = 'RemoveServerContainerError',
+  StopServerContainerError = 'StopServerContainerError',
+  RestartServerContainerError = 'RestartServerContainerError',
   StartServerContainerNotRunningError = 'StartServerContainerNotRunningError',
 }

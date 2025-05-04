@@ -1,23 +1,24 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { Effect, useStore } from '@tanstack/react-store';
 import { useEffect } from 'react';
 
 import { AuthStore } from ':core/store/AuthStore';
+import { isErrorResponse } from ':types/response';
 
 import * as api from '../../../core/api';
 
-import { isErrorResponse } from ':types/response';
-
 export function useLoginApi() {
-  const authenticatedUserFn = useServerFn(api.steam.getAuthenticatedUser);
-  const loginFn = useServerFn(api.steam.login);
+  const queryClient = useQueryClient();
+  const authenticatedUserFn = useServerFn(api.auth.getAuthenticatedUser);
+  const loginFn = useServerFn(api.auth.login);
+  const logoutFn = useServerFn(api.auth.logout);
 
+  const isAuthenticated = useStore(AuthStore, (state) => state.isAuthenticated);
   const username = useStore(
     AuthStore,
     (state) => state.isAuthenticated && state.username,
   );
-  const isAuthenticated = useStore(AuthStore, (state) => state.isAuthenticated);
 
   const userQuery = useQuery({
     queryFn: () => authenticatedUserFn(),
@@ -35,9 +36,38 @@ export function useLoginApi() {
     },
   });
 
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      return await logoutFn();
+    },
+    async onSuccess(data) {
+      if (isErrorResponse(data)) {
+        throw new Error(data.errorCode);
+      }
+      AuthStore.setState((state) => ({
+        ...state,
+        username: undefined,
+        isAuthenticated: false,
+      }));
+      await queryClient.invalidateQueries({
+        queryKey: ['authenticated-user'],
+      });
+    },
+    async onError() {
+      AuthStore.setState((state) => ({
+        ...state,
+        username: undefined,
+        isAuthenticated: false,
+      }));
+      await queryClient.invalidateQueries({
+        queryKey: ['authenticated-user'],
+      });
+    },
+  });
+
   const loginMutation = useMutation({
     mutationFn: loginFn,
-    onSuccess(data) {
+    async onSuccess(data) {
       if (isErrorResponse(data)) {
         throw new Error(data.errorCode);
       }
@@ -46,13 +76,19 @@ export function useLoginApi() {
         username: data.data.username,
         isAuthenticated: true,
       }));
+      await queryClient.invalidateQueries({
+        queryKey: ['authenticated-user'],
+      });
     },
-    onError() {
+    async onError() {
       AuthStore.setState((state) => ({
         ...state,
         username: undefined,
         isAuthenticated: false,
       }));
+      await queryClient.invalidateQueries({
+        queryKey: ['authenticated-user'],
+      });
     },
   });
 
@@ -77,5 +113,6 @@ export function useLoginApi() {
     isAuthenticated,
     userQuery,
     loginMutation,
+    logoutMutation,
   };
 }

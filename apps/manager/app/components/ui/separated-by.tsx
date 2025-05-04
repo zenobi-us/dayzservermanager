@@ -11,12 +11,18 @@ export function SeparatedBy({
   const total = React.Children.count(children);
   return (
     <div className={cn('flex items-center gap-x-2', className)} {...props}>
-      {React.Children.map(children, (child, index) => (
-        <Fragment>
-          {child}
-          {(index < total && by) || null}
-        </Fragment>
-      ))}
+      {React.Children.map(children, (child, index) => {
+        if (!child) {
+          return null;
+        }
+
+        return (
+          <Fragment>
+            {child}
+            {(total > 1 && index < total - 1 && by) || null}
+          </Fragment>
+        );
+      })}
     </div>
   );
 }

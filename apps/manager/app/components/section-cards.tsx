@@ -1,7 +1,5 @@
 import { IconChevronCompactRight } from '@tabler/icons-react';
 
-import { cn } from '../lib/utils/cn';
-
 import { Badge } from ':components/ui/badge';
 import {
   Card,
@@ -11,6 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from ':components/ui/card';
+
+import { cn } from '../lib/utils/cn';
 
 import { PageSectionGrid } from './page-section-grid';
 

@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { ModItemListSchema } from './modsSchema';
 
-import type { ContainerInfo } from 'dockerode';
+import type { ContainerInspectInfo } from 'dockerode';
 
 const ServerConfigBooleanEnum = z.union([
   z.literal(0),
@@ -58,6 +58,13 @@ export type CreateServerContainerPayload = z.infer<
   typeof CreateServerContainerPayloadSchema
 >;
 
+export const RemoveServerContainerPayloadSchema = z.object({
+  serverId: z.string(),
+});
+export type RemoveServerContainerPayload = z.infer<
+  typeof RemoveServerContainerPayloadSchema
+>;
+
 export type CreateServerPayload = z.infer<typeof CreateServerPayloadSchema>;
 
 export const ServerBaseSchema = z.object({
@@ -70,9 +77,7 @@ export type ServerBase = z.infer<typeof ServerBaseSchema>;
 export const ServerWithDetailsSchema = z.object({
   map: z.string(),
   mods: ModItemListSchema,
-  config: z.object({
-    // Add your ServerConfig schema here if you have one defined
-  }),
+  config: ServerConfigSchema,
   error: z.null(),
 });
 
@@ -109,7 +114,7 @@ export const ServerSchema = ServerBaseSchema.and(
   ]),
 );
 export type Server = z.infer<typeof ServerSchema> & {
-  container?: ContainerInfo;
+  container?: ContainerInspectInfo;
 };
 
 export enum ServerExistanceStatus {

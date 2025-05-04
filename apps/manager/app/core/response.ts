@@ -1,17 +1,17 @@
-import { ErrorResponse, SuccessResponse } from '../types/response';
+import type { ErrorResponse, SuccessResponse } from '../types/response';
 
 enum GenericResponseCodes {
   Success = 'Success',
   Error = 'Error',
 }
 
-export function createResponseBody<
-  T = {},
-  C extends string = GenericResponseCodes.Success,
->({ data, code }: { data?: T; code?: C }): SuccessResponse<T, C> {
+export function createResponseBody<T = {}>({
+  data,
+}: {
+  data?: T;
+}): SuccessResponse<T> {
   return {
     data: data || ({} as T),
-    successCode: code || (GenericResponseCodes.Success as C),
   };
 }
 

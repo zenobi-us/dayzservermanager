@@ -7,7 +7,9 @@ export function Container({
   className,
 }: PropsWithChildren<ComponentProps<'div'>>) {
   return (
-    <div className={cn('mx-auto w-full max-w-7xl sm:px-6 lg:px-8', className)}>
+    <div
+      className={cn('flex mx-auto w-full max-w-7xl sm:px-6 lg:px-8', className)}
+    >
       {children}
     </div>
   );

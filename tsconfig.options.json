@@ -1,4 +1,5 @@
 {
+  "extends": "tsconfig-moon/tsconfig.projects.json",
     "compilerOptions": {
         "jsx": "react-jsx",
         "moduleResolution": "Bundler",

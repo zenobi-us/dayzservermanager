@@ -435,7 +435,9 @@ const createSearchUrl = ({
   const key = Config.get('STEAM_APIKEY');
 
   if (!key) {
-    throw new Error('Missing STEAM_APIKEY');
+    throw new Error(
+      'Missing STEAM_APIKEY. Get yours from https://steamcommunity.com/dev/apikey',
+    );
   }
 
   const url = new URL(

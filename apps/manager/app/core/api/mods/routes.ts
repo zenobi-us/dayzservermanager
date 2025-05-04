@@ -1,4 +1,5 @@
 import sdk from '@dayzserver/sdk';
+import * as codes from '@dayzserver/sdk/codes';
 import {
   PublishedFileServiceQueryFilesRequestParamsSchema,
   DownloadModParametersSchema,
@@ -18,8 +19,6 @@ import {
   errorResponseBodyError,
 } from '../../response';
 
-import { ResponseCodes } from './codes';
-
 /**
  * Create a list of mods
  */
@@ -28,13 +27,12 @@ export const getModList = createServerFn({ method: 'GET' }).handler(
     try {
       const output = await sdk.mods.listAllMods();
       const body = createResponseBody({
-        code: ResponseCodes.ModListSuccess,
         data: { mods: output },
       });
       return body;
     } catch (error) {
       const body = createErrorResponseBody({
-        code: ResponseCodes.ModListError,
+        code: codes.mods.ModListError,
         data: null,
         error: errorResponseBodyError(error),
       });
@@ -56,13 +54,12 @@ export const getServerModList = createServerFn({
     try {
       const output = await sdk.mods.listServerMods({ serverId });
       const body = createResponseBody({
-        code: ResponseCodes.ServerModListSuccess,
         data: { mods: output },
       });
       return body;
     } catch (error) {
       const body = createErrorResponseBody({
-        code: ResponseCodes.ModListError,
+        code: codes.mods.ModListError,
         error: errorResponseBodyError(error),
       });
       return body;
@@ -80,26 +77,25 @@ export const getModDetails = createServerFn({ method: 'GET' })
       const modDetails = await sdk.mods.getMod({ modId });
 
       if (!modDetails) {
-        throw new Error(ResponseCodes.ModNotFoundError);
+        throw new Error(codes.mods.ModNotFoundError);
       }
 
       const body = createResponseBody({
         data: modDetails,
-        code: ResponseCodes.ModDetailSuccess,
       });
 
       return body;
     } catch (error) {
-      if (error === ResponseCodes.ModFileNotFound) {
+      if (error === codes.mods.ModFileNotFound) {
         const body = createErrorResponseBody({
-          code: ResponseCodes.ModNotFoundError,
+          code: codes.mods.ModNotFoundError,
         });
         setResponseStatus(404);
         return body;
       }
 
       const body = createErrorResponseBody({
-        code: ResponseCodes.ModDetailError,
+        code: codes.mods.ModDetailError,
         error: errorResponseBodyError(error),
       });
       setResponseStatus(500);
@@ -117,24 +113,24 @@ export const getModFileDetails = createServerFn({ method: 'GET' })
     try {
       const contents = await sdk.mods.getModFile({ modId, file });
       if (!contents) {
-        throw new Error(ResponseCodes.ModFileNotFound);
+        throw new Error(codes.mods.ModFileNotFound);
       }
-      const body = createResponseBody({
-        code: ResponseCodes.ModFileFound,
+      const body = createErrorResponseBody({
+        code: codes.mods.ModFileFound,
         data: contents || '',
       });
       return body;
     } catch (error) {
-      if (error === ResponseCodes.ModFileNotFound) {
+      if (error === codes.mods.ModFileNotFound) {
         const body = createErrorResponseBody({
-          code: ResponseCodes.ModFileNotFound,
+          code: codes.mods.ModFileNotFound,
         });
         setResponseStatus(404);
         return body;
       }
 
       const body = createErrorResponseBody({
-        code: ResponseCodes.ModFileContentsError,
+        code: codes.mods.ModFileContentsError,
       });
 
       setResponseStatus(500);
@@ -154,12 +150,11 @@ export const downloadMod = createServerFn({ method: 'POST' })
       await sdk.mods.downloadMod({ modId });
       const body = createResponseBody({
         data: `Mod ${modId} installed successfully`,
-        code: ResponseCodes.ModDownloadSuccess,
       });
       return body;
     } catch (err) {
       const body = createErrorResponseBody({
-        code: ResponseCodes.ModInstallError,
+        code: codes.mods.ModInstallError,
         error: err as Error,
       });
       return body;
@@ -175,7 +170,6 @@ export const removeMod = createServerFn({ method: 'POST' })
     const { modId } = context.data;
 
     const body = createResponseBody({
-      code: ResponseCodes.ModRemovedSuccess,
       data: `Mod ${modId} removed successfully`,
     });
 
@@ -191,7 +185,6 @@ export const updateMod = createServerFn({ method: 'POST' })
     const { modId } = context.data;
 
     const body = createResponseBody({
-      code: ResponseCodes.ModUpdateSuccess,
       data: `Mod ${modId} updated successfully`,
     });
 
@@ -211,12 +204,11 @@ export const installModToServer = createServerFn({
       await sdk.mods.installModToServer({ serverId, modId });
       const body = createResponseBody({
         data: `Mod ${modId} installed to Server ${serverId} successfully`,
-        code: ResponseCodes.ModInstallSuccess,
       });
       return body;
     } catch (err) {
       const body = createErrorResponseBody({
-        code: ResponseCodes.ModInstallError,
+        code: codes.mods.ModInstallError,
         error: err as Error,
       });
       return body;
@@ -236,12 +228,11 @@ export const uninstallModFromServer = createServerFn({
       await sdk.mods.uninstallModFromServer({ serverId, modId });
       const body = createResponseBody({
         data: `Mod ${modId} uninstalled from Server ${serverId} successfully`,
-        code: ResponseCodes.ModUninstallSuccess,
       });
       return body;
     } catch (err) {
       const body = createErrorResponseBody({
-        code: ResponseCodes.ModUninstallError,
+        code: codes.mods.ModUninstallError,
         error: err as Error,
       });
       return body;
@@ -257,21 +248,19 @@ export const searchWorkshop = createServerFn({ method: 'POST' })
     try {
       const results = await sdk.mods.apiSearch(context.data);
       const body = createResponseBody({
-        code: ResponseCodes.SearchQuerySuccess,
         data: results,
       });
 
       return body;
     } catch (error) {
-      const body = createErrorResponseBody<
-        string,
-        ResponseCodes.SearchQueryError
-      >({
-        code: ResponseCodes.SearchQueryError,
-        error:
-          errorResponseBodyError(error) ??
-          `Error searching for ${context.data.search_text}`,
-      });
+      const body = createErrorResponseBody<string, codes.mods.SearchQueryError>(
+        {
+          code: codes.mods.SearchQueryError,
+          error:
+            errorResponseBodyError(error) ??
+            `Error searching for ${context.data.search_text}`,
+        },
+      );
 
       setResponseStatus(500);
       return body;

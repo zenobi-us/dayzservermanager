@@ -1,19 +1,19 @@
 # yaml-language-server: $schema=../cache/schemas/tasks.json
 
-tasks:
-  build:
-    command:
-      - 'packemon'
-      - 'pack'
-      - '--addEngines'
-      - '--addExports'
-      - '--declaration'
-      - --formats
-      - --debug
-    inputs:
-      - '@globs(sources)'
-      - 'package.json'
-      - 'tsconfig.*.json'
+# tasks:
+#   build:
+#     command:
+#       - 'packemon'
+#       - 'pack'
+#       - '--addEngines'
+#       - '--addExports'
+#       - '--declaration'
+#       - --formats
+#       - --debug
+#     inputs:
+#       - '@globs(sources)'
+#       - 'package.json'
+#       - 'tsconfig.*.json'
 
-    outputs:
-      - 'lib'
+#     outputs:
+#       - 'lib'

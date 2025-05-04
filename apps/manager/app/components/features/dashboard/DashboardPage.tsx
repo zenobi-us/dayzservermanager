@@ -1,6 +1,8 @@
-import { useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 
-import { SectionCards } from ':components/section-cards';
+import { Container } from ':components/container';
+import { Page } from ':components/page';
+import { Text } from ':components/text';
 
 import type { ModItemList, Server } from '@dayzserver/sdk/schema';
 
@@ -12,46 +14,39 @@ export function DashboardPage({
   mods?: ModItemList;
 }) {
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="@container/main flex flex-1 flex-col gap-2">
-        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-          <SectionCards>
-            <ServerCard servers={servers} />
-            <SteamModCard mods={mods} />
-          </SectionCards>
-        </div>
-      </div>
-    </div>
+    <Page className="items-center flex-grow justify-center">
+      <Container className="flex-col items-center gap-4">
+        <SteamModCard mods={mods} />
+      </Container>
+      <Container className="flex-col items-center gap-4">
+        <ServerCard servers={servers} />
+      </Container>
+    </Page>
   );
 }
 
 function SteamModCard({ mods }: { mods: ModItemList }) {
-  const navigate = useNavigate();
-
   return (
-    <SectionCards.Item
-      title="mods"
-      description={`${mods.length} activated mods`}
-      onClick={() => {
-        navigate({
-          to: '/d/mods',
-        }).catch(console.error);
-      }}
-    />
+    <Link to="/d/mods">
+      <Text
+        title={`${mods.length} activated mods`}
+        className="text-6xl text-secondary-foreground"
+      >
+        {mods.length} Mods
+      </Text>
+    </Link>
   );
 }
 
 function ServerCard({ servers }: { servers: Server[] }) {
-  const navigate = useNavigate();
   return (
-    <SectionCards.Item
-      title="servers"
-      description={`${servers.length} servers`}
-      onClick={() => {
-        navigate({
-          to: '/d/servers',
-        }).catch(console.error);
-      }}
-    />
+    <Link to="/d/servers">
+      <Text
+        title={`${servers.length} servers`}
+        className="text-6xl text-secondary-foreground"
+      >
+        {servers.length} Servers
+      </Text>
+    </Link>
   );
 }

@@ -23,6 +23,9 @@ export function UserContainer() {
         name: loginApi.username,
         email: '',
       }}
+      onLogoutClick={() => {
+        loginApi.logoutMutation.mutate();
+      }}
     />
   );
 }

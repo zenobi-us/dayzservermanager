@@ -11,10 +11,10 @@ import { cn } from ':lib/utils';
 import { LoginFormFields } from './LoginFormFields';
 import { LoginFormProvider } from './LoginFormProvider';
 
-import type { LoginFormData } from './LoginFormData';
+import type { LoginFormData } from './LoginFormSchema';
 import type { PropsWithChildren } from 'react';
 
-export function LoginDrawer({
+export function LoginFormDrawer({
   onSubmit,
   children,
 }: PropsWithChildren<{

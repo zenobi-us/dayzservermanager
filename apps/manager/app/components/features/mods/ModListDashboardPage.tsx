@@ -1,8 +1,8 @@
-import { PaginatedDataTable } from '../../PaginatedDataTable';
-
 import { Page } from ':components/page';
 import { PageHeader } from ':components/page-header';
 import { PageSection } from ':components/page-section';
+
+import { PaginatedDataTable } from '../../PaginatedDataTable';
 
 import { modListTableColumns } from './ModListTableColumns';
 import { ModSearchDrawerContainer } from './ModSearchDrawer';

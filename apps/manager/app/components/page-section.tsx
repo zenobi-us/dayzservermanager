@@ -8,7 +8,7 @@ export function PageSection({
   ...props
 }: PropsWithChildren<ComponentProps<'div'>>) {
   return (
-    <div className={cn('flex-col gap-4 px-4 lg:px-6', className)} {...props}>
+    <div className={cn('flex-col gap-4', className)} {...props}>
       {children}
     </div>
   );

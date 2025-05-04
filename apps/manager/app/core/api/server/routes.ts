@@ -1,8 +1,10 @@
 import sdk from '@dayzserver/sdk';
+import * as codes from '@dayzserver/sdk/codes';
 import {
   CreateServerContainerPayloadSchema,
   CreateServerPayloadSchema,
   GetServerDetailParamsSchema,
+  RemoveServerContainerPayloadSchema,
 } from '@dayzserver/sdk/schema';
 import { createServerFn } from '@tanstack/react-start';
 import { setResponseStatus } from '@tanstack/react-start/server';
@@ -13,8 +15,6 @@ import {
   errorResponseBodyError,
 } from '../../response';
 
-import { ResponseCodes } from './codes';
-
 /**
  * Create a list of mods
  */
@@ -24,7 +24,7 @@ export const updateServerBaseFiles = createServerFn({ method: 'POST' }).handler(
       await sdk.auth.useCachedLogin();
     } catch (error) {
       const body = createErrorResponseBody({
-        code: ResponseCodes.LoginFailed,
+        code: codes.auth.LoginFailed,
         error: errorResponseBodyError(error),
       });
 
@@ -33,9 +33,7 @@ export const updateServerBaseFiles = createServerFn({ method: 'POST' }).handler(
       return body;
     }
 
-    const body = createResponseBody({
-      code: ResponseCodes.ServerBaseFilesUpdateSuccess,
-    });
+    const body = createResponseBody({});
 
     return body;
   },
@@ -50,12 +48,11 @@ export const getAllServers = createServerFn({ method: 'GET' }).handler(
       const servers = await sdk.server.getServerList();
       const body = createResponseBody({
         data: { servers },
-        code: ResponseCodes.ServerListSuccess,
       });
       return body;
     } catch (error) {
       const body = createErrorResponseBody({
-        code: ResponseCodes.ServerListError,
+        code: codes.server.ServerListError,
         error: error instanceof Error ? error : undefined,
       });
       setResponseStatus(500);
@@ -77,12 +74,11 @@ export const getServerDetail = createServerFn({ method: 'GET' })
       });
       const body = createResponseBody({
         data: { server },
-        code: ResponseCodes.ServerListSuccess,
       });
       return body;
     } catch (error) {
       const body = createErrorResponseBody({
-        code: ResponseCodes.ServerListError,
+        code: codes.server.ServerListError,
         error: error instanceof Error ? error : undefined,
       });
       setResponseStatus(500);
@@ -101,11 +97,10 @@ export const createServer = createServerFn({ method: 'POST' })
       const server = await sdk.server.createServer(data);
       return createResponseBody({
         data: { server },
-        code: ResponseCodes.CreateServerSuccess,
       });
     } catch (error) {
       return createErrorResponseBody({
-        code: ResponseCodes.CreateServerError,
+        code: codes.server.CreateServerError,
         error: errorResponseBodyError(error),
       });
     }
@@ -119,20 +114,18 @@ export const createServerContainer = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     try {
       const container = await sdk.server.createServerContainer(data);
-      if (!container) { 
-        throw new Error()
+      if (!container) {
+        throw new Error();
       }
 
       return createResponseBody({
         data: {
           containerId: container.id,
         },
-        code: ResponseCodes.CreateServerContainerSuccess,
       });
-
     } catch (error) {
       return createErrorResponseBody({
-        code: ResponseCodes.CreateServerContainerError,
+        code: codes.server.CreateServerContainerError,
         error: errorResponseBodyError(error),
       });
     }
@@ -145,25 +138,83 @@ export const startServerContainer = createServerFn({ method: 'POST' })
   .validator(CreateServerContainerPayloadSchema)
   .handler(async ({ data }) => {
     try {
-      const container = await sdk.server.startServerContainer(data);
-
-      if (container?.Status === 'running') { 
-        throw new Error()
-      }
+      await sdk.server.startServerContainer(data);
+      const containerInfo = await sdk.server.getServerContainerInfo(data);
 
       return createResponseBody({
         data: {
-          containerId: container.id,
+          containerId: containerInfo.Id,
         },
-        code: ResponseCodes.CreateServerContainerSuccess,
       });
-      
     } catch (error) {
       return createErrorResponseBody({
-        code: ResponseCodes.CreateServerContainerError,
+        code: codes.server.CreateServerContainerError,
         error: errorResponseBodyError(error),
       });
     }
   });
 
+/**
+ * Stop Server Container
+ */
 
+export const stopServerContainer = createServerFn({ method: 'POST' })
+  .validator(CreateServerContainerPayloadSchema)
+  .handler(async ({ data }) => {
+    try {
+      await sdk.server.stopServerContainer(data);
+      const containerInfo = await sdk.server.getServerContainerInfo(data);
+
+      return createResponseBody({
+        data: {
+          containerId: containerInfo.Id,
+        },
+      });
+    } catch (error) {
+      return createErrorResponseBody({
+        code: codes.server.StopServerContainerError,
+        error: errorResponseBodyError(error),
+      });
+    }
+  });
+
+/**
+ * Restart Server Container
+ */
+
+export const restartServerContainer = createServerFn({ method: 'POST' })
+  .validator(CreateServerContainerPayloadSchema)
+  .handler(async ({ data }) => {
+    try {
+      await sdk.server.restartServerContainer(data);
+      const containerInfo = await sdk.server.getServerContainerInfo(data);
+
+      return createResponseBody({
+        data: {
+          containerId: containerInfo.Id,
+        },
+      });
+    } catch (error) {
+      return createErrorResponseBody({
+        code: codes.server.RestartServerContainerError,
+        error: errorResponseBodyError(error),
+      });
+    }
+  });
+
+/**
+ * Remove a container
+ */
+export const removeServerContainer = createServerFn({ method: 'POST' })
+  .validator(RemoveServerContainerPayloadSchema)
+  .handler(async ({ data }) => {
+    try {
+      await sdk.server.removeServerContainer(data);
+      return createResponseBody({});
+    } catch (error) {
+      return createErrorResponseBody({
+        code: codes.server.CreateServerContainerError,
+        error: errorResponseBodyError(error),
+      });
+    }
+  });

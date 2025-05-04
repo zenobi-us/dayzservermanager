@@ -12,8 +12,10 @@ export function PageSectionGrid({
   return (
     <PageSection
       className={cn(
-        'grid gap-4 px-4 lg:px-6',
+        'flex-grow',
+        'grid gap-4',
         'grid-rows-[200px_minmax(200px,1fr)_100px]',
+        'grid-cols-2',
         '@xl/main:grid-cols-2',
         '@5xl/main:grid-cols-4',
         className,

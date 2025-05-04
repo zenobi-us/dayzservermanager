@@ -3,7 +3,7 @@ import { Form } from ':components/ui/form';
 import { LoginFormContext } from './LoginFormContext';
 import { useLoginForm } from './useLoginForm';
 
-import type { LoginFormData } from './LoginFormData';
+import type { LoginFormData } from './LoginFormSchema';
 import type { PropsWithChildren } from 'react';
 
 export function LoginFormProvider({
@@ -14,17 +14,17 @@ export function LoginFormProvider({
   const handleSubmit = form.handleSubmit(onSubmit);
 
   return (
-    <Form {...form}>
-      {}
-      <form
-        onSubmit={(event) => {
-          handleSubmit(event);
-        }}
-      >
-        <LoginFormContext.Provider value={form}>
+    <LoginFormContext.Provider value={form}>
+      <Form {...form}>
+        {}
+        <form
+          onSubmit={(event) => {
+            handleSubmit(event);
+          }}
+        >
           {children}
-        </LoginFormContext.Provider>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </LoginFormContext.Provider>
   );
 }

@@ -13,7 +13,7 @@ export function ScreenLayout({ children }: PropsWithChildren) {
 ScreenLayout.Body = ScreenLayoutBody;
 function ScreenLayoutBody({ children }: PropsWithChildren) {
   return (
-    <body className="flex flex-col flex-grow min-h-full w-full p-4">
+    <body className="flex flex-col flex-grow min-h-full w-full">
       {children}
     </body>
   );

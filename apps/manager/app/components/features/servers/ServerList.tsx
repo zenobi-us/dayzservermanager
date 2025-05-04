@@ -16,7 +16,7 @@ const FilteringServerList = createFiltering<Server>({
 export function ServerList({ servers }: { servers: Server[] }) {
   return (
     <FilteringServerList.Provider items={servers}>
-      <Container>
+      <Container className="flex-col">
         <FilteringServerList.FilterInput />
         <FilteringServerList.List
           listElement={ItemList}
@@ -46,7 +46,7 @@ function ServerListItem({ item }: { item: Server }) {
         <>
           {item.container && (
             <Badge variant="outline" className="text-green-800">
-              {item.container?.Status}
+              {item.container?.State.Status}
             </Badge>
           )}
         </>
