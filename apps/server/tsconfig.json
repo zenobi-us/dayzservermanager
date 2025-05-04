@@ -1,7 +1,8 @@
 {
-    "compilerOptions": {
-        "strict": true,
-        "forceConsistentCasingInFileNames": true,
-        "composite": true
-    }
+  "compilerOptions": {
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "composite": true,
+    "outDir": "../../.moon/cache/types/apps/server"
+  }
 }

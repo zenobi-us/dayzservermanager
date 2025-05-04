@@ -1,29 +1,30 @@
 {
-	"compilerOptions": {
-		"moduleResolution": "node",
-		"module": "CommonJS",
-		"target": "ES2022",
-		"allowSyntheticDefaultImports": true,
-		"forceConsistentCasingInFileNames": true,
-		"strict": true,
-		"skipLibCheck": true,
-		"strictNullChecks": true,
-		"esModuleInterop": true,
-		"composite": true
-	},
-	"include": [
-		"src/*.ts",
-	],
-	"ts-node": {
-		// It is faster to skip typechecking.
-		// Remove if you want ts-node to do typechecking.
-		"transpileOnly": true,
-		"files": true,
-		"compilerOptions": {
-				"module": "CommonJS"
-			// compilerOptions specified here will override those declared below,
-			// but *only* in ts-node.  Useful if you want ts-node and tsc to use
-			// different options with a single tsconfig.json.
-		}
-	},
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "target": "ES2022",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "composite": true,
+    "outDir": "../../.moon/cache/types/pkgs/cli"
+  },
+  "include": [
+    "src/*.ts"
+  ],
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true,
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  },
+  "references": [
+    {
+      "path": "../sdk"
+    }
+  ]
 }

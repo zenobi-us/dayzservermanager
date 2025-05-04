@@ -1,17 +1,17 @@
 tasks:
-  # build:
-  #   command:
-  #     - 'packemon'
-  #     - 'pack'
-  #     - '--addEngines'
-  #     - '--addExports'
-  #     - '--declaration'
-  #     - --formats
-  #     - --debug
-  #   inputs:
-  #     - '@globs(sources)'
-  #     - 'package.json'
-  #     - 'tsconfig.*.json'
+  build:
+    command:
+      - 'packemon'
+      - 'pack'
+      - '--addEngines'
+      - '--addExports'
+      - '--declaration'
+      - --formats
+      - --debug
+    inputs:
+      - '@globs(sources)'
+      - 'package.json'
+      - 'tsconfig.*.json'
 
-  #   outputs:
-  #     - 'lib'
+    outputs:
+      - 'lib'

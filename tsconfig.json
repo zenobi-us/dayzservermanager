@@ -6,6 +6,9 @@
       "path": "apps/manager"
     },
     {
+      "path": "apps/server"
+    },
+    {
       "path": "pkgs/cli"
     },
     {

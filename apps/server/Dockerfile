@@ -19,13 +19,13 @@ RUN mise install
 RUN mise run setup
 
 COPY ./apps/manager/ ./apps/manager/
-COPY ./pkgs/sdk/ ./pkgs/sdk/
-COPY ./.mise ./.mise
+COPY ./pkgs/ ./pkgs/
+COPY ./.mise/ ./.mise/
 
 RUN mise run core:tasks
 RUN mise run server:build
 
-RUN mkdir -p /store/steam /serverfiles/{mpmissions, mods, profiles}
+RUN mkdir -p /store/steam /serverfiles/{mpmissions,mods,profiles}
 
 ENV MODE=server
 

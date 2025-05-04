@@ -28,8 +28,8 @@ RUN mise install
 RUN mise run setup
 
 COPY ./apps/manager/ ./apps/manager/
-COPY ./pkgs/sdk/ ./pkgs/sdk/
-COPY ./.mise ./.mise
+COPY ./pkgs/ ./pkgs/
+COPY ./.mise/ ./.mise/
 
 RUN mise run core:tasks
 RUN mise run manager:build

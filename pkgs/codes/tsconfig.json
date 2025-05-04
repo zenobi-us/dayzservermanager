@@ -11,9 +11,6 @@
     "esModuleInterop": true,
     "composite": true,
     "outDir": "../../.moon/cache/types/pkgs/codes",
-    "paths": {
-      "@dayzserver/sdk": [ "../codes/src/index.ts"]
-    }
   },
   "include": [
     "src/**/*.ts"
@@ -24,5 +21,10 @@
     "compilerOptions": {
       "module": "CommonJS"
     }
-  }
+  },
+  "references": [
+    {
+      "path": "../sdk"
+    }
+  ]
 }
